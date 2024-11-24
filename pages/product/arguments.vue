@@ -3,11 +3,11 @@
 		<el-col>
 			<product-selector></product-selector>
 			<el-tabs v-model="activeName">
-				<el-tab-pane label="参数录入" name="first">
+				<el-tab-pane label="参数管理" name="first">
 					<product-arg-table></product-arg-table>
 				</el-tab-pane>
-				<el-tab-pane label="渲染设置" name="second"></el-tab-pane>
-				<el-tab-pane label="效果预览" name="third"></el-tab-pane>
+				<el-tab-pane label="表单设计" name="second"></el-tab-pane>
+				<el-tab-pane label="规格书预览" name="third"></el-tab-pane>
 			</el-tabs>
 		</el-col>
 	</div>
