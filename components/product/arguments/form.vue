@@ -1,107 +1,72 @@
 <template>
-	<div class="custom-tree-container">
-		<el-tree style="max-width: 600px" :data="dataSource" show-checkbox node-key="id" default-expand-all
-			:expand-on-click-node="false">
-			<template #default="{ node, data }">
-				<span class="custom-tree-node">
-					<span>{{ node.label }}</span>
-					<span>
-						<a @click="append(data)"> Append </a>
-						<a style="margin-left: 8px" @click="remove(node, data)"> Delete </a>
-					</span>
-				</span>
+	<el-form :inline="true" label-width="auto">
+		<div>模块名</div>
+		<el-tree :data="argumentExample" node-key="id" default-expand-all :props="{ class: (data) => data.type }"
+			expand-on-click-node draggable>
+			<template #default="{ data, node }">
+				<el-form-item :label="data.name" :label-position="node.parent.data.type === 'struct' ? 'top' : 'left'">
+					<el-input size="small" v-if="data.type === 'string'" />
+					<el-input size="small" v-if="data.type === 'number'" />
+					<el-row v-if="data.type === 'pair'">
+						<el-col :span="5">
+							<el-input size="small" />
+						</el-col>
+						<span>&nbsp; ~ &nbsp;</span>
+						<el-col :span="5">
+							<el-input size="small" />
+						</el-col>
+					</el-row>
+				</el-form-item>
 			</template>
 		</el-tree>
-	</div>
+		<el-button type="primary">保存</el-button>
+	</el-form>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import type Node from 'element-plus/es/components/tree/src/model/node'
-
-interface Tree {
-	id: number
-	label: string
-	children?: Tree[]
-}
-let id = 1000
-
-const append = (data: Tree) => {
-	const newChild = { id: id++, label: 'testtest', children: [] }
-	if (!data.children) {
-		data.children = []
-	}
-	data.children.push(newChild)
-	dataSource.value = [...dataSource.value]
-}
-
-const remove = (node: Node, data: Tree) => {
-	const parent = node.parent
-	const children: Tree[] = parent.data.children || parent.data
-	const index = children.findIndex((d) => d.id === data.id)
-	children.splice(index, 1)
-	dataSource.value = [...dataSource.value]
-}
-
-const dataSource = ref<Tree[]>([
-	{
-		id: 1,
-		label: 'Level one 1',
-		children: [
-			{
-				id: 4,
-				label: 'Level two 1-1',
-				children: [
-					{
-						id: 9,
-						label: 'Level three 1-1-1',
-					},
-					{
-						id: 10,
-						label: 'Level three 1-1-2',
-					},
-				],
-			},
-		],
-	},
-	{
-		id: 2,
-		label: 'Level one 2',
-		children: [
-			{
-				id: 5,
-				label: 'Level two 2-1',
-			},
-			{
-				id: 6,
-				label: 'Level two 2-2',
-			},
-		],
-	},
-	{
-		id: 3,
-		label: 'Level one 3',
-		children: [
-			{
-				id: 7,
-				label: 'Level two 3-1',
-			},
-			{
-				id: 8,
-				label: 'Level two 3-2',
-			},
-		],
-	},
-])
+import { argumentExample } from 'assets/data/args'
 </script>
 
-<style>
-.custom-tree-node {
-	flex: 1;
+<style lang="scss" scoped>
+.el-form {
+	width: 50%;
+	overflow-x: auto;
+	background-color: white;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
-	justify-content: space-between;
-	font-size: 14px;
-	padding-right: 8px;
+	padding: 10px 0 10px 0;
+
+	.el-tree {
+		padding: 10px 0 10px 0;
+
+		.el-tree-node__content {
+			margin: 5px 0px 5px 0px;
+			padding: 5px 0px 5px 0px;
+
+			.el-form-item {
+				margin-bottom: 0;
+			}
+
+		}
+
+		:deep(.el-tree-node.struct > .el-tree-node__children) {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: wrap;
+
+			.el-form-item {
+				margin-right: 0 !important;
+
+				.el-input {
+					width: 50px;
+				}
+			}
+
+			.el-tree-node:nth-child(n+2) .el-tree-node__content {
+				padding-left: 0 !important;
+			}
+		}
+	}
 }
 </style>

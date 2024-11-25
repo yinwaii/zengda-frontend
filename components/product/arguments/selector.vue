@@ -1,7 +1,7 @@
 <template>
 	<div class="selector">
 		<el-text size="large">模块： </el-text>
-		<el-cascader placeholder="直接输入名称可搜索" :options="options" filterable !show-all-levels />
+		<!-- <el-cascader placeholder="直接输入名称可搜索" :options="options" filterable !show-all-levels /> -->
 		<el-button type="primary">确认</el-button>
 	</div>
 </template>

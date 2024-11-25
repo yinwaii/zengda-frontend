@@ -6,10 +6,10 @@
 				<el-tab-pane label="参数管理" name="first">
 					<product-arguments-table></product-arguments-table>
 				</el-tab-pane>
-				<el-tab-pane label="表单设计" name="second">
+				<el-tab-pane label="规格书设计" name="third"></el-tab-pane>
+				<el-tab-pane label="表单预览" name="second">
 					<product-arguments-form></product-arguments-form>
 				</el-tab-pane>
-				<el-tab-pane label="规格书预览" name="third"></el-tab-pane>
 			</el-tabs>
 		</el-col>
 	</div>

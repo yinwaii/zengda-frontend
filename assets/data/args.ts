@@ -1,4 +1,18 @@
-const data = [
+export interface Argument {
+	id: number
+	name: string
+	type: string
+	default?: string
+	isEnabled: boolean
+	isEditable: boolean
+	children?: Argument[]
+	isEditing?: boolean
+	parent: number
+}
+
+export const typeOptions = ['number', 'string', 'boolean', 'struct', 'enum', 'object']
+
+export const argumentExample: Argument[] = [
 	{
 		"id": 0,
 		"name": "设备名称",
@@ -29,7 +43,7 @@ const data = [
 	{
 		"id": 3,
 		"name": "内部尺寸",
-		"type": "object",
+		"type": "struct",
 		"isEnabled": true,
 		"isEditable": true,
 		"default": "",
@@ -67,7 +81,7 @@ const data = [
 	{
 		"id": 7,
 		"name": "外部尺寸",
-		"type": "object",
+		"type": "struct",
 		"isEnabled": true,
 		"isEditable": true,
 		"default": "",
@@ -255,7 +269,7 @@ const data = [
 			{
 				"id": 27,
 				"name": "湿度偏差",
-				"type": "object",
+				"type": "struct",
 				"isEnabled": true,
 				"isEditable": true,
 				"default": "",
@@ -272,7 +286,7 @@ const data = [
 					},
 					{
 						"id": 29,
-						"name": "大于",
+						"name": "大于界限",
 						"type": "number",
 						"isEnabled": true,
 						"isEditable": true,
@@ -281,7 +295,7 @@ const data = [
 					},
 					{
 						"id": 30,
-						"name": "小于",
+						"name": "小于界限",
 						"type": "number",
 						"isEnabled": true,
 						"isEditable": true,
@@ -360,7 +374,7 @@ const data = [
 			{
 				"id": 38,
 				"name": "辐照范面积",
-				"type": "object",
+				"type": "struct",
 				"isEnabled": true,
 				"isEditable": true,
 				"default": "",
@@ -425,5 +439,3 @@ const data = [
 		]
 	},
 ]
-
-export default data;

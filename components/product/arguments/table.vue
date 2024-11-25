@@ -1,5 +1,5 @@
 <template>
-	<el-table :data="tableData" stripe row-key="id">
+	<el-table :data="argumentExample" stripe row-key="id">
 		<el-table-column label="字段名称" min-width="100" fixed="left">
 			<template #default="scope">
 				<el-input v-if="scope.row.isEditing" v-model="scope.row.name" style="width: 70%" />
@@ -44,26 +44,12 @@
 </template>
 
 <script lang="ts" setup>
-import args from 'assets/data/args';
+import { type Argument, argumentExample, typeOptions } from 'assets/data/args'
 
-interface User {
-	id: number
-	name: string
-	type: string
-	default?: string
-	isEnabled: boolean
-	isEditable: boolean
-	children?: User[]
-	isEditing?: boolean
-}
-
-const tableData: User[] = args
-const typeOptions = ['number','string','boolean','enum','object']
-
-const handleEdit = (index: number, row: User) => {
+const handleEdit = (index: number, row: Argument) => {
 	row.isEditing = !(row.isEditing??false)
 }
-const handleDelete = (index: number, row: User) => {
+const handleDelete = (index: number, row: Argument) => {
 	console.log(index, row)
 }
 </script>
