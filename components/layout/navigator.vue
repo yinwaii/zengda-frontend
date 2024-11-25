@@ -1,10 +1,10 @@
 <template>
-	<el-menu :collapse="false" router>
+	<el-menu :collapse="false" :default-openeds="['/product']" default-active="/product/arguments" router>
 		<el-sub-menu index="/product">
-			<template #title>产品管理</template>
-			<el-menu-item index="/product/arguments">参数管理</el-menu-item>
-			<el-menu-item index="/product/algorithm">报价模板</el-menu-item>
-			<el-menu-item index="/product/cost">成本数据</el-menu-item>
+			<template #title>模板管理</template>
+			<el-menu-item index="/product/arguments">模块管理</el-menu-item>
+			<el-menu-item index="/product/cost">产品模板</el-menu-item>
+			<el-menu-item index="/product/algorithm">报价算法</el-menu-item>
 			<el-menu-item index="/product/history">历史报价</el-menu-item>
 		</el-sub-menu>
 		<el-sub-menu index="/price">

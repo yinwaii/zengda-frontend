@@ -6,9 +6,16 @@
 				<el-tab-pane label="参数管理" name="first">
 					<product-arguments-table></product-arguments-table>
 				</el-tab-pane>
-				<el-tab-pane label="规格书设计" name="third"></el-tab-pane>
+				<el-tab-pane label="规格书设计" name="third">
+					<!-- <div class="specifications"> -->
+					<product-arguments-template></product-arguments-template>
+					<!-- </div> -->
+				</el-tab-pane>
 				<el-tab-pane label="表单预览" name="second">
-					<product-arguments-form></product-arguments-form>
+					<div class="preview">
+						<product-arguments-form></product-arguments-form>
+						<el-input v-model="text" :autosize="{ minRows: 50 }" type="textarea" placeholder="Please input" />
+					</div>
 				</el-tab-pane>
 			</el-tabs>
 		</el-col>
@@ -17,6 +24,7 @@
 
 <script setup lang="ts">
 const activeName = ref('first')
+const text = ref('dasasdas')
 </script>
 
 <style lang="scss" scoped>
@@ -29,6 +37,22 @@ const activeName = ref('first')
 		color: #6b778c;
 		font-size: 32px;
 		font-weight: 600;
+	}
+
+	.preview {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+
+		.product-arguments-form {
+			width: 50%;
+			padding: 0px 10px 0px 10px;
+		}
+
+		.el-textarea {
+			width: 50%;
+			padding: 0px 10px 0px 10px;
+		}
 	}
 }
 </style>

@@ -1,12 +1,13 @@
 <template>
-	<el-form :inline="true" label-width="auto">
+	<el-form class="product-arguments-form" :inline="true" label-width="auto">
 		<div>模块名</div>
-		<el-tree :data="argumentExample" node-key="id" default-expand-all :props="{ class: (data) => data.type }"
+		<el-tree :data="rootArgument.children" node-key="id" default-expand-all :props="{ class: (data) => data.type }"
 			expand-on-click-node draggable>
 			<template #default="{ data, node }">
 				<el-form-item :label="data.name" :label-position="node.parent.data.type === 'struct' ? 'top' : 'left'">
 					<el-input size="small" v-if="data.type === 'string'" />
 					<el-input size="small" v-if="data.type === 'number'" />
+					<el-button size="small" type="primary" v-if="data.type === 'file'">上传</el-button>
 					<el-row v-if="data.type === 'pair'">
 						<el-col :span="5">
 							<el-input size="small" />
@@ -24,12 +25,11 @@
 </template>
 
 <script lang="ts" setup>
-import { argumentExample } from 'assets/data/args'
+import { rootArgument } from 'assets/data/args'
 </script>
 
 <style lang="scss" scoped>
 .el-form {
-	width: 50%;
 	overflow-x: auto;
 	background-color: white;
 	display: flex;
