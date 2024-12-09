@@ -1,5 +1,5 @@
 <template>
-	<el-table :data="rootArgument.children" default-expand-all stripe row-key="id">
+	<el-table :data="$props.arg.children" default-expand-all stripe row-key="id">
 		<el-table-column label="字段名称" min-width="100" fixed="left">
 			<template #default="scope">
 				<el-input v-if="scope.row.isEditing" v-model="scope.row.name" style="width: 70%" />
@@ -44,7 +44,9 @@
 </template>
 
 <script lang="ts" setup>
-import { type Argument, rootArgument, typeOptions } from 'assets/data/args'
+import { type Argument, typeOptions } from 'assets/data/args'
+
+defineProps(['arg']);
 
 const handleEdit = (_: number, row: Argument) => {
 	row.isEditing = !(row.isEditing??false)

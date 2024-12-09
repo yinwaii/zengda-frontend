@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+const apiPath = 'http://127.0.0.1:4523/m1/5552475-5229490-default';
+
 export default defineNuxtConfig({
   app: {
     head: {
@@ -29,6 +31,20 @@ export default defineNuxtConfig({
       preprocessorOptions: {
         scss: { api: 'modern-compiler' },
         additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
+      }
+    }
+  },
+  nitro: {
+    devProxy: {
+      "/api": {
+        target: apiPath,
+        changeOrigin: true,
+        prependPath: true,
+      }
+    },
+    routeRules: {
+      '/api/**': {
+        proxy: `${apiPath}/**`
       }
     }
   }
