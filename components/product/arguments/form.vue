@@ -1,7 +1,7 @@
 <template>
 	<el-form class="product-arguments-form" :inline="true" label-width="auto">
 		<div>模块名</div>
-		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data) => data?.type }"
+		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>
 			<template #default="{ data, node }">
 				<el-form-item :label="data.name" :label-position="'left'">
