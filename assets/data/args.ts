@@ -4,6 +4,7 @@ export interface Argument {
 	type: string
 	default?: string
 	template?: string
+	description?: string
 	isEnabled: boolean
 	isEditable: boolean
 	children?: Argument[]

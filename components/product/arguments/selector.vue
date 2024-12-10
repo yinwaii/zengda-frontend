@@ -1,7 +1,7 @@
 <template>
 	<div class="selector">
 		<el-text size="large">模块： </el-text>
-		<el-cascader v-model="selected" :options="options" :props="props" 
+		<el-cascader v-model="selected" :options="module_list" :props="props" 
 			placeholder="直接输入名称可搜索"  filterable !show-all-levels />
 		<el-button type="primary" @click="selectModule">确认</el-button>
 	</div>
@@ -10,7 +10,11 @@
 <script lang="ts" setup>
 import type { CascaderProps, CascaderOption } from 'element-plus';
 
-const options: CascaderOption[] = await $fetch('/api/modules/list');
+interface ModuleListResponse {
+	module_list: CascaderOption[]
+}
+
+const { module_list }: ModuleListResponse = await $fetch('/api/modules/getModuleList');
 const props: CascaderProps = {
 	label: 'name',
 	value: 'id',
@@ -20,7 +24,7 @@ const rootArgument = defineModel()
 
 const selectModule = async () => {
 	if (selected.value)
-		rootArgument.value = await $fetch(`/api/modules/detail?id=${selected.value.at(-1)}`)
+		rootArgument.value = await $fetch('/api/modules/getModuleArgumentList', { query: { id: selected.value.at(-1) } });
 }
 </script>
 

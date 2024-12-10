@@ -14,7 +14,10 @@
 				<el-tab-pane label="表单预览" name="second">
 					<div class="preview">
 						<product-arguments-form :arg="rootArgument" />
-						<utils-editor/>
+						<div class="editor">
+							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />
+						</div>
+						<!-- <utils-preview :src="'/assets/docs/AZTH1000L-BT-Ver1.0.docx'" :name="previewName"/> -->
 						<!-- <el-input v-model="text" :autosize="{ minRows: 50 }" type="textarea" placeholder="Please input" /> -->
 					</div>
 				</el-tab-pane>
@@ -26,7 +29,8 @@
 <script setup lang="ts">
 const rootArgument = ref({children:[]})
 const activeName = ref('first')
-const text = ref('dasasdas')
+const previewSrc = ref('')
+const previewName = ref('specification')
 </script>
 
 <style lang="scss" scoped>

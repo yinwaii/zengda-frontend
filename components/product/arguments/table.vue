@@ -20,6 +20,12 @@
 				<el-text v-else>{{ scope.row.default }}</el-text>
 			</template>
 		</el-table-column>
+		<el-table-column label="备注">
+			<template #default="scope">
+				<el-input v-if="scope.row.isEditing" v-model="scope.row.description" style="width: 70%" />
+				<el-text v-else>{{ scope.row.description }}</el-text>
+			</template>
+		</el-table-column>
 		<el-table-column label="是否可用">
 			<template #default="scope">
 				<el-switch :disabled="!scope.row.isEditing" v-model="scope.row.isEnabled" />
