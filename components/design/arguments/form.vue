@@ -1,5 +1,5 @@
 <template>
-	<el-form class="product-arguments-form" :inline="true" label-width="auto">
+	<el-form class="design-arguments-form" :inline="true" label-width="auto">
 		<div>{{ arg.name }}</div>
 		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>

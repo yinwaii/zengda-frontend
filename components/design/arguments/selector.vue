@@ -1,9 +1,10 @@
 <template>
 	<div class="selector">
 		<el-text size="large">模块： </el-text>
-		<el-cascader v-model="selected" :options="module_list" :props="props" 
-			placeholder="直接输入名称可搜索"  filterable !show-all-levels />
+		<el-cascader v-model="selected" :options="module_list" :props="props" placeholder="直接输入名称可搜索" filterable
+			!show-all-levels />
 		<el-button type="primary" @click="selectModule">确认</el-button>
+		<el-button type="primary" @click="selectModule">新建</el-button>
 	</div>
 </template>
 

@@ -47,18 +47,25 @@
 			</template>
 		</el-table-column>
 	</el-table>
+	<el-button class="mt-4" style="width: 100%" @click="handleInsert">
+		添加新参数
+	</el-button>
 </template>
 
 <script lang="ts" setup>
 import { type Argument, typeOptions } from 'assets/data/args'
 
-defineProps(['arg']);
+const props = defineProps(['arg']);
 
 const handleEdit = (_: number, row: Argument) => {
 	row.isEditing = !(row.isEditing??false)
 }
 const handleDelete = (index: number, row: Argument) => {
 	console.log(index, row)
+}
+
+const handleInsert = () => {
+	// props.arg.children.push()
 }
 </script>
 

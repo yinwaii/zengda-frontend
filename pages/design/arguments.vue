@@ -1,19 +1,19 @@
 <template>
 	<div class="container">
 		<el-col>
-			<product-arguments-selector v-model="rootArgument" />
+			<design-arguments-selector v-model="rootArgument" />
 			<el-tabs v-model="activeName">
 				<el-tab-pane label="参数管理" name="first">
-					<product-arguments-table :arg="rootArgument" />
+					<design-arguments-table :arg="rootArgument" />
 				</el-tab-pane>
 				<el-tab-pane label="规格书设计" name="third">
 					<!-- <div class="specifications"> -->
-					<product-arguments-template :arg="rootArgument" />
+					<design-arguments-template :arg="rootArgument" />
 					<!-- </div> -->
 				</el-tab-pane>
 				<el-tab-pane label="表单预览" name="second">
 					<div class="preview">
-						<product-arguments-form :arg="rootArgument" />
+						<design-arguments-form :arg="rootArgument" />
 						<div class="editor">
 							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />
 						</div>
@@ -29,8 +29,6 @@
 <script setup lang="ts">
 const rootArgument = ref({children:[]})
 const activeName = ref('first')
-const previewSrc = ref('')
-const previewName = ref('specification')
 </script>
 
 <style lang="scss" scoped>
@@ -51,7 +49,7 @@ const previewName = ref('specification')
 		justify-content: space-between;
 		min-height: 70vh;
 
-		.product-arguments-form {
+		.design-arguments-form {
 			width: 33%;
 			padding: 0px 10px 0px 10px;
 		}
