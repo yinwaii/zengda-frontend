@@ -8,6 +8,8 @@
 					<el-tooltip effect="dark" :content="data.description" placement="top">
 						<el-input size="small" v-if="data.type === 'string'" />
 						<el-input size="small" v-if="data.type === 'number'" />
+						<el-input size="small" v-if="data.type === 'enum'" />
+						<el-switch size="small" v-if="data.type === 'boolean'" />
 						<el-button size="small" type="primary" v-if="data.type === 'file'">上传</el-button>
 						<el-row v-if="data.type === 'pair'">
 							<el-col :span="5">

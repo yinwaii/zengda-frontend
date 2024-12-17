@@ -2,7 +2,9 @@
 	<div class="design-arguments-template">
 		<div class="arguments-tree">
 			<div class="arguments-icon">
-				<el-button size="small" @click="saveTemplate"><el-icon><Check /></el-icon></el-button>
+				<el-button size="small" @click="saveTemplate"><el-icon>
+						<Check />
+					</el-icon></el-button>
 			</div>
 			<el-tree :data="$props.arg.children" :props="{ label: 'name' }" default-expand-all expand-on-click-node
 				@node-click="selectArgument" />
