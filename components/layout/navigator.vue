@@ -14,6 +14,10 @@
 			<el-menu-item index="/price/specification">规格书管理</el-menu-item>
 			<el-menu-item index="/price/bom">BOM表管理</el-menu-item>
 		</el-sub-menu>
+		<el-sub-menu index="/project">
+			<template #title>项目管理</template>
+			<el-menu-item index="/project/projects">项目列表</el-menu-item>
+		</el-sub-menu>
 		<el-sub-menu index="/manage">
 			<template #title>系统管理</template>
 			<el-menu-item index="/manage/users">用户管理</el-menu-item>
