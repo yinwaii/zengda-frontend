@@ -16,7 +16,7 @@
         <el-button link type="primary" size="small" @click="handleDetail(row.id)">
           Detail
         </el-button> 
-        <el-button link type="primary" size="small">Edit</el-button>
+        <el-button link type="primary" size="small" @click="handleEdit(row.id)">Edit</el-button>
       </template>
     </el-table-column>
   </el-table>
@@ -48,6 +48,11 @@ await axios.get('/api/projects').then((res) => {
 
 function handleDetail(id: number) {
   router.push(`/project/${id}`)
+  console.log(id)
+}
+
+function handleEdit(id: number) {
+  router.push(`/project/edit?id=${id}`)
   console.log(id)
 }
 </script>

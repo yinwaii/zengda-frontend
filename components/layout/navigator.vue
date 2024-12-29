@@ -17,6 +17,8 @@
 		<el-sub-menu index="/project">
 			<template #title>项目管理</template>
 			<el-menu-item index="/project/projects">项目列表</el-menu-item>
+			<el-menu-item index="/project/create">创建项目</el-menu-item>
+			<el-menu-item index="/project/edit">项目编辑</el-menu-item>
 		</el-sub-menu>
 		<el-sub-menu index="/manage">
 			<template #title>系统管理</template>
