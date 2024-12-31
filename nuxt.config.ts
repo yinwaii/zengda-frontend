@@ -14,6 +14,9 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  plugins: [
+    // { src: '@/plugins/nuxt-quill-plugin.js', ssr: false }
+  ],
   modules: ['@element-plus/nuxt', 'nuxt-codemirror'],
   css: ['~/assets/scss/index.scss'],
   typescript: {
@@ -32,6 +35,11 @@ export default defineNuxtConfig({
         scss: { api: 'modern-compiler' },
         additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
       }
+    }
+  },
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.NUXT_PUBLIC_API_BASE || '/api'
     }
   },
   nitro: {

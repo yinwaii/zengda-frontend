@@ -12,23 +12,24 @@
 </template>
 
 <script lang="ts" setup>
-import type { Argument } from '~/assets/data/args';
 import { Check } from '@element-plus/icons-vue';
-
-const props = defineProps(['arg']);
+const api = useApi();
+const props = defineProps({
+	arg: { type: Object as PropType<Module>, required: true }
+});
 const templateText = ref('');
 const argId = ref(0);
 const saveTemplate = async () => {
-	await $fetch("/api/modules/modifySpecificationForArgument", {
-		method: "POST",
-		body: {
-			mid: props.arg.id, aid: argId.value,
-			template: templateText.value
-		}
-	})
+	// await $fetch("/api/modules/modifySpecificationForArgument", {
+	// 	method: "POST",
+	// 	body: {
+	// 		mid: props.arg.id, aid: argId.value,
+	// 		template: templateText.value
+	// 	}
+	// })
 }
-const selectArgument = async (arg: Argument) => {
-	await saveTemplate();
+const selectArgument = async (arg: Module) => {
+	// await saveTemplate();
 	argId.value = arg.id;
 	templateText.value = await $fetch('/api/modules/getSpecificationForArgument', { query: { mid: props.arg.id, aid: arg.id } });
 }
@@ -52,7 +53,7 @@ const selectArgument = async (arg: Argument) => {
 		}
 	}
 
-	.editor {
+	.quill-editor {
 		width: 75%
 	}
 }

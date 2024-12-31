@@ -20,6 +20,7 @@
     "nuxt": "^3.14.1592",
     "nuxt-codemirror": "^0.0.11",
     "vue": "latest",
+    "vue-quill-editor": "^3.0.6",
     "vue-router": "latest"
   },
   "devDependencies": {

@@ -3,23 +3,19 @@
 		<div>{{ arg.name }}</div>
 		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>
-			<template #default="{ data, node }">
+			<template #default="{ data }">
 				<el-form-item :label="data.name" :label-position="'left'">
-					<el-tooltip effect="dark" :content="data.description" placement="top">
-						<el-input size="small" v-if="data.type === 'string'" />
-						<el-input size="small" v-if="data.type === 'number'" />
-						<el-input size="small" v-if="data.type === 'enum'" />
-						<el-switch size="small" v-if="data.type === 'boolean'" />
-						<el-button size="small" type="primary" v-if="data.type === 'file'">上传</el-button>
-						<el-row v-if="data.type === 'pair'">
-							<el-col :span="5">
-								<el-input size="small" />
-							</el-col>
-							<span>&nbsp; ~ &nbsp;</span>
-							<el-col :span="5">
-								<el-input size="small" />
-							</el-col>
-						</el-row>
+					<el-tooltip effect="dark" :content="data.description" placement="left">
+						<el-input size="small" v-model="data.value" v-if="data.type === 'float'" />
+						<el-input size="small" v-model="data.value" v-else-if="data.type === 'int'" />
+						<el-input size="small" v-model="data.value" v-else-if="data.type === 'string'" />
+						<el-switch size="small" v-model="data.value" v-else-if="data.type === 'boolean'" />
+						<el-button size="small" type="primary" v-else-if="data.type === 'file'">上传</el-button>
+						<el-select size="small" v-model="data.value" v-else-if="data.type.startsWith('selector')">
+							<el-option v-for="item in splitSelector(data.type)" :key="item" :label="item" :value="item" />
+						</el-select>
+						<span v-else-if="data.type === 'submodule'"></span>
+						<span v-else>{{ (data.type as String) }}</span>
 					</el-tooltip>
 					<!-- node.parent.data.type === 'struct' ? 'top' : -->
 
@@ -31,7 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-defineProps(['arg']);
+const props = defineProps({
+	arg: { type: Object as PropType<ModuleParams>, required: true }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -52,10 +50,17 @@ defineProps(['arg']);
 
 			.el-form-item {
 				margin-bottom: 0;
-				
+
 				.el-form-item__content {
 					display: flex;
-						flex-direction: column;
+					flex-direction: column;
+
+					.el-input,
+					.el-switch,
+					.el-button,
+					.el-select {
+						width: 100px;
+					}
 				}
 			}
 
@@ -69,7 +74,10 @@ defineProps(['arg']);
 			.el-form-item {
 				margin-right: 0 !important;
 
-				.el-input {
+				.el-input,
+				.el-switch,
+				.el-button,
+				.el-select {
 					width: 50px;
 				}
 			}

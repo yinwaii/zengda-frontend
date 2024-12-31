@@ -1,6 +1,6 @@
 <template>
 	<div class="container">
-		<el-col>
+		<!-- <el-col>
 			<design-algorithm-selector v-model="rootArgument" />
 			<el-tabs v-model="activeName">
 				<el-tab-pane label="参数列表" name="first">
@@ -18,7 +18,7 @@
 					</div>
 				</el-tab-pane>
 			</el-tabs>
-		</el-col>
+		</el-col> -->
 	</div>
 </template>
 

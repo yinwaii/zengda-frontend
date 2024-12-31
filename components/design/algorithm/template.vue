@@ -54,7 +54,7 @@ const selectArgument = async (arg: Argument) => {
 		}
 	}
 
-	.editor {
+	.quill-editor {
 		width: 75%
 	}
 }
