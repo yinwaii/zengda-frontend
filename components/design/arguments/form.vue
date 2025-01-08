@@ -1,7 +1,7 @@
 <template>
-	<el-form class="design-arguments-form" :inline="true" label-width="auto">
+	<el-form  class="design-arguments-form" :inline="true" label-width="auto">
 		<div>{{ arg.name }}</div>
-		<el-tree :data="arg.children" ref="treeRef" node-key="id"  default-expand-all :props="{ class: (data: any) => data?.type }"
+		<el-tree :data="arg.children" ref="treeRef" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>
 			<template #default="{ data }">
 					<el-form-item :label="data.name" label-position='left'>
@@ -32,7 +32,6 @@ const treeRef = ref<InstanceType<typeof ElTree>>()
 const props = defineProps({
 	arg: { type: Object as PropType<ModuleParams>, required: true }
 });
-
 
 const defaultProps = {
 	children: 'children',
