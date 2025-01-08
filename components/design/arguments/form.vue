@@ -2,7 +2,7 @@
 	<el-form  class="design-arguments-form" :inline="true" label-width="auto">
 		<div>{{ arg.name }}</div>
 		<el-tree :data="arg.children" ref="treeRef" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
-
+			:filter-node-method="filterNode"
 			expand-on-click-node>
 			<template #default="{ data }">
 					<el-form-item :label="data.name" label-position='left'>
@@ -23,6 +23,7 @@
 			</template>
 		</el-tree>
 		<el-button type="primary" @click="onSave">保存</el-button>
+
 	</el-form>
 </template>
 
@@ -36,7 +37,6 @@ const props = defineProps({
 	arg: { type: Object as PropType<ModuleParams>, required: true }
 });
 
-console.log('arg',props.arg);
 
 
 const defaultProps = {
@@ -46,13 +46,16 @@ const defaultProps = {
 
 const api = useApi();
 
-const filterNode = (value: string, data: ModuleParams) => {
-	return data.can_modify !== false;
+const filterNode = (value: string, data: any, node: any) => {
+	console.log(data);
+	return data.can_modify;
 }
 
-const onSave = async () => {
-	console.log(props.arg);
+onUpdated(() => {
+	treeRef.value?.filter(props.arg);
+});
 
+const onSave = async () => {
 	const res = await api.arguments.queryPriceParameters(props.arg);
 	emit('update-price-params', res.data);
 	// console.log(res);
