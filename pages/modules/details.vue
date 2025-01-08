@@ -1,10 +1,10 @@
 <template>
 	<div class="container">
 		<el-col>
-			<design-arguments-selector @update-module="onUpdateModuleId" />
+			<module-selector @update-module="onUpdateModuleId" />
 			<el-tabs v-model="activeName">
 				<el-tab-pane label="参数管理" name="first">
-					<design-arguments-table :arg="params" />
+					<module-table :arg="params" @update-data="onUpdateModuleId"/>
 				</el-tab-pane>
 				<el-tab-pane label="规格书设计" name="third">
 					<design-arguments-template :arg="rootArgument" />

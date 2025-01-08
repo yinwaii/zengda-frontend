@@ -4,7 +4,7 @@
 		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>
 			<template #default="{ data }">
-				<el-form-item :label="data.name" :label-position="'left'">
+				<el-form-item :label="data.name" label-position='left'>
 					<el-tooltip effect="dark" :content="data.description" placement="left">
 						<el-input size="small" v-model="data.value" v-if="data.type === 'float'" />
 						<el-input size="small" v-model="data.value" v-else-if="data.type === 'int'" />

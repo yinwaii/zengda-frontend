@@ -45,6 +45,8 @@ export interface ModuleInsertRequest {
 	description: string
 }
 
+export { defaultModule } from './api/modules'
+
 export default function (baseUrl?: string) {
 	return {
 		modules: modules(baseUrl),

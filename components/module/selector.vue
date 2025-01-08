@@ -1,25 +1,12 @@
 <template>
 	<div class="selector">
 		<el-text size="large">模块： </el-text>
-		<el-descriptions>
-			<template #title>
-				<client-only>
-					<el-cascader v-model="selected" :options="moduleData.data" :props="moduleProps" placeholder="直接输入名称可搜索"
-						filterable !show-all-levels @change="changeModule" ref="cascader" />
-					<el-button type="primary" @click="$emit('updateModule', selected)">确认</el-button>
-					<el-button type="primary" @click="console.log('1')">新建</el-button>
-				</client-only>
-			</template>
-			<el-descriptions-item label="Username">kooriookami</el-descriptions-item>
-			<el-descriptions-item label="Telephone">18100000000</el-descriptions-item>
-			<el-descriptions-item label="Place">Suzhou</el-descriptions-item>
-			<el-descriptions-item label="Remarks">
-				<el-tag size="small">School</el-tag>
-			</el-descriptions-item>
-			<el-descriptions-item label="Address">
-				No.1188, Wuzhong Avenue, Wuzhong District, Suzhou, Jiangsu Province
-			</el-descriptions-item>
-		</el-descriptions>
+		<client-only>
+			<el-cascader v-model="selected" :options="moduleData.data" :props="moduleProps" placeholder="直接输入名称可搜索" filterable
+				!show-all-levels @change="changeModule" ref="cascader" />
+			<el-button type="primary" @click="$emit('updateModule', selected)">确认</el-button>
+			<!-- <el-button type="primary" @click="console.log('1')">新建</el-button> -->
+		</client-only>
 	</div>
 </template>
 

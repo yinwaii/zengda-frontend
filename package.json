@@ -13,6 +13,7 @@
     "@element-plus/icons-vue": "^2.3.1",
     "@element-plus/nuxt": "^1.1.0",
     "@nuxtjs/proxy": "^2.1.0",
+    "@pinia/nuxt": "^0.9.0",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.7.9",
@@ -20,6 +21,7 @@
     "element-plus": "^2.8.8",
     "nuxt": "^3.14.1592",
     "nuxt-codemirror": "^0.0.11",
+    "pinia": "^2.3.0",
     "vue": "latest",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "latest"

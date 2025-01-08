@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   plugins: [
     // { src: '@/plugins/nuxt-quill-plugin.js', ssr: false }
   ],
-  modules: ['@element-plus/nuxt', 'nuxt-codemirror'],
+  modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
   css: ['~/assets/scss/index.scss'],
   typescript: {
     strict: true,

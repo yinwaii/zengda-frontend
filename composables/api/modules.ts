@@ -1,4 +1,17 @@
 
+export const defaultModule = (): Module => {
+	return {
+		id: 0,
+		name: '',
+		price: '',
+		description: '',
+		required: false,
+		visible: false,
+		children: [],
+		parameters: []
+	}
+}
+
 //home.js 传入的axios参数调用
 export default function (baseUrl?: string) {
 	const request = useHttp(baseUrl);
@@ -12,22 +25,25 @@ export default function (baseUrl?: string) {
 		queryDeepParameters(mid: number) {
 			return request.get<ModuleParams>(`/modules/${mid}/deepParameters`);
 		},
-		// queryParameters(curModule: Module): ModuleParams {
-		// 	const parameters = curModule.parameters;
-		// 	const children = curModule.children;
-		// 	parameters.push(...children.map((childModule) => this.queryParameters(childModule)));
-		// 	const result = moduleToParam(curModule);
-		// 	result.children = parameters;
-		// 	return result;
-		// },
 		queryChildren(mid: number) {
 			return request.get<Array<Module>>(`/modules/${mid}/children`);
 		},
-		insert(data: any) {
-			return request.post<ModuleInsertRequest>(`/modules`, data);
+		insert(data: Module) {
+			return request.post<ModuleInsertRequest>(`/modules`, {
+				name: data.name,
+				required: data.required,
+				parent_id: data.parent_id,
+				price: data.price,
+				description: data.description,
+			});
 		},
-		patch(id: number, data: any) {
-			return request.patch<PatchedData>(`/modules/${id}`, data);
+		patch(id: number, data: Module) {
+			return request.patch<PatchedData>(`/modules/${id}`, {
+				name: data.name,
+				required: data.required,
+				price: data.price,
+				description: data.description,
+			});
 		},
 		delete(id: number) {
 			return request.delete(`/modules/${id}`);
