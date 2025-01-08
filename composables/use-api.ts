@@ -44,7 +44,6 @@ export interface ModuleInsertRequest {
 	parent_id: number
 	description: string
 }
-
 export { defaultModule } from './api/modules'
 
 export default function (baseUrl?: string) {

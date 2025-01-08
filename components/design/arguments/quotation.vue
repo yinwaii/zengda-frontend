@@ -21,6 +21,7 @@
 				</el-form-item>
 			</template>
 		</el-tree>
+		<div>产品总价 {{ arg.value }}</div>
 	</el-form>
 </template>
 
@@ -28,6 +29,9 @@
 const props = defineProps({
 	arg: { type: Object as PropType<ModuleParams>, required: true }
 });
+
+
+
 </script>
 
 <style lang="scss" scoped>
