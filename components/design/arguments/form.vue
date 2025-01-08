@@ -1,25 +1,24 @@
 <template>
 	<el-form class="design-arguments-form" :inline="true" label-width="auto">
 		<div>{{ arg.name }}</div>
-		<el-tree :data="arg.children" node-key="id" default-expand-all :props="{ class: (data: any) => data?.type }"
+		<el-tree :data="arg.children" ref="treeRef" node-key="id"  default-expand-all :props="{ class: (data: any) => data?.type }"
 			expand-on-click-node draggable>
 			<template #default="{ data }">
-				<el-form-item :label="data.name" label-position='left'>
-					<el-tooltip effect="dark" :content="data.description" placement="left">
-						<el-input size="small" v-model="data.value" v-if="data.type === 'float'" />
-						<el-input size="small" v-model="data.value" v-else-if="data.type === 'int'" />
-						<el-input size="small" v-model="data.value" v-else-if="data.type === 'string'" />
-						<el-switch size="small" v-model="data.value" v-else-if="data.type === 'boolean'" />
-						<el-button size="small" type="primary" v-else-if="data.type === 'file'">上传</el-button>
-						<el-select size="small" v-model="data.value" v-else-if="data.type.startsWith('selector')">
-							<el-option v-for="item in splitSelector(data.type)" :key="item" :label="item" :value="item" />
-						</el-select>
-						<span v-else-if="data.type === 'submodule'"></span>
-						<span v-else>{{ (data.type as String) }}</span>
-					</el-tooltip>
-					<!-- node.parent.data.type === 'struct' ? 'top' : -->
-
-				</el-form-item>
+					<el-form-item :label="data.name" label-position='left'>
+						<el-tooltip effect="dark" :content="data.description+' '+data.default_exp" placement="left">
+							<el-input size="small" v-model="data.value" v-if="data.type === 'float'" :disabled="!data.can_modify"/>
+							<el-input size="small" v-model="data.value" v-else-if="data.type === 'int'"  :disabled="!data.can_modify"/>
+							<el-input size="small" v-model="data.value" v-else-if="data.type === 'string'"  :disabled="!data.can_modify"/>
+							<el-switch size="small" v-model="data.value" v-else-if="data.type === 'boolean'"  :disabled="!data.can_modify"/>
+							<el-button size="small" type="primary" v-else-if="data.type === 'file'"  :disabled="!data.can_modify">上传</el-button>
+							<el-select size="small" v-model="data.value" v-else-if="data.type.startsWith('selector')" :disabled="!data.can_modify">
+								<el-option v-for="item in splitSelector(data.type)" :key="item" :label="item" :value="item" />
+							</el-select>
+							<span v-else-if="data.type === 'submodule'"></span>
+							<span v-else>{{ (data.type as String) }}</span>
+						</el-tooltip>
+						<!-- node.parent.data.type === 'struct' ? 'top' : -->
+					</el-form-item>
 			</template>
 		</el-tree>
 		<el-button type="primary">保存</el-button>
@@ -27,9 +26,19 @@
 </template>
 
 <script lang="ts" setup>
+import { ElTree } from 'element-plus'
+const treeRef = ref<InstanceType<typeof ElTree>>()
+
 const props = defineProps({
 	arg: { type: Object as PropType<ModuleParams>, required: true }
 });
+
+
+const defaultProps = {
+	children: 'children',
+	label: 'label',
+}
+
 </script>
 
 <style lang="scss" scoped>

@@ -12,9 +12,10 @@
 				<el-tab-pane label="表单预览" name="second">
 					<div class="preview">
 						<design-arguments-form :arg="params" />
-						<div class="editor">
-							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />
-						</div>
+						<design-arguments-quotation :arg="params" />
+<!--						<div class="editor">-->
+<!--							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />-->
+<!--						</div>-->
 					</div>
 				</el-tab-pane>
 			</el-tabs>
