@@ -21,7 +21,7 @@
 				</el-form-item>
 			</template>
 		</el-tree>
-		<div>产品总价 {{ arg.value }}</div>
+		<div v-if="arg.value">产品总价 {{ arg.value }}</div>
 	</el-form>
 </template>
 
