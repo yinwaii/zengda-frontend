@@ -25,7 +25,7 @@
 
 		<el-button-group>
 			<el-button type="primary" @click="onSave">保存</el-button>
-			<el-button type="primary" @click="onGetSpecification" :disabled="props === null">下载规格书</el-button>
+			<!-- <el-button type="primary" @click="onGetSpecification" :disabled="props === null">下载规格书</el-button> -->
 		</el-button-group>
 
 	</el-form>
@@ -64,38 +64,38 @@ const onSave = async () => {
 	// console.log(res);
 }
 
-const onGetSpecification = async () => {
-	try {
-		const res = await $fetch('/doc/generate', {
-			baseURL: useRuntimeConfig().public.baseUrl,
-			method: 'post',
-			body: {"data": props.arg},
-			responseType: 'blob',
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
+// const onGetSpecification = async () => {
+// 	try {
+// 		const res = await $fetch('/doc/generate', {
+// 			baseURL: useRuntimeConfig().public.baseUrl,
+// 			method: 'post',
+// 			body: {"data": props.arg},
+// 			responseType: 'blob',
+// 			headers: {
+// 				'Content-Type': 'application/json'
+// 			}
+// 		});
 
-		// const res = await api.arguments.querySpecification(props.arg);
-		console.log(res);
-		const blob = new Blob([res as BlobPart], { 
-			type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-		});
+// 		// const res = await api.arguments.querySpecification(props.arg);
+// 		console.log(res);
+// 		const blob = new Blob([res as BlobPart], { 
+// 			type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+// 		});
 		
-		const url = window.URL.createObjectURL(blob);
-		const link = document.createElement('a');
-		link.href = url;
+// 		const url = window.URL.createObjectURL(blob);
+// 		const link = document.createElement('a');
+// 		link.href = url;
 		
-		link.download = `specification_${props.arg.name}.docx`;
+// 		link.download = `specification_${props.arg.name}.docx`;
 		
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-		window.URL.revokeObjectURL(url);
-	} catch (error) {
-		console.error('下载规格书失败:', error);
-	}
-}
+// 		document.body.appendChild(link);
+// 		link.click();
+// 		document.body.removeChild(link);
+// 		window.URL.revokeObjectURL(url);
+// 	} catch (error) {
+// 		console.error('下载规格书失败:', error);
+// 	}
+// }
 
 </script>
 
