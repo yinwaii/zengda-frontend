@@ -11,11 +11,11 @@
 				</el-tab-pane>
 				<el-tab-pane label="表单预览" name="second">
 					<div class="preview">
-						<design-arguments-form :arg="params" />
-						<!-- <utils-preview :word-info="{src: }"/> -->
-						<div class="editor">
-							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />
-						</div>
+						<design-arguments-form :arg="params" @update-price-params="onUpdatePriceParams" />
+						<design-arguments-quotation :arg="priceParams" />
+<!--						<div class="editor">-->
+<!--							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />-->
+<!--						</div>-->
 					</div>
 				</el-tab-pane>
 			</el-tabs>
@@ -27,6 +27,7 @@
 const api = useApi();
 const rootArgument = ref<Module>({ id: -1, name: '', required: false, price: "", description: "", parameters: [], children: [], visible: true });
 const params = ref<ModuleParams>({ id: -1, name: '', type: '', default_exp: '', can_modify: true, visible: true });
+let priceParams = ref<ModuleParams>({ id: -1, name: '', type: '', default_exp: '', can_modify: true, visible: true });
 const activeName = ref('first')
 const onUpdateModuleId = async (id?: number) => {
 	if (id) {
@@ -36,6 +37,10 @@ const onUpdateModuleId = async (id?: number) => {
 		params.value = deepParams;
 		console.log(params.value);
 	}
+}
+
+const onUpdatePriceParams = async (arg: ModuleParams) => {
+	priceParams.value = arg;
 }
 </script>
 

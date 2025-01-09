@@ -21,6 +21,9 @@ export default function (baseUrl?: string) {
 		},
 		delete(id: number) {
 			return request.delete(`/parameters/${id}`);
+		},
+		queryPriceParameters(data: ModuleParams) {
+			return request.post('/price/deepParameters', {"data": data}, { headers: { 'Content-Type': 'application/json' } });
 		}
 	}
 };
