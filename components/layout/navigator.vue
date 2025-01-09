@@ -1,5 +1,5 @@
 <template>
-	<el-menu :collapse="false" :default-openeds="['/modules']" default-active="/modules/details" router>
+	<el-menu :collapse="false" :default-openeds="['/modules']" default-active="/modules/list" router>
 		<el-sub-menu index="/modules">
 			<template #title>模块管理</template>
 			<el-menu-item index="/modules/list">模块列表</el-menu-item>

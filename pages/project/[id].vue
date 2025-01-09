@@ -48,7 +48,7 @@ import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 
 definePageMeta({
-  validate: async (route) => {
+  validate: async (route:any) => {
     return typeof route.params.id === 'string' && !isNaN(parseInt(route.params.id))
   }
 })

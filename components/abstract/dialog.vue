@@ -45,16 +45,6 @@ const emit = defineEmits<{
 	(e: 'post-message', message: string, data: T): void
 }>()
 
-const typeOptions = [
-	{ value: 'string', label: '字符串' },
-	{ value: 'int', label: '整数' },
-	{ value: 'float', label: '浮点数' },
-	{ value: 'selector', label: '枚举' },
-	{ value: 'boolean', label: '布尔' },
-	{ value: 'file', label: '文件' },
-	// { value: 'type', label: '类型' },
-]
-
 defineProps<{
 	param: Partial<Record<keyof T, ParamOptions>>
 }>()
@@ -69,3 +59,11 @@ const onCancel = () => {
 }
 
 </script>
+
+<style lang="scss" scoped>
+// .el-form-item {
+// 	.el-input {
+// 		// width: 300px;
+// 	}
+// }
+</style>

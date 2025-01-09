@@ -1,6 +1,8 @@
 <template>
 	<div class="center">
-		<div class="center-file" :id="domId"></div>
+		<ClientOnly>
+			<div class="center-file" :id="domId"></div>
+		</ClientOnly>
 	</div>
 </template>
 
