@@ -1,10 +1,10 @@
 <template>
-	<div class="table">
+	<div class="abstract-table">
 		<el-table :data="$props.data" stripe :row-key="$props.rowKey" default-expand-all>
 			<template v-for="(value, key) in $props.param">
-				<el-table-column v-if="value?.isId === true" min-width="60px" fixed="left" align="right" :prop="key.toString()"
-					:label="value?.name" />
-				<el-table-column v-else align="left" :prop="key.toString()" :label="value?.name" />
+				<!-- <el-table-column v-if="value?.isId === true" min-width="60px" fixed="left" align="right" :prop="key.toString()"
+					:label="value?.name" /> -->
+				<el-table-column align="left" :prop="key.toString()" show-overflow-tooltip :label="value?.name" />
 			</template>
 			<el-table-column v-if="$props.editable === true" fixed="right" min-width="120" align="center">
 				<template #header>
@@ -33,16 +33,6 @@
 
 <script lang="ts" setup generic="T extends Record<string, any>">
 import { Plus } from '@element-plus/icons-vue';
-
-export interface ParamOptions {
-	name: string
-	isId?: boolean
-	type?: string
-	description?: string
-	can_modify?: boolean
-}
-
-export type ParamSchema<T> = Partial<Record<keyof T, ParamOptions>>
 
 const props = defineProps<{
 	param: Partial<Record<keyof T, ParamOptions>>
@@ -93,7 +83,7 @@ const onSave = (message: string, data: any) => {
 
 <style lang="scss" scoped>
 .el-table {
-	// width: 100%;
+	width: 100%;
 	margin-bottom: 20px;
 
 	.insert-button {

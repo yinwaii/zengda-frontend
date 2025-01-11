@@ -1,28 +1,31 @@
 <template>
-	<abstract-table :data="($props.arg?.children ?? [] as ModuleParams[])" :param="paramsModuleParams" id-column="id"
-		:row-key="(row) => row.name + row.id" :default-value="defaultModuleParams" editable 
-		@insert-row="onInsert" @delete-row="onDelete" @update-row="onUpdate"/>
+	<div class="module-arguments">
+		<abstract-table :data="argumentList" :param="paramsModuleParams" id-column="id" :default-value="defaultModuleParams"
+			:editable="true" @insert-row="onInsert" @delete-row="onDelete" @update-row="onUpdate" />
+	</div>
 </template>
 
 <script lang="ts" setup>
 const api = useApi();
 
 const props = defineProps<{
-	arg: ModuleParams
+	mid: number
 }>()
 
-const emit = defineEmits<{
-	(e: 'update-data'): void
-}>()
+const argumentList = ref<ModuleParams[]>([]);
+
+watch(() => props.mid, async (mid) => {
+	argumentList.value = await unpackApi(api.modules.queryParameters(props.mid));
+}, { immediate: true });
 
 const onInsert = async (row: ModuleParams) => {
-	row.module_id = props.arg.id;
+	row.module_id = props.mid;
 	await api.arguments.insert(row);
 	ElMessage({
 		message: '已插入参数',
 		type: 'success',
 	})
-	emit('update-data');
+	// emit('update-data');
 }
 
 const onDelete = async (row: ModuleParams) => {
@@ -31,7 +34,7 @@ const onDelete = async (row: ModuleParams) => {
 		message: '已删除参数',
 		type: 'success',
 	})
-	emit('update-data');
+	// emit('update-data');
 }
 
 const onUpdate = async (row: ModuleParams) => {
@@ -43,9 +46,3 @@ const onUpdate = async (row: ModuleParams) => {
 }
 </script>
 
-<style lang="scss" scoped>
-.el-table {
-	width: 100%;
-	margin-bottom: 20px;
-}
-</style>

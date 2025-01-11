@@ -1,5 +1,5 @@
 <template>
-	<abstract-table :data="data" :param="params" id-column="id" :row-key="(row) => row.name + row.id"
+	<abstract-table :data="data" :param="paramsModule" id-column="id" :row-key="(row) => row.name + row.id"
 		:default-value="defaultModule" editable @insert-row="onInsert" @update-row="onUpdate" @delete-row="onDelete">
 		<template #button="{ row }">
 			<el-button size="small" type="primary" @click="onDetail(row)">详情</el-button>
@@ -8,22 +8,10 @@
 </template>
 
 <script lang="ts" setup>
-import type { ParamSchema } from '~/components/abstract/table.vue';
 const api = useApi();
 
 const data = await unpackApi(api.modules.queryAll());
 console.log(data);
-
-const params: ParamSchema<Module> = {
-	// id: { name: 'id', type: 'int', isId: true },
-	name: { name: '字段名称', type: 'string' },
-	price: { name: '默认值', type: 'string' },
-	description: { name: '备注', type: 'string' },
-	required: { name: '是否必须', type: 'boolean' },
-	visible: { name: '是否可见', type: 'boolean' },
-}
-
-
 
 const onDetail = async (row: Module) => {
 	await navigateTo(`/modules/${row.id}/detail`);

@@ -1,18 +1,11 @@
-
-export const defaultModule = (): Module => {
-	return {
-		id: 0,
-		name: '',
-		price: '',
-		description: '',
-		required: false,
-		visible: false,
-		children: [],
-		parameters: []
-	}
-}
-
 //home.js 传入的axios参数调用
+export interface ModuleInsertRequest {
+	name: string
+	required: boolean
+	price: string
+	parent_id: number
+	description: string
+}
 export default function (baseUrl?: string) {
 	const request = useHttp(baseUrl);
 	return {
@@ -21,6 +14,9 @@ export default function (baseUrl?: string) {
 		},
 		queryAll() {
 			return request.get<Array<Module>>(`/modules`);
+		},
+		queryParameters(mid: number) {
+			return request.get<Array<ModuleParams>>(`/modules/${mid}/parameters`);
 		},
 		queryDeepParameters(mid: number) {
 			return request.get<ModuleParams>(`/modules/${mid}/deepParameters`);

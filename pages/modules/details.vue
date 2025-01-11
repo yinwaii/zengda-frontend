@@ -67,6 +67,11 @@ const onUpdatePriceParams = async (arg: ModuleParams) => {
 			padding: 0px 10px 0px 10px;
 		}
 
+		.design-arguments-quotation {
+			width: 50%;
+			// padding: 0px 10px 0px 10px;
+		}
+
 		.editor {
 			width: 50%;
 			// padding: 0px 10px 0px 10px;

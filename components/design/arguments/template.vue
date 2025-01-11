@@ -2,10 +2,10 @@
 	<div class="design-arguments-template">
 		<div class="arguments-tree">
 			<div class="arguments-icon">
-				<el-button size="small" @click="saveTemplate"><el-icon><Check /></el-icon></el-button>
+				<el-button size="small"><el-icon><Check /></el-icon></el-button>
 			</div>
 			<el-tree :data="$props.arg.children" :props="{ label: 'name' }" default-expand-all expand-on-click-node
-				@node-click="selectArgument" />
+				@node-click="selectArgument" :indent="8" />
 		</div>
 		<utils-editor v-model="templateText" />
 	</div>
@@ -19,19 +19,10 @@ const props = defineProps({
 });
 const templateText = ref('');
 const argId = ref(0);
-const saveTemplate = async () => {
-	// await $fetch("/api/modules/modifySpecificationForArgument", {
-	// 	method: "POST",
-	// 	body: {
-	// 		mid: props.arg.id, aid: argId.value,
-	// 		template: templateText.value
-	// 	}
-	// })
-}
 const selectArgument = async (arg: Module) => {
 	// await saveTemplate();
 	argId.value = arg.id;
-	templateText.value = await $fetch('/api/modules/getSpecificationForArgument', { query: { mid: props.arg.id, aid: arg.id } });
+	// templateText.value = await $fetch('/api/modules/getSpecificationForArgument', { query: { mid: props.arg.id, aid: arg.id } });
 }
 </script>
 

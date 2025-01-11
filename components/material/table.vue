@@ -1,22 +1,13 @@
 <template>
-	<abstract-table v-if="props.arg" :data="props.arg" :param="params" id-column="id"
+	<abstract-table v-if="props.arg" :data="props.arg" :param="paramsMaterial" id-column="id"
 		:row-key="(row) => row.name + row.id" :default-value="defaultMaterial" editable 
 		@insert-row="onInsert" @delete-row="onDelete" @update-row="onUpdate"/>
 </template>
 
 <script lang="ts" setup>
-import type { ParamSchema } from '~/components/abstract/table.vue';
-
 const props = defineProps<{
 	arg: Array<Material>
 }>()
-
-const params: ParamSchema<Material> = {
-    name: { name: '物料名称', type: 'string' },
-    price: { name: '价格', type: 'float' },
-    quantity: { name: '数量', type: 'int' },
-    description: { name: '备注', type: 'string' },
-}
 
 const emit = defineEmits<{
 	(e: 'update-data'): void

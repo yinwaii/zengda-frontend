@@ -4,6 +4,7 @@
 			<template #title>模块管理</template>
 			<el-menu-item index="/modules/list">模块列表</el-menu-item>
 			<el-menu-item index="/modules/details">模块细节</el-menu-item>
+			<el-menu-item index="/modules/test">测试</el-menu-item>
 		</el-sub-menu>
 		<el-sub-menu index="/project">
 			<template #title>项目管理</template>

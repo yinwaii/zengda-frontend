@@ -31,7 +31,6 @@
 </template>
 
 <script lang="ts" setup generic="T extends Record<string, any>">
-import type { ParamOptions } from './table.vue';
 
 export interface DialogModel<T> {
 	isVisible: boolean
@@ -59,11 +58,3 @@ const onCancel = () => {
 }
 
 </script>
-
-<style lang="scss" scoped>
-// .el-form-item {
-// 	.el-input {
-// 		// width: 300px;
-// 	}
-// }
-</style>
