@@ -1,6 +1,6 @@
 import parameters from "./api/parameters";
 import modules from "./api/modules";
-
+import materials from "./api/materials";
 interface PatchedItem {
 	param: string
 	value: string
@@ -37,6 +37,15 @@ export interface ModuleParams {
 	children?: Array<ModuleParams>
 }
 
+
+export interface Material {
+	id: number
+	name: string
+	quantity?: number
+	price: number
+	description?: string
+}
+
 export interface ModuleInsertRequest {
 	name: string
 	required: boolean
@@ -50,5 +59,6 @@ export default function (baseUrl?: string) {
 	return {
 		modules: modules(baseUrl),
 		arguments: parameters(baseUrl),
+		materials: materials(baseUrl),
 	}
 }

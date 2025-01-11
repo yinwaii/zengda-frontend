@@ -11,6 +11,11 @@
 			<el-menu-item index="/project/create">创建项目</el-menu-item>
 			<el-menu-item index="/project/edit">项目编辑</el-menu-item>
 		</el-sub-menu>
+
+		<el-sub-menu index="/materials">
+			<template #title>物料管理</template>
+			<el-menu-item index="/materials/list">物料列表</el-menu-item>
+		</el-sub-menu>
 		<!-- <el-sub-menu index="/design">
 			<template #title>设计管理</template>
 			<el-menu-item index="/design/modules">模块管理</el-menu-item>
