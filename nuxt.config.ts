@@ -15,12 +15,14 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   plugins: [
-    { src: '@/plugins/nuxt-wangeditor-plugin.js', ssr: false },
+    { src: '@/plugins/wangeditor.js', ssr: false },
+    { src: '@/plugins/nuxt-office-docx.js', ssr: false },
   ],
   modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
   css: [
     '~/assets/scss/index.scss',
     "@wangeditor/editor/dist/css/style.css",
+    '@vue-office/docx/lib/index.css',
   ],
   typescript: {
     strict: true,

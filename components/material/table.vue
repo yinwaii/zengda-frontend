@@ -13,15 +13,6 @@ const emit = defineEmits<{
 	(e: 'update-data'): void
 }>()
 
-const defaultMaterial = (): Material => {
-    return {
-        id: -1,
-        name: '',
-        price: 0,
-        description: '',
-    }
-}
-
 const api = useApi();
 
 const onInsert = async (row: Material) => {

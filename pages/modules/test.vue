@@ -3,7 +3,8 @@
 		<module-tree ref="moduleTree" :id="1" />
 		<div class="module-main">
 			<!-- <utils-quill></utils-quill> -->
-			 <utils-editor v-model="exampleText"></utils-editor>
+			 <!-- <utils-editor v-model="exampleText"></utils-editor> -->
+			<utils-word></utils-word>
 			<!-- <h1>参数列表</h1>
 			<module-arguments :mid="mid" /> -->
 		</div>
