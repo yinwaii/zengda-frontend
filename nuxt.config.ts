@@ -15,10 +15,13 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   plugins: [
-    // { src: '@/plugins/nuxt-quill-plugin.js', ssr: false }
+    { src: '@/plugins/nuxt-wangeditor-plugin.js', ssr: false },
   ],
   modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
-  css: ['~/assets/scss/index.scss'],
+  css: [
+    '~/assets/scss/index.scss',
+    "@wangeditor/editor/dist/css/style.css",
+  ],
   typescript: {
     strict: true,
     typeCheck: true,
@@ -42,18 +45,4 @@ export default defineNuxtConfig({
       baseUrl: process.env.NUXT_PUBLIC_API_BASE || '/api'
     }
   },
-  nitro: {
-    devProxy: {
-      "/api": {
-        target: apiPath,
-        changeOrigin: true,
-        prependPath: true,
-      }
-    },
-    routeRules: {
-      '/api/**': {
-        proxy: `${apiPath}/**`
-      }
-    }
-  }
 })

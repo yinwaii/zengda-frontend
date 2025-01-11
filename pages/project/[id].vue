@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import { useRouter, useRoute } from 'vue-router'
-import axios from 'axios'
+// import axios from 'axios'
 
 definePageMeta({
   validate: async (route:any) => {
@@ -66,12 +66,12 @@ interface Project {
 }
 
 const project = ref<Project | null>(null)
-await axios.get(`/api/projects/${id}`).then((res) => {
-  project.value = res.data['data']
-  console.log(project.value)
-}).catch((error) => {
-  console.log(error)
-})
+// await axios.get(`/api/projects/${id}`).then((res) => {
+//   project.value = res.data['data']
+//   console.log(project.value)
+// }).catch((error) => {
+//   console.log(error)
+// })
 </script>
 
 <style></style>

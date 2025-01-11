@@ -39,7 +39,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { ArrowDown } from '@element-plus/icons-vue'
-import axios from 'axios'
+// import axios from 'axios'
 let projectName = ref('')
 let projectId = ref('')
 let productType = ref('')
@@ -61,8 +61,8 @@ const createProject = async () => {
     description: description.value,
   }
 
-  const res = await axios.post('/api/projects', project)
-  console.log(res)
+  // const res = await axios.post('/api/projects', project)
+  // console.log(res)
 }
 </script>
 

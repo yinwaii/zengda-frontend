@@ -2,6 +2,8 @@
 	<div class="module-test">
 		<module-tree ref="moduleTree" :id="1" />
 		<div class="module-main">
+			<!-- <utils-quill></utils-quill> -->
+			 <utils-editor v-model="exampleText"></utils-editor>
 			<!-- <h1>参数列表</h1>
 			<module-arguments :mid="mid" /> -->
 		</div>
@@ -10,6 +12,7 @@
 
 <script setup lang="ts">
 const mid = ref(1)
+const exampleText = ref('sdadsad')
 provide('afterSelectedTree', (node: Module) => {
 	mid.value = node.id
 })

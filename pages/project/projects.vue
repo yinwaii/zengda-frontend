@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts" setup>
-import axios from 'axios'
+// import axios from 'axios'
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -39,12 +39,12 @@ interface Project {
 
 let tableData: Project[] = reactive([])
 
-await axios.get('/api/projects').then((res) => {
-  tableData = res.data['data']['project_list']
-  console.log(tableData)
-}).catch((error) => {
-  console.log(error)
-})
+// await axios.get('/api/projects').then((res) => {
+//   tableData = res.data['data']['project_list']
+//   console.log(tableData)
+// }).catch((error) => {
+//   console.log(error)
+// })
 
 function handleDetail(id: number) {
   router.push(`/project/${id}`)
