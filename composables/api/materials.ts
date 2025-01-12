@@ -15,11 +15,11 @@ export default function (baseUrl?: string) {
 			});
 		},
 		patch(id: number, data: Material) {
-			return request.patch<PatchedData>(`/materials/${id}`, {
+			return request.patch<PatchedData>(`/materials/${id}`, patchData({
 				name: data.name,
 				price: data.price,
 				description: data.description,
-			});
+			}));
 		},
 		delete(id: number) {
 			return request.delete(`/materials/${id}`);

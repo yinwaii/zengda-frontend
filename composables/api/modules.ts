@@ -21,6 +21,12 @@ export default function (baseUrl?: string) {
 		queryDeepParameters(mid: number) {
 			return request.get<ModuleParams>(`/modules/${mid}/deepParameters`);
 		},
+		queryMaterials(mid: number) {
+			return request.get<Array<Material>>(`/modules/${mid}/materials`);
+		},
+		queryDeepMaterials(mid: number) {
+			return request.get<Array<Material>>(`/modules/${mid}/deeoMaterials`);
+		},
 		queryChildren(mid: number) {
 			return request.get<Array<Module>>(`/modules/${mid}/children`);
 		},
@@ -34,12 +40,12 @@ export default function (baseUrl?: string) {
 			});
 		},
 		patch(id: number, data: Module) {
-			return request.patch<PatchedData>(`/modules/${id}`, {
+			return request.patch<PatchedData>(`/modules/${id}`, patchData({
 				name: data.name,
 				required: data.required,
 				price: data.price,
 				description: data.description,
-			});
+			}));
 		},
 		delete(id: number) {
 			return request.delete(`/modules/${id}`);

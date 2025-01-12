@@ -12,7 +12,10 @@
 				<el-tab-pane label="参数列表" name="second">
 					<module-arguments :mid="mid" />
 				</el-tab-pane>
-				<el-tab-pane label="规格书管理" name="third">
+				<el-tab-pane label="物料详情" name="third">
+					<material-module-table :mid="mid" />
+				</el-tab-pane>
+				<el-tab-pane label="规格书管理" name="fourth">
 					<module-template :mid="mid" />
 				</el-tab-pane>
 			</el-tabs>
