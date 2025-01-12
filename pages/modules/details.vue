@@ -13,9 +13,6 @@
 					<div class="preview">
 						<design-arguments-form :arg="params" @update-price-params="onUpdatePriceParams" />
 						<design-arguments-quotation :arg="priceParams" />
-<!--						<div class="editor">-->
-<!--							<embed src="/_nuxt/public/AZTH1000L-BT-Ver1.0_compressed.pdf" width="100%" height="100%" />-->
-<!--						</div>-->
 					</div>
 				</el-tab-pane>
 			</el-tabs>
