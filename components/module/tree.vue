@@ -12,7 +12,10 @@ const props = defineProps<{
 	id: number
 }>();
 
-const moduleData: Module[] = [await unpackApi(api.modules.query(props.id))];
+const moduleData = ref<Module[]>([await unpackApi(api.modules.query(1))]);
+watch(() => props.id, async (id) => {
+	moduleData.value = [await unpackApi(api.modules.query(id))];
+})
 
 const onInsert = async (row: Module) => {
 	await api.modules.insert(row);

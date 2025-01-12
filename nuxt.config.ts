@@ -16,13 +16,14 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   plugins: [
     { src: '@/plugins/wangeditor.js', ssr: false },
-    { src: '@/plugins/nuxt-office-docx.js', ssr: false },
+    { src: '@/plugins/nuxt-office.js', ssr: false },
   ],
   modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
   css: [
     '~/assets/scss/index.scss',
     "@wangeditor/editor/dist/css/style.css",
     '@vue-office/docx/lib/index.css',
+    '@vue-office/excel/lib/index.css',
   ],
   typescript: {
     strict: true,

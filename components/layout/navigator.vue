@@ -1,43 +1,17 @@
 <template>
-	<el-menu :collapse="false" :default-openeds="['/modules']" default-active="/modules/list" router>
-		<el-sub-menu index="/modules">
-			<template #title>模块管理</template>
-			<el-menu-item index="/modules/list">模块列表</el-menu-item>
-			<el-menu-item index="/modules/details">模块细节</el-menu-item>
-			<el-menu-item index="/modules/test">测试</el-menu-item>
-		</el-sub-menu>
+	<el-menu :collapse="false" default-active="/modules" router>
+		<el-menu-item index="/module">模块管理</el-menu-item>
+		<el-menu-item index="/preview">效果预览</el-menu-item>
 		<el-sub-menu index="/project">
 			<template #title>项目管理</template>
 			<el-menu-item index="/project/projects">项目列表</el-menu-item>
 			<el-menu-item index="/project/create">创建项目</el-menu-item>
 			<el-menu-item index="/project/edit">项目编辑</el-menu-item>
 		</el-sub-menu>
-
 		<el-sub-menu index="/materials">
 			<template #title>物料管理</template>
 			<el-menu-item index="/materials/list">物料列表</el-menu-item>
 		</el-sub-menu>
-		<!-- <el-sub-menu index="/design">
-			<template #title>设计管理</template>
-			<el-menu-item index="/design/modules">模块管理</el-menu-item>
-			<el-menu-item index="/design/arguments">参数管理</el-menu-item>
-			<el-menu-item index="/design/product">产品模板</el-menu-item>
-			<el-menu-item index="/design/history">历史报价</el-menu-item>
-		</el-sub-menu>
-		<el-sub-menu index="/price">
-			<template #title>报价管理</template>
-			<el-menu-item index="/price/calculate">报价计算</el-menu-item>
-			<el-menu-item index="/price/edify">报价校核</el-menu-item>
-			<el-menu-item index="/price/specification">规格书管理</el-menu-item>
-			<el-menu-item index="/price/bom">BOM表管理</el-menu-item>
-		</el-sub-menu>
-		<el-sub-menu index="/manage">
-			<template #title>系统管理</template>
-			<el-menu-item index="/manage/users">用户管理</el-menu-item>
-			<el-menu-item index="/manage/record">活动记录</el-menu-item>
-			<el-menu-item index="/manage/db">数据库管理</el-menu-item>
-			<el-menu-item index="/manage/log">系统日志</el-menu-item>
-		</el-sub-menu> -->
 	</el-menu>
 </template>
 

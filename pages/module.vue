@@ -1,11 +1,12 @@
 <template>
+	<module-selector @update-module="onUpdateModule" />
 	<div class="module-test">
-		<module-tree ref="moduleTree" :id="1" />
+		<module-tree ref="moduleTree" :id="rootid" />
 		<div class="module-main">
 			<el-tabs v-model="activeName">
 				<el-tab-pane label="模块详情" name="first">
 					<module-descriptions :mid="mid" />
-					<el-divider />
+					<!-- <el-divider /> -->
 					<module-editor :mid="mid" />
 				</el-tab-pane>
 				<el-tab-pane label="参数列表" name="second">
@@ -14,35 +15,21 @@
 				<el-tab-pane label="规格书管理" name="third">
 					<module-template :mid="mid" />
 				</el-tab-pane>
-				<!-- <el-tab-pane label="参数管理" name="first">
-					<module-table :arg="params" @update-data="onUpdateModuleId" />
-				</el-tab-pane>
-				<el-tab-pane label="规格书设计" name="third">
-					<design-arguments-template :arg="rootArgument" />
-				</el-tab-pane>
-				<el-tab-pane label="表单预览" name="second">
-					<div class="preview">
-						<design-arguments-form :arg="params" @update-price-params="onUpdatePriceParams" />
-						<design-arguments-quotation :arg="priceParams" />
-					</div>
-				</el-tab-pane> -->
 			</el-tabs>
-			<!-- <utils-quill></utils-quill> -->
-			<!-- <utils-editor v-model="exampleText"></utils-editor> -->
-			<!-- <utils-word></utils-word> -->
-			<!-- <h1>参数列表</h1>
-			<module-arguments :mid="mid" /> -->
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 const activeName = ref('first')
-const mid = ref(1)
-const exampleText = ref('sdadsad')
+const mid = ref(1), rootid = ref(1)
 provide('afterSelectedTree', (node: Module) => {
 	mid.value = node.id
 })
+const onUpdateModule = (id?: number) => {
+	if (id)
+		mid.value = rootid.value = id
+}
 </script>
 
 <style lang="scss" scoped>
