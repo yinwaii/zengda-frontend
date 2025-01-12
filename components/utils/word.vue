@@ -1,12 +1,15 @@
 <template>
 	<ClientOnly>
-		<vue-office-docx :src="docx" class="vue-office" @rendered="renderedHandler" @error="errorHandler"
+		<vue-office-docx :src="$props.docx" class="vue-office" @rendered="renderedHandler" @error="errorHandler"
 			:option="option" />
 	</ClientOnly>
 </template>
 
 <script lang="ts" setup>
-const docx = 'http://static.shanhuxueyuan.com/test6.docx' //设置文档网络地址，可以是相对地址
+defineProps<{
+	docx: string
+}>()
+// const docx = 'http://static.shanhuxueyuan.com/test6.docx' //设置文档网络地址，可以是相对地址
 const option = {
 	className: "docx", //class name/prefix for default and document style classes
 	inWrapper: true, //enables rendering of wrapper around document content

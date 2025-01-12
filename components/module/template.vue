@@ -1,7 +1,5 @@
 <template>
-	<div class="template-header">
-		<h1>规格书</h1>
-		<div class="template-menu">
+			<div class="template-menu">
 			<el-upload
 				class="upload-demo" name="document"
 				:action="useRuntimeConfig().public.baseUrl + `/doc/${$props.mid}`"
@@ -9,31 +7,37 @@
 				@on-success="onSuccess">
 				<el-button type="primary">上传</el-button>
 			</el-upload>
-			<el-button type="primary">保存</el-button>
+			<a :href="useRuntimeConfig().public.baseUrl + `/doc/${$props.mid}`"><el-button type="primary">下载</el-button></a>
+			<el-button type="danger" @click="onDelete">删除</el-button>
 		</div>
-	</div>
-	<utils-editor v-model="exampleText" />
+		<utils-word v-if="hasTemplate" :docx="useRuntimeConfig().public.baseUrl + `/doc/${$props.mid}`"/>
+		<el-alert v-else title="请先上传模板" type="warning" />
 </template>
-
-<script lang="ts" setup>
+<script setup lang="ts">
 import type { UploadProps } from 'element-plus';
-const exampleText = ref('sdadsad')
+const api = useApi()
 
-defineProps<{
+const props = defineProps<{
 	mid: number
 }>()
+
+const hasTemplate = ref<boolean>(await unpackApi(api.documents.exist(props.mid)));
+
+watch(() => props.mid, async (mid) => {
+	hasTemplate.value = await unpackApi(api.documents.exist(mid))
+})
 
 const onSuccess: UploadProps['onSuccess'] = (response, file, fileList) => {
 	console.log(response, file, fileList);
 }
 
-</script>
+const onDelete = async () => {
+	await unpackApi(api.documents.delete(props.mid))
+	hasTemplate.value = false
+}
 
+</script>
 <style lang="scss" scoped>
-.template-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
 	.template-menu {
 		display: flex;
 		display-direction: row;
@@ -41,5 +45,4 @@ const onSuccess: UploadProps['onSuccess'] = (response, file, fileList) => {
 			margin: 10px
 		}
 	}
-}
 </style>

@@ -5,11 +5,14 @@
 			<el-tabs v-model="activeName">
 				<el-tab-pane label="模块详情" name="first">
 					<module-descriptions :mid="mid" />
-					<!-- <el-divider /> -->
-					<module-template :mid="mid" />
+					<el-divider />
+					<module-editor :mid="mid" />
 				</el-tab-pane>
 				<el-tab-pane label="参数列表" name="second">
 					<module-arguments :mid="mid" />
+				</el-tab-pane>
+				<el-tab-pane label="规格书管理" name="third">
+					<module-template :mid="mid" />
 				</el-tab-pane>
 				<!-- <el-tab-pane label="参数管理" name="first">
 					<module-table :arg="params" @update-data="onUpdateModuleId" />
