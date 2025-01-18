@@ -16,7 +16,7 @@
 
 const props = defineProps<{
 	title: string
-	param: Partial<Record<keyof T, ParamOptions>>
+	param: ParamSchema<T>
 	defaultValue: () => T
 	data: T
 }>()

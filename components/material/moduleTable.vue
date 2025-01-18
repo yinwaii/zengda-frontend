@@ -1,6 +1,6 @@
 <template>
-	<abstract-table :data="materials" :param="paramsMaterial" id-column="id"
-	 :default-value="defaultMaterial" editable @insert-row="onInsert"
+	<abstract-table :data="materials" :param="paramsMaterialRecord" id-column="id"
+	 :default-value="defaultMaterialRecord" editable @insert-row="onInsert"
 		@delete-row="onDelete" @update-row="onUpdate" />
 </template>
 
@@ -11,7 +11,7 @@ const props = defineProps<{
 	mid: number
 }>()
 
-const materials = ref<Material[]>(await unpackApi(api.modules.queryMaterials(props.mid)));
+const materials = ref<MaterialRecord[]>(await unpackApi(api.modules.queryMaterials(props.mid)));
 watch(() => props.mid, async (mid) => {
 	materials.value = await unpackApi(api.modules.queryMaterials(mid));
 })
@@ -20,8 +20,8 @@ const emit = defineEmits<{
 	(e: 'update-data'): void
 }>()
 
-const onInsert = async (row: Material) => {
-	await api.materials.insert(row);
+const onInsert = async (row: MaterialRecord) => {
+	await api.materialsRecord.insert(props.mid, row.material.id);
 	ElMessage({
 		message: '已添加物料',
 		type: 'success',
@@ -29,8 +29,8 @@ const onInsert = async (row: Material) => {
 	emit('update-data');
 }
 
-const onDelete = async (row: Material) => {
-	await api.materials.delete(row.id);
+const onDelete = async (row: MaterialRecord) => {
+	await api.materialsRecord.delete(props.mid, row.material.id);
 	ElMessage({
 		message: '已删除物料',
 		type: 'success',
@@ -38,9 +38,9 @@ const onDelete = async (row: Material) => {
 	emit('update-data');
 }
 
-const onUpdate = async (row: Material) => {
+const onUpdate = async (row: MaterialRecord) => {
 	console.log(row);
-	await api.materials.patch(row.id, row);
+	await api.materialsRecord.patch(props.mid, row.material.id, row.quantity);
 	ElMessage({
 		message: '已更新物料',
 		type: 'success',

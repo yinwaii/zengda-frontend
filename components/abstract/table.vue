@@ -4,7 +4,11 @@
 			<template v-for="(value, key) in $props.param">
 				<!-- <el-table-column v-if="value?.isId === true" min-width="60px" fixed="left" align="right" :prop="key.toString()"
 					:label="value?.name" /> -->
-				<el-table-column align="left" :prop="key.toString()" show-overflow-tooltip :label="value?.name" />
+				<el-table-column align="left" :prop="key.toString()" show-overflow-tooltip :label="value?.name">
+					<template #default="{ row }">
+						{{ value ? getParamItem(row, value)[key] : 'null' }}
+					</template>
+				</el-table-column>
 			</template>
 			<el-table-column v-if="$props.editable === true" fixed="right" min-width="120" align="center">
 				<template #header>
@@ -35,7 +39,7 @@
 import { Plus } from '@element-plus/icons-vue';
 
 const props = defineProps<{
-	param: Partial<Record<keyof T, ParamOptions>>
+	param: ParamSchema<T>
 	defaultValue: () => T
 	data: T[]
 	rowKey?: (row: T) => string

@@ -20,6 +20,8 @@
 								:disabled="!$props.canModify">
 								<el-option v-for="item in splitSelector(data.type)" :key="item" :label="item" :value="item" />
 							</el-select>
+							<el-input size="small" v-model="data.quantity" type="primary" v-else-if="data.type === 'bomline'"
+								:disabled="!$props.canModify"/>
 							<span v-else-if="data.type === 'submodule'"></span>
 							<span v-else>{{ (data.type as String) }}</span>
 						</el-tooltip>

@@ -25,7 +25,7 @@ const emit = defineEmits<{
 }>()
 
 defineProps<{
-	param: Partial<Record<keyof T, ParamOptions>>
+	param: ParamSchema<T>
 }>()
 
 const onSave = () => {

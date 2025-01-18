@@ -22,10 +22,10 @@ export default function (baseUrl?: string) {
 			return request.get<ModuleParams>(`/modules/${mid}/deepParameters`);
 		},
 		queryMaterials(mid: number) {
-			return request.get<Array<Material>>(`/modules/${mid}/materials`);
+			return request.get<Array<MaterialRecord>>(`/modules/${mid}/materials`);
 		},
 		queryDeepMaterials(mid: number) {
-			return request.get<Array<Material>>(`/modules/${mid}/deeoMaterials`);
+			return request.get<Array<MaterialRecord>>(`/modules/${mid}/deeoMaterials`);
 		},
 		queryChildren(mid: number) {
 			return request.get<Array<Module>>(`/modules/${mid}/children`);

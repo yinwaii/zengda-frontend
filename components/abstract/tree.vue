@@ -21,7 +21,7 @@
 import { Plus, Minus, Edit } from '@element-plus/icons-vue';
 
 const props = defineProps<{
-	param: Partial<Record<keyof T, ParamOptions>>
+	param: ParamSchema<T>
 	defaultValue: () => T
 	data: T[]
 }>()
