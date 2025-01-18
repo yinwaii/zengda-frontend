@@ -16,7 +16,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   plugins: [
     { src: '@/plugins/wangeditor.js', ssr: false },
-    { src: '@/plugins/nuxt-office.js', ssr: false },
+    { src: '@/plugins/nuxt-office.ts', ssr: false },
   ],
   modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
   css: [

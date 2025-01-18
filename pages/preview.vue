@@ -8,7 +8,7 @@
 					<module-form class="module-result" v-model="parameters" :can-modify="false" />
 				</el-tab-pane>
 				<el-tab-pane label="规格书预览" name="second">
-					<!-- <module-template :mid="mid" /> -->
+					<module-specifications ref="specifications" :parameters="parameters" />
 				</el-tab-pane>
 				<el-tab-pane label="报价表预览" name="third">
 					<!-- <module-template :mid="mid" /> -->
@@ -22,12 +22,15 @@
 const api = useApi()
 const activeName = ref('first')
 const parameters = ref<ModuleParams>(await unpackApi(api.modules.queryDeepParameters(1)))
+const specifications = useTemplateRef('specifications')
 const onUpdateModule = async (id?: number) => {
 	if (id)
 		parameters.value = await unpackApi(api.modules.queryDeepParameters(id))
 }
 const onUpdatePrice = async (data: ModuleParams) => {
 	parameters.value = await unpackApi(api.arguments.queryPriceParameters(data));
+	specifications.value?.onGetSpecification();
+	// specifications.value?.onGet
 	// console.log(res);
 }
 </script>

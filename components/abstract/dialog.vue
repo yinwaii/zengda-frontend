@@ -1,13 +1,15 @@
 <template>
-	<el-dialog v-model="model.isVisible" title="修改" width="500" align-center center>
-		<abstract-form v-model="model.data" :param="$props.param"></abstract-form>
-		<template #footer>
-			<div class="dialog-footer">
-				<el-button type="primary" @click="onSave">保存</el-button>
-				<el-button @click="onCancel">取消</el-button>
-			</div>
-		</template>
-	</el-dialog>
+	<ClientOnly>
+		<el-dialog v-model="model.isVisible" title="修改" width="500" align-center center>
+			<abstract-form v-model="model.data" :param="$props.param"></abstract-form>
+			<template #footer>
+				<div class="dialog-footer">
+					<el-button type="primary" @click="onSave">保存</el-button>
+					<el-button @click="onCancel">取消</el-button>
+				</div>
+			</template>
+		</el-dialog>
+	</ClientOnly>
 </template>
 
 <script lang="ts" setup generic="T extends Record<string, any>">

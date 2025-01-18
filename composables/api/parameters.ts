@@ -26,7 +26,7 @@ export default function (baseUrl?: string) {
 			return request.post<ModuleParams>('/price/deepParameters', {"data": data}, { headers: { 'Content-Type': 'application/json' } });
 		},
 		querySpecification(data: ModuleParams) {
-			return request.post('/doc/generate', {"data": data}, { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' });
-		}
+			return request.postBlob('/doc/generate', {"data": data}, { headers: { 'Content-Type': 'application/json' }, responseType: 'blob' });
+		},
 	}
 };

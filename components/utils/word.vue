@@ -1,14 +1,17 @@
 <template>
 	<ClientOnly>
-		<vue-office-docx :src="$props.docx" class="vue-office" @rendered="renderedHandler" @error="errorHandler"
-			:option="option" />
+		<el-scrollbar :height="docxHeight">
+			<vue-office-docx :src="$props.docx" class="vue-office" @rendered="renderedHandler" @error="errorHandler"
+				:option="option" />
+		</el-scrollbar>
 	</ClientOnly>
 </template>
 
 <script lang="ts" setup>
 defineProps<{
-	docx: string
+	docx: string | ArrayBuffer
 }>()
+const docxHeight = ref('100%');
 // const docx = 'http://static.shanhuxueyuan.com/test6.docx' //设置文档网络地址，可以是相对地址
 const option = {
 	className: "docx", //class name/prefix for default and document style classes
@@ -27,15 +30,16 @@ const option = {
 }
 const renderedHandler = () => {
 	console.log("渲染完成")
+	if (import.meta.client) {
+		const docxElem = document.querySelector('div.docx-wrapper') as HTMLElement;
+		const clientWidth = document.documentElement.clientWidth || document.body.clientWidth;
+		const docxWidth = docxElem.offsetWidth;
+		console.log(docxElem.offsetWidth, clientWidth);
+		docxElem.style.zoom = `${docxWidth / clientWidth * 1.4}`;
+		docxHeight.value = `${docxWidth * 1.414}px`;
+	}
 }
 const errorHandler = () => {
 	console.log("渲染失败")
 }
 </script>
-
-<style lang="scss">
-section.docx {
-	//设置文档样式
-	width: 100% !important;
-}
-</style>

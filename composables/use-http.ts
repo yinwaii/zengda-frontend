@@ -20,6 +20,10 @@ export default function (baseUrl?: string) {
 			return fetch<ResOptions<T>>(url, { method: 'post', body, ...option });
 		},
 
+		postBlob: (url: string, body?: RequestInit['body'] | Record<string, any>, option?: any) => {
+			return fetch<Blob>(url, { method: 'post', body, ...option });
+		},
+
 		put: <T>(url: string, body?: RequestInit['body'] | Record<string, any>, option?: any) => {
 			return fetch<ResOptions<T>>(url, { method: 'put', body, ...option });
 		},
