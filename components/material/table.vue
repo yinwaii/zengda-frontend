@@ -1,6 +1,6 @@
 <template>
 	<abstract-table v-if="props.arg" :data="props.arg" :param="paramsMaterial" id-column="id"
-		:row-key="(row) => row.name + row.id" :default-value="defaultMaterial" editable 
+		:row-key="(row) => row.name + row.id" :default-value="defaultMaterial" editable
 		@insert-row="onInsert" @delete-row="onDelete" @update-row="onUpdate"/>
 </template>
 
@@ -45,3 +45,10 @@ const onUpdate = async (row: Material) => {
 
 
 </script>
+
+<style scoped>
+.abstract-table {
+  margin-top: 10px;
+}
+
+</style>

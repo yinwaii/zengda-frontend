@@ -23,6 +23,9 @@ export default function (baseUrl?: string) {
 		},
 		delete(id: number) {
 			return request.delete(`/materials/${id}`);
+		},
+		search(searchForm: Object) {
+			return request.post<Array<Material>>(`/materials/search/`, searchForm);
 		}
 	};
 }
