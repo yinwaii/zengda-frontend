@@ -52,8 +52,6 @@
 <script setup>
 import {defineEmits, defineProps, onMounted, reactive, ref, watch} from 'vue'
 import {ElMessage} from 'element-plus'
-import axios from "axios"
-
 
 const emit = defineEmits(['returnValue'])
 const props = defineProps({
@@ -250,6 +248,7 @@ const openChange = (open, value) => {
   }
 }
 let params = reactive({})
+const http = useHttp()
 const getOptions = async (value) => {
   // 搜索的字段，可更改，根据业务需求来的
 
@@ -263,11 +262,7 @@ const getOptions = async (value) => {
   }
   selectLoading.value = true
   newSelectOptions.value = []
-  let res = (
-      await axios.get(props.remoteSelectUrl, {
-        params: params
-      })
-  ).data
+  let res = (await http.get(props.remoteSelectUrl, params)).data
   if (res.code === 200) {
     if (res.data.length > 0) {
       newSelectOptions.value = res.data
