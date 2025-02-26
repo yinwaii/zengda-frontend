@@ -1,7 +1,8 @@
 <template>
 	<el-form label-position="left" label-width="80px">
 		<template v-for="(value, key) in $props.param">
-			<el-form-item :label="value?.name" label-position='left'>
+			<template v-if="value?.can_modify === false"></template>
+			<el-form-item v-else :label="value?.name" label-position='left'>
 				<!-- <el-tooltip effect="dark" :content="data.description" placement="left"> -->
 				<el-input size="small" v-model="getParamItem(model, value)[key]" v-if="value?.type === 'float'" />
 				<el-input size="small" v-model="getParamItem(model, value)[key]" v-else-if="value?.type === 'int'" />
