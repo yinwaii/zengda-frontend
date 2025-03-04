@@ -18,7 +18,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/wangeditor.js', ssr: false },
     { src: '@/plugins/nuxt-office.ts', ssr: false },
   ],
-  modules: ['@element-plus/nuxt', 'nuxt-codemirror', '@pinia/nuxt'],
+  modules: ['@element-plus/nuxt', '@pinia/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt'],
   css: [
     '~/assets/scss/index.scss',
     "@wangeditor/editor/dist/css/style.css",
@@ -38,8 +38,10 @@ export default defineNuxtConfig({
   vite: {
     css: {
       preprocessorOptions: {
-        scss: { api: 'modern-compiler' },
-        additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
+        scss: {
+          api: 'modern-compiler',
+          additionalData: `@use "@/assets/scss/element/index.scss" as element;`,
+        },
       }
     }
   },
@@ -48,4 +50,22 @@ export default defineNuxtConfig({
       baseUrl: process.env.NUXT_PUBLIC_API_BASE || '/api'
     }
   },
+  shadcn: {
+    /**
+     * Prefix for all the imported component
+     */
+    prefix: '',
+    /**
+     * Directory that the component lives in.
+     * @default "./components/ui"
+     */
+    componentDir: './components/ui'
+  },
+  // experimental: {
+  //   decorators: true,
+  //   renderJsonPayloads: true
+  // },
+  imports: {
+    dirs: ['models/**']
+  }
 })

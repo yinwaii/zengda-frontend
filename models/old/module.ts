@@ -20,7 +20,7 @@ export const paramsModule: ParamSchema<Module> = {
 	visible: { name: '是否可见', type: 'boolean' },
 }
 
-export default (): Module => {
+export const defaultModule =  (): Module => {
 	return {
 		id: 0,
 		name: '',

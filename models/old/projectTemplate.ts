@@ -22,7 +22,7 @@ export const paramsProjectTemplate: ParamSchema<ProjectTemplate> = {
 	update_time: { name: '更新时间', type: 'boolean', can_modify: false },
 }
 
-export default (): ProjectTemplate => {
+export const defaultProjectTemplate = (): ProjectTemplate => {
 	return {
 		id: -1,
 		name: '',

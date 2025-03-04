@@ -1,11 +1,11 @@
 import type { SearchParameters } from 'ofetch';
 
-export interface ResOptions<T> {
-	data: T;
-	code: number;
-	message?: boolean;
-	err?: string[];
-}
+// export interface ResOptions<T> {
+// 	data: T;
+// 	code: number;
+// 	message?: boolean;
+// 	err?: string[];
+// }
 
 export default function (baseUrl?: string) {
 	const fetch = $fetch.create({

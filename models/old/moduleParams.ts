@@ -21,7 +21,7 @@ export const paramsModuleParams: ParamSchema<ModuleParams> = {
 	visible: { name: '是否可见', type: 'boolean' }
 }
 
-export const arrayToParams: (arr: Array<ModuleParams>) => ParamSchema<any> = (arr) => { 
+export const arrayToParams: (arr: Array<ModuleParams>) => ParamSchema<any> = (arr) => {
 	let result: ParamSchema<any> = {}
 	arr.forEach((item, index) => {
 		result[index] = { name: item.name, type: item.type }
@@ -29,8 +29,8 @@ export const arrayToParams: (arr: Array<ModuleParams>) => ParamSchema<any> = (ar
 	return result
 }
 
-export default (): ModuleParams => {
-	return  {
+export const defaultModuleParams = (): ModuleParams => {
+	return {
 		id: -1,
 		name: '',
 		type: '',

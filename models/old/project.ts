@@ -20,7 +20,7 @@ export const paramsProject: ParamSchema<Project> = {
 	jsonContent: { name: '项目raw内容', type: 'boolean' },
 }
 
-export default (): Project => {
+export const defaultProject = (): Project => {
 	return {
 		id: -1,
 		name: '',

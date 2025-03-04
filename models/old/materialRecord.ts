@@ -10,7 +10,7 @@ export const paramsMaterialRecord: ParamSchema<MaterialRecord> = {
 	description: { name: '备注', type: 'string', getItem: (data: MaterialRecord) => data.material },
 }
 
-export default (): MaterialRecord => {
+export const defaultMaterialRecord =  (): MaterialRecord => {
 	return {
 		material: {
 			id: -1,

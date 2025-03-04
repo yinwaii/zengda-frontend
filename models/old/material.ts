@@ -13,7 +13,7 @@ export const paramsMaterial: ParamSchema<Material> = {
 	description: { name: '备注', type: 'string' },
 }
 
-export default (): Material => {
+export const defaultMaterial = (): Material => {
 	return {
 		id: -1,
 		name: '',
