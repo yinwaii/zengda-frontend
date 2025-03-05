@@ -8,5 +8,5 @@
 </template>
 
 <script setup lang="ts">
-const layout = 'default'
+const layout = 'shadcn'
 </script>
