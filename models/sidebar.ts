@@ -13,7 +13,7 @@ export const sidebarData = [
 		items: [
 			{
 				title: '部件 / Component',
-				url: '/design/component',
+				url: '#',
 			},
 			{
 				title: '子系统 / PSystem',
@@ -37,7 +37,7 @@ export const sidebarData = [
 			},
 			{
 				title: '项目 / Project',
-				url: '#',
+				url: '/design/project',
 			},
 			{
 				title: '物料 / Item',

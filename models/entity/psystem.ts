@@ -3,7 +3,7 @@ export interface ZdPSystem extends BasicProperty, TimeStamp {
 	docsUrl: null | string;
 	parentId: number;
 	children: Array<ZdPSystem> | null;
-	parameters: Array<ModuleParams> | null;
+	parameters: Array<ZdParameter> | null;
 }
 
 export class ZdPSystem implements ZdPSystem {

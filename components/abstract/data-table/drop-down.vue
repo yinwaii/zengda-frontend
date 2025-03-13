@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
 import { MoreHorizontal } from 'lucide-vue-next'
 
 defineProps<{
@@ -20,10 +19,10 @@ function copy(id: string) {
 <template>
 	<shadcn-dropdown-menu>
 		<shadcn-dropdown-menu-trigger as-child>
-			<Button variant="ghost" class="w-8 h-8 p-0">
+			<shadcn-button variant="ghost" class="w-8 h-8 p-0">
 				<span class="sr-only">Open menu</span>
 				<MoreHorizontal class="w-4 h-4" />
-			</Button>
+			</shadcn-button>
 		</shadcn-dropdown-menu-trigger>
 		<shadcn-dropdown-menu-content align="end">
 			<shadcn-dropdown-menu-label>Actions</shadcn-dropdown-menu-label>
@@ -33,7 +32,7 @@ function copy(id: string) {
 			<shadcn-dropdown-menu-item @click="$emit('expand')">
 				Expand
 			</shadcn-dropdown-menu-item>
-			<shadcn-dropdown-menuSeparator />
+			<shadcn-dropdown-menu-separator />
 			<shadcn-dropdown-menu-item>View customer</shadcn-dropdown-menu-item>
 			<shadcn-dropdown-menu-item>View payment details</shadcn-dropdown-menu-item>
 		</shadcn-dropdown-menu-content>
