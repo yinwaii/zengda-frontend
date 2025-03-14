@@ -8,6 +8,14 @@ export interface ZdTemplate extends BasicProperty, TimeStamp {
 	isDeleted?: boolean
 }
 
+export const ZdTemplateColumns = getColumns<ZdTemplate>([
+	{ accessorKey: 'isShow', header: packHeader<ZdTemplate>('是否显示') },
+	{ accessorKey: 'productTypeId', header: packHeader<ZdTemplate>('产品类型ID') },
+	{ accessorKey: 'productTypeName', header: packHeader<ZdTemplate>('产品类型名称') },
+	{ accessorKey: 'isCustomized', header: packHeader<ZdTemplate>('是否定制') },
+	{ accessorKey: 'isDeleted', header: packHeader<ZdTemplate>('是否删除') },
+], true, true)
+
 export class ZdTemplate implements ZdTemplate {
 	constructor() {
 		this.id = -1;

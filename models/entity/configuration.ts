@@ -7,6 +7,15 @@ export interface ZdConfiguration extends BasicProperty, TimeStamp {
 	componentConfig: string
 }
 
+export const ZdConfigurationColumns = getColumns<ZdConfiguration>([
+	{ accessorKey: 'isShow', header: packHeader<ZdConfiguration>('是否显示') },
+	{ accessorKey: 'template_id', header: packHeader<ZdConfiguration>('模板ID') },
+	{ accessorKey: 'project_id', header: packHeader<ZdConfiguration>('项目ID') },
+	{ accessorKey: 'lastVersionId', header: packHeader<ZdConfiguration>('最后版本ID') },
+	{ accessorKey: 'valueConfig', header: packHeader<ZdConfiguration>('值配置') },
+	{ accessorKey: 'componentConfig', header: packHeader<ZdConfiguration>('组件配置') },
+], true, true)
+
 export class ZdConfiguration implements ZdConfiguration {
 	constructor() {
 		this.id = -1;

@@ -7,75 +7,11 @@ export interface ResOptions<T> {
 	err?: string[];
 }
 
-export interface GenericParam<T> {
-	name: string
-	type: string
-	isreadonly?: boolean
-	getItem: (data: any) => any
-}
-
-export class GenericParam<T> implements GenericParam<T> {
-	constructor(name: string, type: string) {
-		this.name = name;
-		this.type = type;
-		this.isreadonly = false;
-		this.getItem = (data: any) => data ?? {};
-	}
-}
-
-export type GenericParamMap<T> = Partial<Record<keyof T, GenericParam<T>>>
-
-export interface BasicProperty {
-	id: number;
-	name: string;
-	description?: string;
-}
-
-export interface TimeStamp {
-	createdBy?: string;
-	createdTime?: string;
-	updatedBy?: string;
-	updatedTime?: string;
-}
-
-export interface VOList<T> {
-	list: Array<T>
-}
-
-export interface VOPaged<T> {
-	content: Array<T>
-	pageable: {
-		sort: {
-			sorted: boolean
-			unsorted: boolean
-			empty: boolean
-		}
-		offset: number
-		pageSize: number
-		pageNumber: number
-		unpaged: boolean
-		paged: boolean
-	}
-	totalPages: number
-	totalElements: number
-	last: boolean
-	size: number
-	number: number
-	sort: {
-		sorted: boolean
-		unsorted: boolean
-		empty: boolean
-	}
-	numberOfElements: number
-	first: boolean
-	empty: boolean
-}
-
 class MyFetch {
 	_fetch: typeof $fetch;
 	constructor(baseUrl?: string) {
 		this._fetch = $fetch.create({
-			baseURL: baseUrl ?? useRuntimeConfig().public.baseUrl
+			baseURL: baseUrl ?? "http://127.0.0.1:8080/api/"
 		});
 	}
 
@@ -95,8 +31,8 @@ class MyFetch {
 		return this.fetch<T>(url, { method: 'post', body, ...option });
 	}
 
-	postBlob(url: string, body?: RequestInit['body'] | Record<string, any>, option?: any) {
-		return this._fetch<Blob>(url, { method: 'post', body, ...option });
+	postRaw<T>(url: string, body?: RequestInit['body'] | Record<string, any>, option?: any) {
+		return this._fetch<T>(url, { method: 'post', body, ...option });
 	}
 
 	put<T>(url: string, body?: RequestInit['body'] | Record<string, any>, option?: any) {

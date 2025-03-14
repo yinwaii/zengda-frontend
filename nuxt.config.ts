@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/wangeditor.js', ssr: false },
     { src: '@/plugins/nuxt-office.ts', ssr: false },
   ],
-  modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt'],
+  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt'],
   css: [
     "@wangeditor/editor/dist/css/style.css",
     '@vue-office/docx/lib/index.css',
@@ -42,7 +42,7 @@ export default defineNuxtConfig({
   },
   shadcn: {
     prefix: 'shadcn',
-    componentDir: './components/ui'
+    componentDir: './components/ui',
   },
   lucide: {
     prefix: "lucide",

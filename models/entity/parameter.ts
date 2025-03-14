@@ -9,6 +9,17 @@ export interface ZdParameter extends BasicProperty, TimeStamp {
 	isDeleted: boolean
 }
 
+export const ZdParameterColumns = getColumns<ZdParameter>([
+	{ accessorKey: 'isShow', header: packHeader<ZdParameter>('是否显示') },
+	{ accessorKey: 'orderId', header: packHeader<ZdParameter>('排序ID') },
+	{ accessorKey: 'objectId', header: packHeader<ZdParameter>('对象ID') },
+	{ accessorKey: 'objectType', header: packHeader<ZdParameter>('对象类型') },
+	{ accessorKey: 'dtype', header: packHeader<ZdParameter>('数据类型') },
+	{ accessorKey: 'value', header: packHeader<ZdParameter>('值') },
+	{ accessorKey: 'isReadonly', header: packHeader<ZdParameter>('是否只读') },
+	{ accessorKey: 'isDeleted', header: packHeader<ZdParameter>('是否删除') },
+], true, true)
+
 export class ZdParameter implements ZdParameter {
 	constructor() {
 		this.id = -1;

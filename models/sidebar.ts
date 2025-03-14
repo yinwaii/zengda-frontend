@@ -9,39 +9,27 @@ export type SidebarData = Array<SidebarNode>
 export const sidebarData = [
 	{
 		title: '设计 / Design',
-		url: '#',
+		url: '/design',
 		items: [
 			{
 				title: '部件 / Component',
-				url: '#',
+				url: '/design/component/table',
 			},
 			{
 				title: '子系统 / PSystem',
-				url: '#',
+				url: '/design/psystem/table',
 			},
 			{
 				title: '模板 / Template',
-				url: '#',
+				url: '/design/template/table',
 			},
 			{
 				title: '产品类型 / PType',
-				url: '#',
-			},
-			{
-				title: '参数 / Argument',
-				url: '#',
-			},
-			{
-				title: '配置 / Configuration',
-				url: '#',
+				url: '/design/ptype/table',
 			},
 			{
 				title: '项目 / Project',
-				url: '/design/project',
-			},
-			{
-				title: '物料 / Item',
-				url: '#',
+				url: '/design/project/table',
 			},
 		],
 	},

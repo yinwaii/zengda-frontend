@@ -5,6 +5,13 @@ export interface ZdComponent extends BasicProperty, TimeStamp {
 	value?: string
 }
 
+export const ZdComponentColumns = getColumns<ZdComponent>([
+	{ accessorKey: 'isShow', header: packHeader<ZdComponent>('是否显示') },
+	{ accessorKey: 'isRequired', header: packHeader<ZdComponent>('是否必须') },
+	{ accessorKey: 'price', header: packHeader<ZdComponent>('价格') },
+	{ accessorKey: 'value', header: packHeader<ZdComponent>('数量') },
+], true, true)
+
 export class ZdComponent implements ZdComponent {
 	constructor() {
 		this.id = 0;

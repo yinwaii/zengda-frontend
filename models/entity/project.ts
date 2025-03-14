@@ -15,6 +15,40 @@ export interface ZdProject extends BasicProperty, TimeStamp {
 	price?: string
 }
 
+export const ZdProjectColumns = getColumns<ZdProject>([
+	{ accessorKey: 'productTypeId', header: packHeader<ZdProject>('产品类型') },
+	{ accessorKey: 'templateId', header: packHeader<ZdProject>('模板ID') },
+	{ accessorKey: 'quantity', header: packHeader<ZdProject>('数量') },
+	{ accessorKey: 'model', header: packHeader<ZdProject>('模型') },
+	{ accessorKey: 'attention', header: packHeader<ZdProject>('注意力') },
+	{ accessorKey: 'company', header: packHeader<ZdProject>('公司') },
+	{ accessorKey: 'tel', header: packHeader<ZdProject>('电话') },
+	{ accessorKey: 'mob', header: packHeader<ZdProject>('手机') },
+	{ accessorKey: 'fax', header: packHeader<ZdProject>('传真') },
+	{ accessorKey: 'email', header: packHeader<ZdProject>('邮件') },
+	{ accessorKey: 'number', header: packHeader<ZdProject>('号码') },
+	{ accessorKey: 'date', header: packHeader<ZdProject>('日期') },
+	{ accessorKey: 'valid', header: packHeader<ZdProject>('是否合法') },
+	{ accessorKey: 'price', header: packHeader<ZdProject>('价格') },
+], true, true)
+
+export const ZdProjectColumnsVisibility = {
+	productTypeId: true,
+	templateId: true,
+	quantity: true,
+	model: false,
+	attention: false,
+	company: false,
+	tel: true,
+	mob: false,
+	fax: false,
+	email: true,
+	number: false,
+	date: false,	
+	valid: false,
+	price: false,
+}
+
 export class ZdProject implements ZdProject {
 	constructor() {
 		this.id = 0
@@ -22,35 +56,6 @@ export class ZdProject implements ZdProject {
 		this.description = ''
 		this.productTypeId = 0
 		this.templateId = 0
-	}
-
-	static formSchema: GenericParamMap<ZdProject> = {
-		id: new GenericParam('ID', 'span'),
-		name: new GenericParam('名称', 'string'),
-		description: new GenericParam('描述', 'string'),
-		productTypeId: new GenericParam('产品类型ID', 'number'),
-		templateId: new GenericParam('模板ID', 'number'),
-		quantity: new GenericParam('数量', 'number'),
-		model: new GenericParam('模型', 'string'),
-		attention: new GenericParam('注意力', 'string'),
-		company: new GenericParam('公司', 'string'),
-		tel: new GenericParam('电话', 'string'),
-		mob: new GenericParam('手机', 'string'),
-		fax: new GenericParam('传真', 'string'),
-		email: new GenericParam('邮箱', 'string'),
-		number: new GenericParam('号码', 'string'),
-		date: new GenericParam('日期', 'string'),
-		valid: new GenericParam('合法值', 'string'),
-		price: new GenericParam('价格', 'string'),
-	}
-
-	static tableSchema: GenericParamMap<ZdProject> = {
-		id: new GenericParam('ID', 'span'),
-		name: new GenericParam('名称', 'string'),
-		description: new GenericParam('描述', 'string'),
-		productTypeId: new GenericParam('产品类型ID', 'number'),
-		templateId: new GenericParam('模板ID', 'number'),
-		quantity: new GenericParam('数量', 'number'),
 	}
 
 	static get(id: number) {

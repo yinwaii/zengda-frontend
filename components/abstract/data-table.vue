@@ -48,17 +48,19 @@ const table = useVueTable({
 		get expanded() { return expanded.value },
 	},
 })
+
+defineExpose({ columnVisibility })
 </script>
 
 <template>
-	<div>
+	<div class="max-w-3/4">
 		<div class="flex items-center py-4">
-				<!-- <shadcn-input class="max-w-sm" placeholder="Filter emails..."
-					:model-value="table.getColumn('email')?.getFilterValue() as string"
-					@update:model-value=" table.getColumn('email')?.setFilterValue($event)" /> -->
-				<abstract-data-table-view-options :table="table" />
+			<shadcn-input class="max-w-sm" placeholder="根据名称检索..."
+				:model-value="table.getColumn('name')?.getFilterValue() as string"
+				@update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
+			<abstract-data-table-view-options :table="table" />
 		</div>
-		<div class="border rounded-md">
+		<div class="overflow-x-auto border rounded-md">
 			<shadcn-table>
 				<shadcn-table-header>
 					<abstract-data-table-header :table="table" />

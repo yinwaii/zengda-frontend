@@ -1,10 +1,10 @@
 <template>
-	<div class="wrap"></div>
-	<el-overlay z-index="0">
+	<!-- <div class="wrap"></div> -->
+	<!-- <el-overlay z-index="0"> -->
 		<div class="container">
 			<slot></slot>
 		</div>
-	</el-overlay>
+	<!-- </el-overlay> -->
 </template>
 
 <style lang="scss" scoped>

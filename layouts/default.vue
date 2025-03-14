@@ -1,58 +1,22 @@
+<script lang="ts">
+export const iframeHeight = '800px'
+export const description
+	= 'A simple sidebar with navigation grouped by section.'
+</script>
 <template>
-	<el-container class="layout">
-		<el-header>
-			<layout-header></layout-header>
-		</el-header>
-		<el-container>
-			<el-aside>
-				<el-scrollbar>
-					<layout-navigator></layout-navigator>
-				</el-scrollbar>
-			</el-aside>
-			<el-container class="content">
-				<el-scrollbar>
-					<el-main>
-						<slot></slot>
-					</el-main>
-					<el-footer>
-						<layout-footer></layout-footer>
-					</el-footer>
-				</el-scrollbar>
-			</el-container>
-		</el-container>
-	</el-container>
+	<shadcn-sidebar-provider>
+		<layout-sidebar :data="sidebarData" />
+		<shadcn-sidebar-inset>
+			<layout-breadcrumb />
+			<slot></slot>
+			<!-- <div class="flex flex-1 flex-col gap-4 p-4">
+				<div class="grid auto-rows-min gap-4 md:grid-cols-3">
+					<div class="aspect-video rounded-xl bg-muted/50" />
+					<div class="aspect-video rounded-xl bg-muted/50" />
+					<div class="aspect-video rounded-xl bg-muted/50" />
+				</div>
+				<div class="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+			</div> -->
+		</shadcn-sidebar-inset>
+	</shadcn-sidebar-provider>
 </template>
-
-<style lang="scss" scoped>
-.layout {
-	height: 100vh;
-
-	.el-header {
-		box-shadow: var(--el-box-shadow-light);
-		height: var(--header-height);
-	}
-
-	.el-aside {
-		width: 200px;
-		color: var(--el-text-color-primary);
-	}
-
-	.el-scrollbar {
-		width: 100%;
-		height: calc(100vh - var(--header-height));
-	}
-
-	.content {
-		background-color: var(--el-fill-color);
-
-		.el-main {
-			padding: 0 16px 16px;
-			min-height: calc(100vh - var(--header-height) - var(--footer-min-height) - 10px);
-		}
-	}
-
-	.el-footer {
-		min-height: var(--footer-min-height);
-	}
-}
-</style>

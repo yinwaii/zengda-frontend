@@ -6,6 +6,14 @@ export interface ZdTComponent extends TimeStamp {
 	description?: string
 }
 
+export const ZdTComponentColumns = getColumns<ZdTComponent>([
+	{ accessorKey: 'id', header: packHeader<ZdTComponent>('ID') },
+	{ accessorKey: 'psystemId', header: packHeader<ZdTComponent>('系统ID') },
+	{ accessorKey: 'templateId', header: packHeader<ZdTComponent>('模板ID') },
+	{ accessorKey: 'componentId', header: packHeader<ZdTComponent>('组件ID') },
+	{ accessorKey: 'description', header: packHeader<ZdTComponent>('描述') },
+], false, true)
+
 export class ZdTComponent implements ZdTComponent {
 	constructor() {
 		this.id = -1;
