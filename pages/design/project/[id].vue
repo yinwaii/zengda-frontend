@@ -14,14 +14,15 @@
 			</div>
 		</div>
 		<div class="flex-1 overflow-auto">
-			<template v-if="selectedProject">
-				<design-project-detail
-					:project="selectedProject"
-					:is-editing="isEditing"
-					@edit="isEditing = true"
-					@cancel="isEditing = false"
-					@submit="handleProjectSubmit"
-				/>
+			<template v-if="showProjectDetail && selectedProject">
+				<div class="space-y-6">
+					<design-project-detail :project="selectedProject" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleProjectSubmit" :parameters="parameterDetails" />
+
+					<shadcn-separator />
+
+					<design-parameter-preview :parameters="parameterDetails" />
+				</div>
 			</template>
 			<div v-else class="flex items-center justify-center h-full text-muted-foreground">
 				请从左侧选择一个项目
@@ -45,6 +46,8 @@ const projectId = Number(id)
 const selectedProject = ref<ZdProject | null>(null)
 const isEditing = ref(false)
 const isProjectExpanded = ref(true)
+const showProjectDetail = ref(false)
+const parameterDetails = ref<ZdParameter[]>([])
 const entityApis = useEntityApis()
 
 // 切换项目展开状态
@@ -57,7 +60,17 @@ const handleProjectSelect = async () => {
 	try {
 		const project = await entityApis.project.get(projectId)
 		selectedProject.value = project
+		showProjectDetail.value = true
 		isEditing.value = false
+
+		// 获取参数列表
+		try {
+			const response = await entityApis.parameter.get(projectId, 'project')
+			parameterDetails.value = response || []
+		} catch (error) {
+			console.error('获取参数列表失败:', error)
+			parameterDetails.value = []
+		}
 	} catch (error) {
 		console.error('获取项目详情失败:', error)
 	}

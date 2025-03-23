@@ -7,10 +7,12 @@
 						<h2 class="text-2xl font-bold">{{ component.name }}</h2>
 						<p class="text-sm text-muted-foreground mt-1">{{ component.description || '暂无描述' }}</p>
 					</div>
-					<shadcn-button @click="$emit('edit')">
-						<LucidePencil class="mr-2 h-4 w-4" />
-						编辑
-					</shadcn-button>
+					<div class="flex items-center gap-2">
+						<shadcn-button @click="$emit('edit')">
+							<LucidePencil class="mr-2 h-4 w-4" />
+							编辑
+						</shadcn-button>
+					</div>
 				</div>
 			</shadcn-card-header>
 			<shadcn-card-content>
@@ -22,29 +24,25 @@
 								<shadcn-input id="name" v-model="editForm.name" />
 							</div>
 							<div class="space-y-2">
-								<shadcn-label for="description">描述</shadcn-label>
-								<shadcn-input id="description" v-model="editForm.description" />
-							</div>
-						</div>
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
-								<shadcn-label for="isShow">是否显示</shadcn-label>
-								<shadcn-switch id="isShow" v-model="editForm.isShow" />
-							</div>
-							<div class="space-y-2">
-								<shadcn-label for="isRequired">是否必须</shadcn-label>
-								<shadcn-switch id="isRequired" v-model="editForm.isRequired" />
-							</div>
-						</div>
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
 								<shadcn-label for="price">价格</shadcn-label>
 								<shadcn-input id="price" v-model="editForm.price" />
 							</div>
-							<div class="space-y-2">
-								<shadcn-label for="value">数量</shadcn-label>
-								<shadcn-input id="value" v-model="editForm.value" />
-							</div>
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="description">描述</shadcn-label>
+							<shadcn-textarea id="description" v-model="editForm.description" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="value">数量</shadcn-label>
+							<shadcn-input id="value" v-model="editForm.value" />
+						</div>
+						<div class="flex items-center space-x-2">
+							<shadcn-checkbox id="isShow" v-model="editForm.isShow" />
+							<shadcn-label for="isShow">是否显示</shadcn-label>
+						</div>
+						<div class="flex items-center space-x-2">
+							<shadcn-checkbox id="isRequired" v-model="editForm.isRequired" />
+							<shadcn-label for="isRequired">是否必须</shadcn-label>
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -63,12 +61,16 @@
 							<dd class="mt-1">{{ component.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">名称</dt>
-							<dd class="mt-1">{{ component.name }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
+							<dd class="mt-1">{{ component.price || '暂无价格' }}</dd>
 						</div>
 						<div class="col-span-2 space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">描述</dt>
 							<dd class="mt-1">{{ component.description || '暂无描述' }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">数量</dt>
+							<dd class="mt-1">{{ component.value || '暂无数量' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
@@ -77,14 +79,6 @@
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">是否必须</dt>
 							<dd class="mt-1">{{ component.isRequired ? '是' : '否' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
-							<dd class="mt-1">{{ component.price || '暂无价格' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">数量</dt>
-							<dd class="mt-1">{{ component.value || '暂无数量' }}</dd>
 						</div>
 					</div>
 				</template>
@@ -118,17 +112,25 @@
 				</div>
 			</shadcn-card-content>
 		</shadcn-card>
+
+		<shadcn-separator />
+
+		<parameter-preview :parameters="parameters" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ZdComponent } from '~/models/entity/component'
+import { ref } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
+import { ZdComponent } from '~/models/entity/component'
+import { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
+import ParameterPreview from '~/components/design/parameter/preview.vue'
 
 const props = defineProps<{
 	component: ZdComponent
 	isEditing: boolean
+	parameters: ZdParameter[]
 }>()
 
 const emit = defineEmits<{
@@ -140,10 +142,10 @@ const emit = defineEmits<{
 const editForm = ref<Partial<ZdComponent>>({
 	name: props.component.name,
 	description: props.component.description,
-	isShow: props.component.isShow,
-	isRequired: props.component.isRequired,
 	price: props.component.price,
-	value: props.component.value
+	value: props.component.value,
+	isShow: props.component.isShow,
+	isRequired: props.component.isRequired
 })
 
 const handleSubmit = () => {

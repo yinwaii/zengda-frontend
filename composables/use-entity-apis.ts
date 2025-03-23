@@ -119,19 +119,19 @@ export const useEntityApis = () => {
 
     specification: {
       getAll: (id: number) => api.get<ZdSpecification>(`/specification/tree/${id}`),
-      render: (configId: number, body: ZdSpecification) => api.get<object>('/specification/rendering', { configId }, {
+      render: (configId: number, body: ZdSpecificationQuery) => api.get<object>('/specification/rendering', { configId }, {
         body, 
         headers: {
           'Content-Type': 'application/json'
         }
       }),
-      upload: (tag: string, file: File, specification: string) => api.post<object>('/specification', { file, specification }, {
+      upload: (tag: string, file: File, specification: ZdSpecificationMeta) => api.post<object>('/specification', { file, specification }, {
         query: { tag },
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }),
-      update: (tag: string, file: File, specification: string) => api.put<object>('/specification', { file, specification }, {
+      update: (tag: string, file: File, specification: ZdSpecificationMeta) => api.put<object>('/specification', { file, specification }, {
         query: { tag },
         headers: {
           'Content-Type': 'multipart/form-data'

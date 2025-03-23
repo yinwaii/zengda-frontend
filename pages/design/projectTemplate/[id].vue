@@ -4,156 +4,80 @@
 			<div class="space-y-1">
 				<div class="flex items-center gap-1">
 					<button class="p-1 hover:bg-accent rounded-sm" @click="toggleTemplateExpand">
-						<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': isTemplateExpanded }]" />
+						<lucide-chevron-right :class="['h-4 w-4 transition-transform', { 'rotate-90': isTemplateExpanded }]" />
 					</button>
 					<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
 						@click="handleTemplateSelect">
-						<LucideBookTemplate class="h-4 w-4" />
+						<lucide-book-template class="h-4 w-4" />
 						<span class="flex-1">{{ selectedTemplate?.name }}</span>
 					</div>
 				</div>
 			</div>
 			<div v-if="isTemplateExpanded" class="ml-6 mt-1">
-				<PSystemTree :items="treeData" @select="handleSelect" @component-select="handleComponentSelect" />
+				<design-template-tree 
+					:items="treeData" 
+					@select="handleSelect" 
+					@component-select="handleComponentSelect" 
+				/>
+				
+				<!-- 规格书项 -->
+				<div v-if="selectedTemplate?.specId && specificationData" class="space-y-1 mt-2">
+					<div class="flex items-center gap-1">
+						<button class="p-1 hover:bg-accent rounded-sm" @click="isSpecificationExpanded = !isSpecificationExpanded">
+							<lucide-chevron-right :class="['h-4 w-4 transition-transform', { 'rotate-90': isSpecificationExpanded }]" />
+						</button>
+						<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="handleRootSpecificationSelect">
+							<lucide-file-text class="h-4 w-4" />
+							<span class="flex-1">规格书</span>
+						</div>
+					</div>
+					
+					<div v-if="isSpecificationExpanded" class="ml-6 space-y-1">
+						<div v-for="(child, index) in specificationData.children" :key="index" class="space-y-1">
+							<design-specification-node 
+								:spec="child" 
+								@select="handleSpecificationNodeSelect" 
+							/>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="flex-1 overflow-auto">
 			<template v-if="showTemplateDetail && selectedTemplate">
 				<div class="space-y-6">
-					<TemplateDetail :template="selectedTemplate" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleTemplateSubmit" />
-
-					<shadcn-separator />
-
-					<shadcn-card>
-						<shadcn-card-header>
-							<shadcn-card-title>参数列表</shadcn-card-title>
-						</shadcn-card-header>
-						<shadcn-card-content>
-							<shadcn-table v-if="parameterDetails.length > 0">
-								<shadcn-table-header>
-									<shadcn-table-row>
-										<shadcn-table-head>参数名</shadcn-table-head>
-										<shadcn-table-head>描述</shadcn-table-head>
-										<shadcn-table-head>值</shadcn-table-head>
-										<shadcn-table-head>类型</shadcn-table-head>
-									</shadcn-table-row>
-								</shadcn-table-header>
-								<shadcn-table-body>
-									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
-										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
-									</shadcn-table-row>
-								</shadcn-table-body>
-							</shadcn-table>
-							<div v-else class="text-center text-muted-foreground py-4">
-								暂无参数
-							</div>
-						</shadcn-card-content>
-					</shadcn-card>
+					<design-template-detail :template="selectedTemplate" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleTemplateSubmit" :parameters="parameterDetails" />
 				</div>
 			</template>
 			<template v-else-if="selectedPSystem">
 				<div class="space-y-6">
-					<PSystemBasicInfo :system="selectedPSystem" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleSubmit" />
-
-					<shadcn-separator />
-
-					<PSystemInfo :system="selectedPSystem" />
-
-					<shadcn-separator />
-
-					<shadcn-card>
-						<shadcn-card-header>
-							<shadcn-card-title>参数列表</shadcn-card-title>
-						</shadcn-card-header>
-						<shadcn-card-content>
-							<shadcn-table v-if="parameterDetails.length > 0">
-								<shadcn-table-header>
-									<shadcn-table-row>
-										<shadcn-table-head>参数名</shadcn-table-head>
-										<shadcn-table-head>描述</shadcn-table-head>
-										<shadcn-table-head>值</shadcn-table-head>
-										<shadcn-table-head>类型</shadcn-table-head>
-									</shadcn-table-row>
-								</shadcn-table-header>
-								<shadcn-table-body>
-									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
-										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
-									</shadcn-table-row>
-								</shadcn-table-body>
-							</shadcn-table>
-							<div v-else class="text-center text-muted-foreground py-4">
-								暂无参数
-							</div>
-						</shadcn-card-content>
-					</shadcn-card>
+					<design-psystem-detail :system="selectedPSystem" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleSubmit" :parameters="parameterDetails" />
 				</div>
 			</template>
 			<template v-else-if="selectedComponent">
 				<div class="space-y-6">
-					<ComponentDetail :component="selectedComponent" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleComponentSubmit" />
-
-					<shadcn-separator />
-
-					<shadcn-card>
-						<shadcn-card-header>
-							<shadcn-card-title>参数列表</shadcn-card-title>
-						</shadcn-card-header>
-						<shadcn-card-content>
-							<shadcn-table v-if="parameterDetails.length > 0">
-								<shadcn-table-header>
-									<shadcn-table-row>
-										<shadcn-table-head>参数名</shadcn-table-head>
-										<shadcn-table-head>描述</shadcn-table-head>
-										<shadcn-table-head>值</shadcn-table-head>
-										<shadcn-table-head>类型</shadcn-table-head>
-									</shadcn-table-row>
-								</shadcn-table-header>
-								<shadcn-table-body>
-									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
-										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
-										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
-									</shadcn-table-row>
-								</shadcn-table-body>
-							</shadcn-table>
-							<div v-else class="text-center text-muted-foreground py-4">
-								暂无参数
-							</div>
-						</shadcn-card-content>
-					</shadcn-card>
+					<design-component-detail :component="selectedComponent" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleComponentSubmit" :parameters="parameterDetails" />
+				</div>
+			</template>
+			<template v-else-if="selectedSpecification">
+				<div class="space-y-6">
+					<design-specification-detail :specification="selectedSpecification" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleSpecificationSubmit" :parameters="parameterDetails" />
 				</div>
 			</template>
 			<div v-else class="flex items-center justify-center h-full text-muted-foreground">
-				请从左侧选择一个项目模板、系统或组件
+				请从左侧选择一个项目模板、系统、组件或规格书
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import PSystemTree from '~/components/design/template/PSystemTree.vue'
-import PSystemBasicInfo from '~/components/design/template/PSystemBasicInfo.vue'
-import PSystemInfo from '~/components/design/template/PSystemInfo.vue'
-import PSystemParameters from '~/components/design/template/PSystemParameters.vue'
-import ComponentDetail from '~/components/design/template/ComponentDetail.vue'
-import TemplateDetail from '~/components/design/template/TemplateDetail.vue'
-import { ZdPSystem } from '~/models/entity/psystem'
-import { ZdTComponent } from '~/models/entity/tcompoment'
-import { ZdParameter } from '~/models/entity/parameter'
-import { ZdComponent } from '~/models/entity/component'
-import { ZdTemplate } from '~/models/entity/template'
-import { useEntityApis } from '~/composables/use-entity-apis'
-import { LucideBookTemplate, LucideChevronRight } from 'lucide-vue-next'
+import { LucideBookTemplate, LucideChevronRight, LucideFileText } from 'lucide-vue-next'
+import type { ZdSpecification } from '~/models/entity/specification'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -173,6 +97,11 @@ const isEditing = ref(false)
 const isTemplateExpanded = ref(true)
 const entityApis = useEntityApis()
 const showTemplateDetail = ref(false)
+
+// 规格书相关状态
+const specificationData = ref<ZdSpecification | null>(null)
+const selectedSpecification = ref<ZdSpecification | null>(null)
+const isSpecificationExpanded = ref(true)
 
 // 计算选中系统的关联组件
 const selectedComponents = computed(() => {
@@ -210,8 +139,23 @@ const fetchData = async () => {
 		components.value = componentResponse.list
 		selectedTemplate.value = templateResponse
 		template.value = templateResponse
+		
+		// 如果模板有规格书ID，获取规格书数据
+		if (templateResponse.specId) {
+			await fetchSpecificationData(templateResponse.specId)
+		}
 	} catch (error) {
 		console.error('获取数据失败:', error)
+	}
+}
+
+// 获取规格书数据
+const fetchSpecificationData = async (specId: number) => {
+	try {
+		const response = await entityApis.specification.getAll(specId)
+		specificationData.value = response
+	} catch (error) {
+		console.error('获取规格书数据失败:', error)
 	}
 }
 
@@ -219,6 +163,7 @@ const fetchData = async () => {
 const handleTemplateSelect = async () => {
 	selectedPSystem.value = null
 	selectedComponent.value = null
+	selectedSpecification.value = null
 	showTemplateDetail.value = true
 	isEditing.value = false
 
@@ -236,6 +181,7 @@ const handleTemplateSelect = async () => {
 const handleSelect = async (system: ZdPSystem) => {
 	selectedPSystem.value = system
 	selectedComponent.value = null
+	selectedSpecification.value = null
 	showTemplateDetail.value = false
 	isEditing.value = false
 	
@@ -255,6 +201,7 @@ const handleComponentSelect = async (componentId: number) => {
 		const component = await entityApis.component.get(componentId)
 		selectedComponent.value = component
 		selectedPSystem.value = null
+		selectedSpecification.value = null
 		showTemplateDetail.value = false
 		isEditing.value = false
 
@@ -271,6 +218,44 @@ const handleComponentSelect = async (componentId: number) => {
 	}
 }
 
+// 处理根规格书选择
+const handleRootSpecificationSelect = async () => {
+	if (specificationData.value) {
+		selectedSpecification.value = specificationData.value
+		selectedPSystem.value = null
+		selectedComponent.value = null
+		showTemplateDetail.value = false
+		isEditing.value = false
+		
+		// 获取规格书参数列表
+		try {
+			const response = await entityApis.parameter.get(specificationData.value.id, 'specification')
+			parameterDetails.value = response || []
+		} catch (error) {
+			console.error('获取规格书参数列表失败:', error)
+			parameterDetails.value = []
+		}
+	}
+}
+
+// 处理规格书节点选择
+const handleSpecificationNodeSelect = async (spec: ZdSpecification) => {
+	selectedSpecification.value = spec
+	selectedPSystem.value = null
+	selectedComponent.value = null
+	showTemplateDetail.value = false
+	isEditing.value = false
+	
+	// 获取规格书参数列表
+	try {
+		const response = await entityApis.parameter.get(spec.id, 'specification')
+		parameterDetails.value = response || []
+	} catch (error) {
+		console.error('获取规格书参数列表失败:', error)
+		parameterDetails.value = []
+	}
+}
+
 // 处理模板表单提交
 const handleTemplateSubmit = async (form: Partial<ZdTemplate>) => {
 	if (!selectedTemplate.value) return
@@ -282,6 +267,15 @@ const handleTemplateSubmit = async (form: Partial<ZdTemplate>) => {
 		})
 		selectedTemplate.value = updatedTemplate
 		isEditing.value = false
+		
+		// 如果规格书ID更新了，需要重新获取规格书数据
+		if (form.specId !== selectedTemplate.value.specId) {
+			if (form.specId) {
+				await fetchSpecificationData(form.specId)
+			} else {
+				specificationData.value = null
+			}
+		}
 	} catch (error) {
 		console.error('更新模板失败:', error)
 	}
@@ -320,6 +314,36 @@ const handleComponentSubmit = async (form: Partial<ZdComponent>) => {
 		await fetchData()
 	} catch (error) {
 		console.error('更新组件失败:', error)
+	}
+}
+
+// 处理规格书表单提交
+const handleSpecificationSubmit = async (form: Partial<ZdSpecification>) => {
+	if (!selectedSpecification.value) return
+	
+	try {
+		// 创建规格书元数据对象
+		const specMeta: ZdSpecificationMeta = {
+			name: form.name || selectedSpecification.value.name,
+			fileTag: form.fileTag || selectedSpecification.value.fileTag,
+			lastVersionId: selectedSpecification.value.latestVersionId
+		}
+		
+		// 使用update方法更新规格书
+		await entityApis.specification.update(
+			specMeta.fileTag,
+			null as any, // 这里应该传文件，但当前只是更新元数据
+			specMeta
+		)
+		
+		// 刷新规格书数据
+		if (selectedTemplate.value?.specId) {
+			await fetchSpecificationData(selectedTemplate.value.specId)
+		}
+		
+		isEditing.value = false
+	} catch (error) {
+		console.error('更新规格书失败:', error)
 	}
 }
 
