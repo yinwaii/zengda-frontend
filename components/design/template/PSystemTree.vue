@@ -1,104 +1,67 @@
 <template>
-	<TreeView
-		:items="mappedItems"
-		:get-key="getKey"
-		:get-title="getTitle"
-		:get-children="getChildren"
-		v-model:expanded-state="expandedState"
-		class="rounded-lg border bg-card p-4"
-	>
-		<template #title="{ item }">
-			<div class="flex items-center gap-2">
-				<component 
-					:is="isComponent(item) ? PuzzleIcon : FolderIcon" 
-					:class="[
-						'h-4 w-4 shrink-0',
-						isComponent(item) ? 'text-blue-500' : 'text-muted-foreground'
-					]"
-				/>
-				<span class="font-medium">{{ (item as ExtendedTreeViewItem).name }}</span>
-				<span 
-					v-if="(item as ExtendedTreeViewItem).description" 
-					class="text-sm text-muted-foreground truncate max-w-[400px]"
-				>
-					{{ (item as ExtendedTreeViewItem).description }}
-				</span>
+	<div class="space-y-1">
+		<div v-for="item in items" :key="getKey(item)" class="space-y-1">
+			<div class="flex items-center gap-1">
+				<button v-if="hasChildren(item)" class="p-1 hover:bg-accent rounded-sm" @click="toggleExpand(item)">
+					<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': expandedKeys.includes(getKey(item)) }]" />
+				</button>
+				<div v-else class="w-6"></div>
+				<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="handleClick(item)">
+					<LucideFolder class="h-4 w-4" />
+					<span class="flex-1">{{ getTitle(item) }}</span>
+				</div>
 			</div>
-		</template>
-		<template #content="{ item }">
-			<div v-if="getParameters(item as ExtendedTreeViewItem)?.length" class="flex flex-wrap gap-1.5 my-2">
-				<shadcn-badge 
-					v-for="param in getParameters(item as ExtendedTreeViewItem)" 
-					:key="param.id" 
-					variant="outline"
-					class="text-xs bg-background/50"
-				>
-					<span class="font-medium">{{ param.name }}:</span>
-					<span class="ml-1 opacity-85">{{ param.value }}</span>
-				</shadcn-badge>
+			<div v-if="hasChildren(item) && expandedKeys.includes(getKey(item))" class="ml-6 space-y-1">
+				<PSystemTree v-if="item.children" :items="item.children" @select="$emit('select', $event)" @component-select="$emit('componentSelect', $event)" />
 			</div>
-		</template>
-	</TreeView>
+			<div v-if="item.components?.length && expandedKeys.includes(getKey(item))" class="ml-6 space-y-1">
+				<div v-for="comp in item.components" :key="comp.id" class="flex items-center gap-1">
+					<div class="w-6"></div>
+					<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="$emit('componentSelect', comp.componentId)">
+						<LucidePuzzle class="h-4 w-4" />
+						<span class="flex-1">组件 {{ comp.componentId }}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script setup lang="ts">
-import type { ZdPSystem } from '~/models/entity/psystem'
-import type { TreeViewItem } from '~/components/abstract/TreeView.vue'
-import type { ZdTComponent } from '~/models/entity/tcompoment'
-import TreeView from '~/components/abstract/TreeView.vue'
-import { computed, ref } from 'vue'
-import { FolderIcon, PuzzleIcon } from 'lucide-vue-next'
-
-interface ExtendedTreeViewItem extends TreeViewItem {
-	_original: ZdPSystem | ZdTComponent
-	_type: 'system' | 'component'
-}
+import { ZdPSystem } from '~/models/entity/psystem'
+import { ZdTComponent } from '~/models/entity/tcompoment'
+import { LucideChevronRight, LucideFolder, LucidePuzzle } from 'lucide-vue-next'
 
 const props = defineProps<{
 	items: (ZdPSystem & { components?: ZdTComponent[] })[]
 }>()
 
-// 展开状态管理
-const expandedState = ref<Record<string | number, boolean>>({})
+const emit = defineEmits<{
+	select: [system: ZdPSystem]
+	componentSelect: [componentId: number]
+}>()
 
-// 将 ZdPSystem 映射到 TreeViewItem
-const mappedItems = computed(() => mapToTreeViewItems(props.items))
+const expandedKeys = ref<string[]>([])
 
-function mapToTreeViewItems(items: (ZdPSystem & { components?: ZdTComponent[] })[]): TreeViewItem[] {
-	return items.map(item => {
-		const systemItem: ExtendedTreeViewItem = {
-			id: item.id,
-			name: item.name,
-			description: item.description,
-			children: item.children ? mapToTreeViewItems(item.children) : null,
-			_original: item,
-			_type: 'system'
-		}
+const getKey = (item: ZdPSystem) => item.id.toString()
 
-		// 如果有组件，添加为子节点
-		if (item.components?.length) {
-			const componentItems: ExtendedTreeViewItem[] = item.components.map(comp => ({
-				id: comp.id,
-				name: `组件 ${comp.componentId}`,
-				description: comp.description,
-				children: null,
-				_original: comp,
-				_type: 'component'
-			}))
-			
-			systemItem.children = systemItem.children 
-				? [...systemItem.children, ...componentItems]
-				: componentItems
-		}
+const getTitle = (item: ZdPSystem) => item.name
 
-		return systemItem
-	})
+const hasChildren = (item: ZdPSystem & { components?: ZdTComponent[] }) => {
+	return (item.children && item.children.length > 0) || (item.components && item.components.length > 0)
 }
 
-// 类型安全的辅助函数
-const getKey = (item: TreeViewItem): number => (item as ExtendedTreeViewItem).id
-const getTitle = (item: TreeViewItem): string => (item as ExtendedTreeViewItem).name
-const getChildren = (item: TreeViewItem): TreeViewItem[] | null => (item as ExtendedTreeViewItem).children || null
-const getParameters = (item: ExtendedTreeViewItem) => item._type === 'system' ? (item._original as ZdPSystem).parameters : null
-const isComponent = (item: TreeViewItem): boolean => (item as ExtendedTreeViewItem)._type === 'component'
+const toggleExpand = (item: ZdPSystem) => {
+	const key = getKey(item)
+	const index = expandedKeys.value.indexOf(key)
+	if (index === -1) {
+		expandedKeys.value.push(key)
+	} else {
+		expandedKeys.value.splice(index, 1)
+	}
+}
+
+const handleClick = (item: ZdPSystem) => {
+	emit('select', item)
+}
 </script> 

@@ -37,7 +37,7 @@ export const useEntityApis = () => {
 
     // Parameter APIs
     parameter: {
-      get: (id: number, type: string) => api.get<ZdParameter>('/parameter', { type, id }),
+      get: (id: number, type: string) => api.get<Array<ZdParameter>>('/parameter', { type, id }),
       create: (data: ZdParameter) => api.post<ZdParameter>('/parameter', data),
       createBatch: (data: Array<ZdParameter>) => api.post<boolean>('/parameter/batch', data),
       updateBatch: (data: Array<ZdParameter>) => api.put<boolean>('/parameter/batch', data),
