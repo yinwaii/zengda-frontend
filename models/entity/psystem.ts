@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface ZdPSystem extends BasicProperty, TimeStamp {
 	isDeleted: boolean;
 	docsUrl: null | string;
@@ -15,6 +17,24 @@ export const ZdPSystemColumns = getColumns<ZdPSystem>([
 	{ accessorKey: 'parameters', header: packHeader<ZdPSystem>('参数') },
 ], true, true)
 
+export const ZdPSystemFormZod = z.object({
+	isDeleted: z.boolean(),
+	docsUrl: z.string().nullable(),
+	parentId: z.number(),
+	specId: z.number().nullable(),
+	// children: z.array(z.object(ZdPSystemFormZod)).nullable(),
+	// parameters: z.array(z.object(ZdParameterFormZod)).nullable(),
+})
+
+export const ZdPSystemFormConfig = {
+	isDeleted: { label: '是否被删除' },
+	docsUrl: { label: '文档链接' },
+	parentId: { label: '父ID' },
+	specId: { label: '规格ID' },
+	// children: { label: '子系统' },
+	// parameters: { label: '参数' },
+}
+
 export class ZdPSystem implements ZdPSystem {
 	constructor() {
 		this.id = -1;
@@ -25,29 +45,5 @@ export class ZdPSystem implements ZdPSystem {
 		this.description = '';
 		this.children = null;
 		this.parameters = null;
-	}
-
-	static getAll(require_tree: boolean = false) {
-		return useApis().get<Array<ZdPSystem>>('/pSystem/tree', { require_tree });
-	}
-
-	static get(id: number) {
-		return useApis().get<ZdPSystem>(`/pSystem/${id}`);
-	}
-
-	static getByPage(page: number, size: number) {
-		return useApis().get<VOPaged<ZdPSystem>>('/pSystem/', { page, size });
-	}
-
-	static post(data: ZdPSystem) {
-		return useApis().post<ZdPSystem>('/pSystem/', data);
-	}
-
-	static put(data: ZdPSystem) {
-		return useApis().put<ZdPSystem>('/pSystem', data);
-	}
-
-	static delete(id: number) {
-		return useApis().delete<ZdPSystem>(`/pSystem/${id}`);
 	}
 }

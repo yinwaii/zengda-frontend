@@ -21,7 +21,10 @@
 </template>
 
 <script lang="ts" setup>
-definePageMeta({ layout: 'personal' });
+definePageMeta({ 
+  layout: 'personal',
+  keepalive: false
+})
 </script>
 
 <style scoped>

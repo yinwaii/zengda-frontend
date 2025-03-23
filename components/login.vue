@@ -63,7 +63,10 @@
 </template>
 
 <script lang="ts" setup>
+import { useSessionStorage } from '@vueuse/core';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '~/stores/user';
+import { useToast } from '~/components/ui/toast/use-toast';
 
 interface RuleForm {
   username: string;
@@ -81,6 +84,8 @@ const errors = reactive({
 });
 
 const router = useRouter();
+const userStore = useUserStore();
+const { toast } = useToast();
 
 const validateForm = () => {
   errors.username = '';
@@ -105,15 +110,26 @@ const validateForm = () => {
 
 const submitForm = async () => {
   if (validateForm()) {
-		try {
-      // await store.login(form.username, form.password);
+    try {
+      await userStore.login(form.username.trim(), form.password);
       router.push('/');
     }
-    catch (error) {
-      console.log(error);
+    catch (error: any) {
+      console.error('登录失败:', error);
+      // 使用 Toast 显示错误信息
+      toast({
+        variant: "destructive",
+        title: "登录失败",
+        description: error.message || '请检查用户名和密码是否正确',
+      });
     }
   } else {
-    console.log('error submit!');
+    // 表单验证失败时也显示 Toast
+    toast({
+      variant: "destructive",
+      title: "表单验证失败",
+      description: "请检查输入信息是否正确",
+    });
   }
 };
 

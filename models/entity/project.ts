@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export interface ZdProject extends BasicProperty, TimeStamp {
 	productTypeId: number
 	templateId: number
@@ -32,6 +34,44 @@ export const ZdProjectColumns = getColumns<ZdProject>([
 	{ accessorKey: 'price', header: packHeader<ZdProject>('价格') },
 ], true, true)
 
+export const ZdProjectFormZod = z.object({
+	productTypeId: z.number(),
+	templateId: z.number(),
+	name: z.string(),
+	description: z.string(),
+	quantity: z.number().optional(),
+	model: z.string().optional(),
+	attention: z.string().optional(),
+	company: z.string().optional(),
+	tel: z.string().optional(),
+	mob: z.string().optional(),
+	fax: z.string().optional(),
+	email: z.string().optional(),
+	number: z.string().optional(),
+	date: z.string().optional(),
+	valid: z.string().optional(),
+	price: z.string().optional(),
+})
+
+export const ZdProjectFormConfig = {
+	name: { label: '名称' },
+	description: { label: '描述' },
+	productTypeId: { label: '产品类型' },
+	templateId: { label: '模板ID' },
+	quantity: { label: '数量' },
+	model: { label: '模型' },
+	attention: { label: '注意力' },
+	company: { label: '公司' },
+	tel: { label: '电话' },
+	mob: { label: '手机' },
+	fax: { label: '传真' },
+	email: { label: '邮件' },
+	number: { label: '号码' },
+	date: { label: '日期' },
+	valid: { label: '是否合法' },
+	price: { label: '价格' },
+}
+
 export const ZdProjectColumnsVisibility = {
 	productTypeId: true,
 	templateId: true,
@@ -56,25 +96,5 @@ export class ZdProject implements ZdProject {
 		this.description = ''
 		this.productTypeId = 0
 		this.templateId = 0
-	}
-
-	static get(id: number) {
-		return useApis().get<ZdProject>(`/project/${id}`)
-	}
-
-	static getByPage(page: number, size: number) {
-		return useApis().get<VOPaged<ZdProject>>('/project/', { page, size })
-	}
-
-	static post(data: ZdProject) {
-		return useApis().post<ZdProject>('/project/', data)
-	}
-
-	static put(data: ZdProject) {
-		return useApis().put<ZdProject>('/project', data)
-	}
-
-	static delete(id: number) {
-		return useApis().delete<ZdProject>(`/project/${id}`)
 	}
 }

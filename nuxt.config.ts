@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/wangeditor.js', ssr: false },
     { src: '@/plugins/nuxt-office.ts', ssr: false },
   ],
-  modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt'],
+  modules: ['@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt'],
   css: [
     "@wangeditor/editor/dist/css/style.css",
     '@vue-office/docx/lib/index.css',
@@ -38,7 +38,7 @@ export default defineNuxtConfig({
     renderJsonPayloads: true
   },
   imports: {
-    dirs: ['models/**', 'lib/*']
+    dirs: ['models/**']
   },
   shadcn: {
     prefix: 'shadcn',
@@ -47,4 +47,20 @@ export default defineNuxtConfig({
   lucide: {
     prefix: "lucide",
   },
+  pinia: {
+    storesDirs: ['./stores']
+  },
+  piniaPluginPersistedstate: {
+    storage: 'cookies',
+    cookieOptions: {
+      sameSite: 'lax',
+    },
+    debug: true
+  },
+  nitro: {
+    prerender: {
+      crawlLinks: true,
+      routes: ['/']
+    }
+  }
 })

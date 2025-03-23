@@ -1,29 +1,8 @@
 <template>
-	<!-- <div class="wrap"></div> -->
+	<!-- <div class="h-screen w-screen relative bg-[url('/assets/imgs/background.jpg')] bg-no-repeat bg-[length:100%]"></div> -->
 	<!-- <el-overlay z-index="0"> -->
-		<div class="container">
+		<div class="min-w-[300px]">
 			<slot></slot>
 		</div>
 	<!-- </el-overlay> -->
 </template>
-
-<style lang="scss" scoped>
-.wrap {
-	height: 100vh;
-	width: 100vw;
-	position: relative;
-	background: url('/assets/imgs/background.jpg') no-repeat;
-	-webkit-background-size: 100%;
-	background-size: 100%;
-}
-
-.el-overlay {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-
-	.container {
-		min-width: 300px;
-	}
-}
-</style>

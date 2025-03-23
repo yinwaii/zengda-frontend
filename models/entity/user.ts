@@ -23,8 +23,4 @@ export class ZdUser implements ZdUser {
 		this.phone = '';
 		this.role = '';
 	}
-
-	static login(username: string, password: string) {
-		return useApis().postRaw<ZdSession>('/user/login', { username, password });
-	}
 }

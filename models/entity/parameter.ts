@@ -1,3 +1,5 @@
+import { z } from "zod"
+
 export interface ZdParameter extends BasicProperty, TimeStamp {
 	isShow: boolean
 	orderId?: number
@@ -20,6 +22,28 @@ export const ZdParameterColumns = getColumns<ZdParameter>([
 	{ accessorKey: 'isDeleted', header: packHeader<ZdParameter>('是否删除') },
 ], true, true)
 
+export const ZdParameterFormZod = z.object({
+	isShow: z.boolean(),
+	orderId: z.number().optional(),
+	objectId: z.number(),
+	objectType: z.string(),
+	dtype: z.string().optional(),
+	value: z.any(),
+	isReadonly: z.boolean().optional(),
+	isDeleted: z.boolean(),
+})
+
+export const ZdParameterFormConfig = {
+	isShow: { label: '是否显示' },
+	orderId: { label: '排序ID' },
+	objectId: { label: '对象ID' },
+	objectType: { label: '对象类型' },
+	dtype: { label: '数据类型' },
+	value: { label: '值' },
+	isReadonly: { label: '是否只读' },
+	isDeleted: { label: '是否删除' },
+}
+
 export class ZdParameter implements ZdParameter {
 	constructor() {
 		this.id = -1;
@@ -29,25 +53,5 @@ export class ZdParameter implements ZdParameter {
 		this.objectType = '';
 		this.value = '';
 		this.isDeleted = false;
-	}
-
-	static get(id: number, type: string) {
-		return useApis().get<ZdParameter>('/parameter/', { type, id });
-	}
-
-	static post(data: ZdParameter) {
-		return useApis().post<ZdParameter>('/parameter/', data);
-	}
-
-	static postByBatch(data: Array<ZdParameter>) {
-		return useApis().post<boolean>('/parameter/batch', data);
-	}
-
-	static putByBatch(data: Array<ZdParameter>) {
-		return useApis().put<boolean>('/parameter/batch', data);
-	}
-
-	static delete(id: number) {
-		return useApis().delete<ZdParameter>(`/parameter/${id}`);
 	}
 }

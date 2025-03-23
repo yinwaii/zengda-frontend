@@ -12,25 +12,23 @@ export const sidebarData = [
 		url: '/design',
 		items: [
 			{
-				title: '部件 / Component',
-				url: '/design/component/table',
-			},
-			{
-				title: '子系统 / PSystem',
-				url: '/design/psystem/table',
-			},
-			{
 				title: '模板 / Template',
-				url: '/design/template/table',
+				url: '/design/projectTemplate',
 			},
-			{
-				title: '产品类型 / PType',
-				url: '/design/ptype/table',
-			},
-			{
-				title: '项目 / Project',
-				url: '/design/project/table',
-			},
+			// {
+			// 	title: '项目 / Project',
+			// 	url: '/design/project',
+			// },
 		],
 	},
+	// {
+	// 	title: '管理 / Management',
+	// 	url: '/manage',
+	// 	items: [
+	// 		{
+	// 			title: '产品类型 / PType',
+	// 			url: '/manage/ptype',
+	// 		},
+	// 	],
+	// },
 ]

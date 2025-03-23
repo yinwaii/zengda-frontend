@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 export interface ZdPType extends BasicProperty, TimeStamp {
 	isShow: boolean;
 	code: string;
@@ -10,6 +12,18 @@ export const ZdPTypeColumns = getColumns<ZdPType>([
 	{ accessorKey: 'model', header: packHeader<ZdPType>('型号') },
 ], true, true)
 
+export const ZdPTypeFormZod = z.object({
+	isShow: z.boolean(),
+	code: z.string(),
+	model: z.string(),
+})
+
+export const ZdPTypeFormConfig = {
+	isShow: { label: '是否显示' },
+	code: { label: '代码' },
+	model: { label: '型号' },
+}
+
 export class ZdPType implements ZdPType {
 	constructor() {
 		this.id = -1;
@@ -17,25 +31,5 @@ export class ZdPType implements ZdPType {
 		this.code = '';
 		this.model = '';
 		this.isShow = true;
-	}
-
-	static getAll() {
-		return useApis().get<Array<ZdPType>>('/pType/');
-	}
-
-	static get(id: number) {
-		return useApis().get<ZdPType>(`/pType/${id}`);
-	}
-
-	static post(data: ZdPType) {
-		return useApis().post<ZdPType>('/pType/', data);
-	}
-
-	static put(data: ZdPType) {
-		return useApis().put<ZdPType>('/pType', data);
-	}
-
-	static delete(id: number) {
-		return useApis().delete<ZdPType>(`/pType/${id}`);
 	}
 }

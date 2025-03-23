@@ -19,6 +19,7 @@ import {
 const props = defineProps<{
 	columns: ColumnDef<TData, TValue>[]
 	data: TData[]
+	onRowClick?: (row: TData) => void
 }>()
 
 const sorting = ref<SortingState>([])
@@ -66,7 +67,7 @@ defineExpose({ columnVisibility })
 					<abstract-data-table-header :table="table" />
 				</shadcn-table-header>
 				<shadcn-table-body>
-					<abstract-data-table-body :table="table" :columns="columns" />
+					<abstract-data-table-body :table="table" :columns="columns" :on-row-click="onRowClick" />
 				</shadcn-table-body>
 			</shadcn-table>
 		</div>
