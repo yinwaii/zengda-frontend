@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { RotateCcw, Download, RefreshCw, Trash2 } from 'lucide-vue-next'
+import { RotateCcw, Download, RefreshCw, Trash2, Plus } from 'lucide-vue-next'
 import { useToast } from '@/components/ui/toast/use-toast'
 
 const { toast } = useToast()
@@ -10,6 +10,7 @@ const props = defineProps<{
   onRefresh?: () => void
   onExport?: () => void
   onBatchDelete?: () => void
+  onCreate?: () => void
   selectedRows?: any[]
 }>()
 
@@ -60,6 +61,19 @@ const handleBatchDelete = () => {
     })
   }
 }
+
+// 新建
+const handleCreate = () => {
+  if (props.onCreate) {
+    props.onCreate()
+  } else {
+    toast({
+      title: '新建功能',
+      description: '新建功能正在开发中...',
+      variant: 'default'
+    })
+  }
+}
 </script>
 
 <template>
@@ -76,6 +90,10 @@ const handleBatchDelete = () => {
       <Button variant="outline" size="sm" @click="handleExport">
         <Download class="h-4 w-4 mr-2" />
         导出数据
+      </Button>
+      <Button variant="default" size="sm" @click="handleCreate">
+        <Plus class="h-4 w-4 mr-2" />
+        新建
       </Button>
     </div>
     <div class="flex items-center gap-2">

@@ -15,10 +15,10 @@ export const sidebarData = [
 				title: '模板 / Template',
 				url: '/design/projectTemplate',
 			},
-			// {
-			// 	title: '项目 / Project',
-			// 	url: '/design/project',
-			// },
+			{
+				title: '项目 / Project',
+				url: '/design/project',
+			},
 		],
 	},
 	// {

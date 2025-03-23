@@ -20,7 +20,7 @@ const props = defineProps<{
 			<shadcn-dropdown-menu-separator /> -->
 			<shadcn-dropdown-menu-checkbox-item
 				v-for="column in table.getAllColumns().filter((column) => column.getCanHide())" :key="column.id"
-				class="capitalize" :modelValue="column.getIsVisible()" @update:modelValue="(value) => {
+				class="capitalize" :modelValue="column.getIsVisible()" @update:modelValue="(value: boolean) => {
 					column.toggleVisibility(!!value)
 				}">
 				{{ column.id }}

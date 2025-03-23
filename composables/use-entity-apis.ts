@@ -13,7 +13,8 @@ export const useEntityApis = () => {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         })
-      }
+      },
+      logout: () => api.get<null>('/sysUser/logout'),
     },
 
     // Project APIs
@@ -97,6 +98,60 @@ export const useEntityApis = () => {
       update: (data: ZdTComponent) => api.put<ZdTComponent>('/tComponent', data),
       updateBatch: (data: Array<ZdTComponent>) => api.put<boolean>('/tComponent/batch', data),
       delete: (id: number) => api.delete<ZdTComponent>(`/tComponent/${id}`)
+    },
+
+    item: {
+      get: (id: string) => api.get<ZdItem>(`/item/${id}`),
+      getByPage: (query: ZdItemQuery) => api.get<ZdItemPaged>(`/item`, {}, {
+        body: query,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+    },
+
+    bom: {
+      get: (id: number) => api.get<ZdBom>(`/bom/${id}`),
+      create: (data: ZdBom) => api.post<ZdBom>('/bom', data),
+      update: (data: ZdBom) => api.put<ZdBom>('/bom', data),
+      data: (id: number) => api.delete<ZdBom>(`/bom/${id}`)
+    },
+
+    specification: {
+      getAll: (id: number) => api.get<ZdSpecification>(`/specification/tree/${id}`),
+      render: (configId: number, body: ZdSpecification) => api.get<object>('/specification/rendering', { configId }, {
+        body, 
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }),
+      upload: (tag: string, file: File, specification: string) => api.post<object>('/specification', { file, specification }, {
+        query: { tag },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }),
+      update: (tag: string, file: File, specification: string) => api.put<object>('/specification', { file, specification }, {
+        query: { tag },
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      })
+    },
+
+    system: {
+      hash: (filename: string, hash: string) => api.get<object>(`/${filename}`, { hash }, {
+        baseUrl: ''
+      }),
+      download: (filename: string) => api.get<object>(`/${filename}`, {}, {
+        baseUrl: ''
+      }),
+      upload: (filename: string, file: File) => api.put<object>(`/${filename}`, file, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      }),
+      delete: (filename: string) => api.delete<object>(`/${filename}`)
     }
   }
 } 

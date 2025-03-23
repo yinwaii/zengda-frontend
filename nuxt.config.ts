@@ -17,7 +17,7 @@ export default defineNuxtConfig({
     { src: '@/plugins/wangeditor.js', ssr: false },
     { src: '@/plugins/nuxt-office.ts', ssr: false },
   ],
-  modules: ['@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt'],
+  modules: ['@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt', '@nuxtjs/color-mode'],
   css: [
     "@wangeditor/editor/dist/css/style.css",
     '@vue-office/docx/lib/index.css',

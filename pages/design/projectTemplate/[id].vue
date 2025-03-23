@@ -6,9 +6,10 @@
 					<button class="p-1 hover:bg-accent rounded-sm" @click="toggleTemplateExpand">
 						<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': isTemplateExpanded }]" />
 					</button>
-					<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="handleTemplateSelect">
+					<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
+						@click="handleTemplateSelect">
 						<LucideBookTemplate class="h-4 w-4" />
-						<span class="flex-1">{{ selectedTemplate?.name || '项目模板' }}</span>
+						<span class="flex-1">{{ selectedTemplate?.name }}</span>
 					</div>
 				</div>
 			</div>
@@ -17,41 +18,120 @@
 			</div>
 		</div>
 		<div class="flex-1 overflow-auto">
-			<template v-if="selectedTemplate">
-				<TemplateDetail
-					:template="selectedTemplate"
-					:is-editing="isEditing"
-					@edit="isEditing = true"
-					@cancel="isEditing = false"
-					@submit="handleTemplateSubmit"
-				/>
+			<template v-if="showTemplateDetail && selectedTemplate">
+				<div class="space-y-6">
+					<TemplateDetail :template="selectedTemplate" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleTemplateSubmit" />
+
+					<shadcn-separator />
+
+					<shadcn-card>
+						<shadcn-card-header>
+							<shadcn-card-title>参数列表</shadcn-card-title>
+						</shadcn-card-header>
+						<shadcn-card-content>
+							<shadcn-table v-if="parameterDetails.length > 0">
+								<shadcn-table-header>
+									<shadcn-table-row>
+										<shadcn-table-head>参数名</shadcn-table-head>
+										<shadcn-table-head>描述</shadcn-table-head>
+										<shadcn-table-head>值</shadcn-table-head>
+										<shadcn-table-head>类型</shadcn-table-head>
+									</shadcn-table-row>
+								</shadcn-table-header>
+								<shadcn-table-body>
+									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
+										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
+									</shadcn-table-row>
+								</shadcn-table-body>
+							</shadcn-table>
+							<div v-else class="text-center text-muted-foreground py-4">
+								暂无参数
+							</div>
+						</shadcn-card-content>
+					</shadcn-card>
+				</div>
 			</template>
 			<template v-else-if="selectedPSystem">
 				<div class="space-y-6">
-					<PSystemBasicInfo
-						:system="selectedPSystem"
-						:is-editing="isEditing"
-						@edit="isEditing = true"
-						@cancel="isEditing = false"
-						@submit="handleSubmit"
-					/>
+					<PSystemBasicInfo :system="selectedPSystem" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleSubmit" />
+
+					<shadcn-separator />
 
 					<PSystemInfo :system="selectedPSystem" />
 
-					<PSystemParameters
-						:parameters="parameterDetails"
-						@update="handleParameterUpdate"
-					/>
+					<shadcn-separator />
+
+					<shadcn-card>
+						<shadcn-card-header>
+							<shadcn-card-title>参数列表</shadcn-card-title>
+						</shadcn-card-header>
+						<shadcn-card-content>
+							<shadcn-table v-if="parameterDetails.length > 0">
+								<shadcn-table-header>
+									<shadcn-table-row>
+										<shadcn-table-head>参数名</shadcn-table-head>
+										<shadcn-table-head>描述</shadcn-table-head>
+										<shadcn-table-head>值</shadcn-table-head>
+										<shadcn-table-head>类型</shadcn-table-head>
+									</shadcn-table-row>
+								</shadcn-table-header>
+								<shadcn-table-body>
+									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
+										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
+									</shadcn-table-row>
+								</shadcn-table-body>
+							</shadcn-table>
+							<div v-else class="text-center text-muted-foreground py-4">
+								暂无参数
+							</div>
+						</shadcn-card-content>
+					</shadcn-card>
 				</div>
 			</template>
 			<template v-else-if="selectedComponent">
-				<ComponentDetail
-					:component="selectedComponent"
-					:is-editing="isEditing"
-					@edit="isEditing = true"
-					@cancel="isEditing = false"
-					@submit="handleComponentSubmit"
-				/>
+				<div class="space-y-6">
+					<ComponentDetail :component="selectedComponent" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleComponentSubmit" />
+
+					<shadcn-separator />
+
+					<shadcn-card>
+						<shadcn-card-header>
+							<shadcn-card-title>参数列表</shadcn-card-title>
+						</shadcn-card-header>
+						<shadcn-card-content>
+							<shadcn-table v-if="parameterDetails.length > 0">
+								<shadcn-table-header>
+									<shadcn-table-row>
+										<shadcn-table-head>参数名</shadcn-table-head>
+										<shadcn-table-head>描述</shadcn-table-head>
+										<shadcn-table-head>值</shadcn-table-head>
+										<shadcn-table-head>类型</shadcn-table-head>
+									</shadcn-table-row>
+								</shadcn-table-header>
+								<shadcn-table-body>
+									<shadcn-table-row v-for="param in parameterDetails" :key="param.id">
+										<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
+										<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
+									</shadcn-table-row>
+								</shadcn-table-body>
+							</shadcn-table>
+							<div v-else class="text-center text-muted-foreground py-4">
+								暂无参数
+							</div>
+						</shadcn-card-content>
+					</shadcn-card>
+				</div>
 			</template>
 			<div v-else class="flex items-center justify-center h-full text-muted-foreground">
 				请从左侧选择一个项目模板、系统或组件
@@ -87,10 +167,12 @@ const components = ref<ZdTComponent[]>([])
 const selectedPSystem = ref<ZdPSystem | null>(null)
 const selectedComponent = ref<ZdComponent | null>(null)
 const selectedTemplate = ref<ZdTemplate | null>(null)
+const template = ref<ZdTemplate | null>(null)
 const parameterDetails = ref<ZdParameter[]>([])
 const isEditing = ref(false)
 const isTemplateExpanded = ref(true)
 const entityApis = useEntityApis()
+const showTemplateDetail = ref(false)
 
 // 计算选中系统的关联组件
 const selectedComponents = computed(() => {
@@ -116,16 +198,37 @@ const toggleTemplateExpand = () => {
 	isTemplateExpanded.value = !isTemplateExpanded.value
 }
 
+// 获取数据
+const fetchData = async () => {
+	try {
+		const [systemResponse, componentResponse, templateResponse] = await Promise.all([
+			entityApis.template_psystem.getByTemplateId(templateId),
+			entityApis.template_component.getByTemplateId(templateId),
+			entityApis.template.get(templateId)
+		])
+		data.value = systemResponse.list
+		components.value = componentResponse.list
+		selectedTemplate.value = templateResponse
+		template.value = templateResponse
+	} catch (error) {
+		console.error('获取数据失败:', error)
+	}
+}
+
 // 处理模板选择
 const handleTemplateSelect = async () => {
+	selectedPSystem.value = null
+	selectedComponent.value = null
+	showTemplateDetail.value = true
+	isEditing.value = false
+
+	// 获取参数列表
 	try {
-		const template = await entityApis.template.get(templateId)
-		selectedTemplate.value = template
-		selectedPSystem.value = null
-		selectedComponent.value = null
-		isEditing.value = false
+		const response = await entityApis.parameter.get(templateId, 'template')
+		parameterDetails.value = response || []
 	} catch (error) {
-		console.error('获取模板详情失败:', error)
+		console.error('获取参数列表失败:', error)
+		parameterDetails.value = []
 	}
 }
 
@@ -133,7 +236,7 @@ const handleTemplateSelect = async () => {
 const handleSelect = async (system: ZdPSystem) => {
 	selectedPSystem.value = system
 	selectedComponent.value = null
-	selectedTemplate.value = null
+	showTemplateDetail.value = false
 	isEditing.value = false
 	
 	// 获取参数列表
@@ -152,8 +255,17 @@ const handleComponentSelect = async (componentId: number) => {
 		const component = await entityApis.component.get(componentId)
 		selectedComponent.value = component
 		selectedPSystem.value = null
-		selectedTemplate.value = null
+		showTemplateDetail.value = false
 		isEditing.value = false
+
+		// 获取参数列表
+		try {
+			const response = await entityApis.parameter.get(componentId, 'component')
+			parameterDetails.value = response || []
+		} catch (error) {
+			console.error('获取参数列表失败:', error)
+			parameterDetails.value = []
+		}
 	} catch (error) {
 		console.error('获取组件详情失败:', error)
 	}
@@ -225,23 +337,8 @@ const handleParameterUpdate = async (updatedParam: ZdParameter) => {
 	}
 }
 
-// 获取数据
-const fetchData = async () => {
-	try {
-		const [systemResponse, componentResponse] = await Promise.all([
-			entityApis.template_psystem.getByTemplateId(templateId),
-			entityApis.template_component.getByTemplateId(templateId)
-		])
-		data.value = systemResponse.list
-		components.value = componentResponse.list
-	} catch (error) {
-		console.error('获取数据失败:', error)
-	}
-}
-
 // 页面加载时，默认选择模板
 onMounted(async () => {
 	await fetchData()
-	await handleTemplateSelect()
 })
 </script>
