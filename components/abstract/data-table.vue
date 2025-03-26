@@ -20,6 +20,8 @@ const props = defineProps<{
 	columns: ColumnDef<TData, TValue>[]
 	data: TData[]
 	onRowClick?: (row: TData) => void
+	searchColumn?: string
+	searchPlaceholder?: string
 }>()
 
 const sorting = ref<SortingState>([])
@@ -27,6 +29,9 @@ const columnFilters = ref<ColumnFiltersState>([])
 const columnVisibility = ref<VisibilityState>({})
 const rowSelection = ref({})
 const expanded = ref<ExpandedState>({})
+
+const searchColumnId = computed(() => props.searchColumn || 'name')
+const placeholder = computed(() => props.searchPlaceholder || '根据名称检索...')
 
 const table = useVueTable({
 	get data() { return props.data },
@@ -54,15 +59,15 @@ defineExpose({ columnVisibility })
 </script>
 
 <template>
-	<div class="max-w-3/4">
+	<div class="w-full">
 		<div class="flex items-center py-4">
-			<shadcn-input class="max-w-sm" placeholder="根据名称检索..."
-				:model-value="table.getColumn('name')?.getFilterValue() as string"
-				@update:model-value=" table.getColumn('name')?.setFilterValue($event)" />
+			<shadcn-input class="max-w-sm" :placeholder="placeholder"
+				:model-value="table.getColumn(searchColumnId)?.getFilterValue() as string"
+				@update:model-value="table.getColumn(searchColumnId)?.setFilterValue($event)" />
 			<abstract-data-table-view-options :table="table" />
 		</div>
 		<div class="overflow-x-auto border rounded-md">
-			<shadcn-table>
+			<shadcn-table class="w-full">
 				<shadcn-table-header>
 					<abstract-data-table-header :table="table" />
 				</shadcn-table-header>
@@ -74,3 +79,15 @@ defineExpose({ columnVisibility })
 		<abstract-data-table-pagination :table="table" />
 	</div>
 </template>
+
+<style>
+.table-fixed {
+  table-layout: auto;
+}
+
+.table-fixed th, .table-fixed td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

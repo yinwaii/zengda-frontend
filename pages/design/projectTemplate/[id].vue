@@ -17,7 +17,8 @@
 				<design-template-tree 
 					:items="treeData" 
 					@select="handleSelect" 
-					@component-select="handleComponentSelect" 
+					@component-select="handleComponentSelect"
+					@bom-select="handleBomSelect"
 				/>
 				
 				<!-- 规格书项 -->
@@ -62,6 +63,12 @@
 						@cancel="isEditing = false" @submit="handleComponentSubmit" :parameters="parameterDetails" />
 				</div>
 			</template>
+			<template v-else-if="selectedBom">
+				<div class="space-y-6">
+					<design-bom-detail :bom="selectedBom" :is-editing="isEditing" @edit="isEditing = true"
+						@cancel="isEditing = false" @submit="handleBomSubmit" :parameters="parameterDetails" />
+				</div>
+			</template>
 			<template v-else-if="selectedSpecification">
 				<div class="space-y-6">
 					<design-specification-detail :specification="selectedSpecification" :is-editing="isEditing" @edit="isEditing = true"
@@ -69,15 +76,16 @@
 				</div>
 			</template>
 			<div v-else class="flex items-center justify-center h-full text-muted-foreground">
-				请从左侧选择一个项目模板、系统、组件或规格书
+				请从左侧选择一个项目模板、系统、组件、BOM或规格书
 			</div>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { LucideBookTemplate, LucideChevronRight, LucideFileText } from 'lucide-vue-next'
+import { LucideBookTemplate, LucideChevronRight, LucideFileText, LucideClipboardList } from 'lucide-vue-next'
 import type { ZdSpecification } from '~/models/entity/specification'
+import type { ZdBom } from '~/models/entity/bom'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -103,6 +111,9 @@ const showTemplateDetail = ref(false)
 const specificationData = ref<ZdSpecification | null>(null)
 const selectedSpecification = ref<ZdSpecification | null>(null)
 const isSpecificationExpanded = ref(true)
+
+// 添加BOM相关状态
+const selectedBom = ref<ZdBom | null>(null)
 
 // 计算选中系统的关联组件
 const selectedComponents = computed(() => {
@@ -165,6 +176,7 @@ const handleTemplateSelect = async () => {
 	selectedPSystem.value = null
 	selectedComponent.value = null
 	selectedSpecification.value = null
+	selectedBom.value = null
 	showTemplateDetail.value = true
 	isEditing.value = false
 
@@ -183,6 +195,7 @@ const handleSelect = async (system: ZdPSystem) => {
 	selectedPSystem.value = system
 	selectedComponent.value = null
 	selectedSpecification.value = null
+	selectedBom.value = null
 	showTemplateDetail.value = false
 	isEditing.value = false
 	
@@ -203,6 +216,7 @@ const handleComponentSelect = async (componentId: number) => {
 		selectedComponent.value = component
 		selectedPSystem.value = null
 		selectedSpecification.value = null
+		selectedBom.value = null
 		showTemplateDetail.value = false
 		isEditing.value = false
 
@@ -225,6 +239,7 @@ const handleRootSpecificationSelect = async () => {
 		selectedSpecification.value = specificationData.value
 		selectedPSystem.value = null
 		selectedComponent.value = null
+		selectedBom.value = null
 		showTemplateDetail.value = false
 		isEditing.value = false
 		
@@ -244,6 +259,7 @@ const handleSpecificationNodeSelect = async (spec: ZdSpecification) => {
 	selectedSpecification.value = spec
 	selectedPSystem.value = null
 	selectedComponent.value = null
+	selectedBom.value = null
 	showTemplateDetail.value = false
 	isEditing.value = false
 	
@@ -380,6 +396,48 @@ const handleParameterUpdate = async (updatedParam: ZdParameter) => {
 		}
 	} catch (error) {
 		console.error('更新参数失败:', error)
+	}
+}
+
+// 添加处理BOM选择的方法
+const handleBomSelect = async (bomId: number) => {
+	try {
+		const bom = await entityApis.bom.get(bomId)
+		selectedBom.value = bom
+		selectedComponent.value = null
+		selectedPSystem.value = null
+		selectedSpecification.value = null
+		showTemplateDetail.value = false
+		isEditing.value = false
+
+		// 获取参数列表
+		try {
+			const response = await entityApis.parameter.get(bomId, 'bom')
+			parameterDetails.value = response || []
+		} catch (error) {
+			console.error('获取参数列表失败:', error)
+			parameterDetails.value = []
+		}
+	} catch (error) {
+		console.error('获取BOM详情失败:', error)
+	}
+}
+
+// 添加处理BOM提交的方法
+const handleBomSubmit = async (form: Partial<ZdBom>) => {
+	if (!selectedBom.value) return
+	
+	try {
+		const updatedBom = await entityApis.bom.update({
+			...selectedBom.value,
+			...form
+		})
+		selectedBom.value = updatedBom
+		isEditing.value = false
+		// 刷新列表
+		await fetchData()
+	} catch (error) {
+		console.error('更新BOM失败:', error)
 	}
 }
 

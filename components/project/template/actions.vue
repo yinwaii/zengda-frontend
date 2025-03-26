@@ -1,23 +1,3 @@
-<script setup lang="ts">
-import { MoreHorizontal } from 'lucide-vue-next'
-
-// defineProps<{
-// 	payment: {
-// 		id: string
-// 	}
-// }>()
-
-defineEmits<{
-	(e: 'expand'): void
-	(e: 'edit'): void
-	(e: 'delete'): void
-}>()
-
-function copy(id: string) {
-	navigator.clipboard.writeText(id)
-}
-</script>
-
 <template>
 	<shadcn-dropdown-menu>
 		<shadcn-dropdown-menu-trigger as-child>
@@ -28,13 +8,6 @@ function copy(id: string) {
 		</shadcn-dropdown-menu-trigger>
 		<shadcn-dropdown-menu-content align="end">
 			<shadcn-dropdown-menu-label>操作</shadcn-dropdown-menu-label>
-			<!-- <shadcn-dropdown-menu-item @click="copy(payment.id)">
-				Copy payment ID
-			</shadcn-dropdown-menu-item> -->
-			<shadcn-dropdown-menu-item @click="$emit('expand')">
-				展开
-			</shadcn-dropdown-menu-item>
-			<shadcn-dropdown-menu-separator />
 			<shadcn-dropdown-menu-item @click="$emit('edit')">
 				编辑
 			</shadcn-dropdown-menu-item>
@@ -44,3 +17,17 @@ function copy(id: string) {
 		</shadcn-dropdown-menu-content>
 	</shadcn-dropdown-menu>
 </template>
+
+<script setup lang="ts">
+import { MoreHorizontal } from 'lucide-vue-next'
+import { ZdTemplate } from '~/models/entity/template'
+
+defineProps<{
+	template: ZdTemplate
+}>()
+
+defineEmits<{
+	(e: 'edit'): void
+	(e: 'delete'): void
+}>()
+</script> 

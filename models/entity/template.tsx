@@ -1,5 +1,8 @@
-import type { ZdPSystem } from "./psystem"
 import { z } from "zod"
+import { h } from 'vue'
+import type { ColumnDef } from '@tanstack/vue-table'
+import type { BasicProperty, TimeStamp } from '../entity'
+import { getColumns, packHeader, TimeStampColumnVisibility } from '../column'
 
 export interface ZdTemplate extends BasicProperty, TimeStamp {
 	isShow: boolean
@@ -11,12 +14,36 @@ export interface ZdTemplate extends BasicProperty, TimeStamp {
 }
 
 export const ZdTemplateColumns = getColumns<ZdTemplate>([
-	{ accessorKey: 'isShow', header: packHeader<ZdTemplate>('是否显示') },
-	{ accessorKey: 'productTypeId', header: packHeader<ZdTemplate>('产品类型ID') },
-	{ accessorKey: 'productTypeName', header: packHeader<ZdTemplate>('产品类型名称') },
-	{ accessorKey: 'isCustomized', header: packHeader<ZdTemplate>('是否定制') },
-	{ accessorKey: 'isDeleted', header: packHeader<ZdTemplate>('是否删除') },
-	{ accessorKey: 'specId', header: packHeader<ZdTemplate>('规格书ID') },
+	{ 
+		accessorKey: 'isShow', 
+		header: packHeader<ZdTemplate>('是否显示'),
+		meta: { width: '80px' }
+	},
+	{ 
+		accessorKey: 'productTypeId', 
+		header: packHeader<ZdTemplate>('产品类型ID'),
+		meta: { width: '120px' }
+	},
+	{ 
+		accessorKey: 'productTypeName', 
+		header: packHeader<ZdTemplate>('产品类型名称'),
+		meta: { width: '150px' }
+	},
+	{ 
+		accessorKey: 'isCustomized', 
+		header: packHeader<ZdTemplate>('是否定制'),
+		meta: { width: '80px' }
+	},
+	{ 
+		accessorKey: 'isDeleted', 
+		header: packHeader<ZdTemplate>('是否删除'),
+		meta: { width: '80px' }
+	},
+	{ 
+		accessorKey: 'specId', 
+		header: packHeader<ZdTemplate>('规格书ID'),
+		meta: { width: '100px' }
+	}
 ], true, true)
 
 export const ZdTemplateFormZod = z.object({
@@ -45,4 +72,4 @@ export class ZdTemplate implements ZdTemplate {
 		this.isShow = false;
 		this.specId = undefined;
 	}
-}
+} 

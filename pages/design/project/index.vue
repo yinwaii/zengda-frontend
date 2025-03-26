@@ -1,6 +1,9 @@
-<script setup lang="ts">
-import TableToolbar from '@/components/design/table/TableToolbar.vue'
+<script setup lang="tsx">
 import { navigateTo } from '#app'
+import { h, ref } from 'vue'
+import { ZdProject, ZdProjectColumns, ZdProjectColumnsVisibility } from '~/models/entity/project'
+import { TimeStampColumnVisibility } from '~/models/column'
+import { useToast } from '@/components/ui/toast'
 
 definePageMeta({
 	name: 'design-project-project-total',
@@ -11,9 +14,14 @@ definePageMeta({
 })
 
 const dataTableRef = useTemplateRef<any>('dataTable')
-// const { template: templateApi } = useEntityApis()
+const { project: projectApi } = useEntityApis()
 const data = ref<ZdProject[]>([])
 const entityApis = useEntityApis()
+const { toast } = useToast()
+
+// 对话框控制
+const dialogVisible = ref(false)
+const editingProject = ref<ZdProject | undefined>(undefined)
 
 // 使用持久化状态管理
 const { loadState, saveState, clearState } = useTableState('design-project-project-total')
@@ -36,6 +44,7 @@ const handleReset = () => {
 		// 重置表格到默认状态
 		dataTableRef.value.columnVisibility = {
 			...dataTableRef.value.columnVisibility,
+			...ZdProjectColumnsVisibility,
 			...TimeStampColumnVisibility,
 		}
 		dataTableRef.value.sortBy = null
@@ -48,8 +57,17 @@ const handleRefresh = async () => {
 	try {
 		const response = await entityApis.project.getByPage(0, 100)
 		data.value = response.content
+		toast({
+			title: '刷新成功',
+			description: `已获取 ${response.content.length} 条数据`
+		})
 	} catch (error) {
 		console.error('刷新数据失败:', error)
+		toast({
+			title: '刷新失败',
+			description: '无法获取数据，请稍后重试',
+			variant: 'destructive'
+		})
 	}
 }
 
@@ -73,6 +91,98 @@ const handleBatchDelete = async () => {
 	}
 }
 
+// 处理编辑操作
+const handleEdit = (project: ZdProject) => {
+	editingProject.value = { ...project }
+	dialogVisible.value = true
+}
+
+// 处理删除操作
+const handleDelete = async (project: ZdProject) => {
+	if (!project.id) {
+		toast({
+			title: '删除失败',
+			description: '无效的项目ID',
+			variant: 'destructive'
+		})
+		return
+	}
+
+	try {
+		if (confirm('确定要删除此项目吗？')) {
+			await projectApi.delete(project.id)
+			toast({
+				title: '删除成功',
+				description: `项目 "${project.name}" 已被删除`
+			})
+			await handleRefresh()
+		}
+	} catch (error) {
+		console.error('删除项目失败:', error)
+		toast({
+			title: '删除失败',
+			description: '无法删除项目，请稍后重试',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 处理表单提交
+const handleProjectSubmit = async (project: ZdProject) => {
+	try {
+		let result
+		if (project.id) {
+			// 更新现有项目
+			result = await projectApi.update(project)
+			toast({
+				title: '更新成功',
+				description: `项目 "${project.name}" 已更新`
+			})
+		} else {
+			// 创建新项目
+			result = await projectApi.create(project)
+			toast({
+				title: '创建成功',
+				description: `项目 "${project.name}" 已创建`
+			})
+		}
+		await handleRefresh()
+	} catch (error) {
+		console.error('保存项目失败:', error)
+		toast({
+			title: '保存失败',
+			description: '无法保存项目，请稍后重试',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 添加新项目
+const handleAddProject = () => {
+	editingProject.value = undefined
+	dialogVisible.value = true
+}
+
+// 准备列定义，注入编辑和删除的逻辑
+const projectColumns = ref([
+	...ZdProjectColumns,
+	{
+			id: 'actions',
+			enableHiding: false,
+			enableSorting: false,
+			cell: ({ row }: { row: any }) => {
+				return <div class="relative">
+					<abstract-data-table-drop-down
+						onExpand={row.toggleExpanded}
+						onEdit={() => handleEdit(row.original)}
+						onDelete={() => handleDelete(row.original)}
+					/>
+				</div>
+			},
+			meta: { width: '80px' }
+	},
+])
+
 onMounted(async () => {
 	if (dataTableRef.value) {
 		// 尝试从 localStorage 加载状态
@@ -85,15 +195,15 @@ onMounted(async () => {
 			// 否则使用默认状态
 			dataTableRef.value.columnVisibility = {
 				...dataTableRef.value.columnVisibility,
-				ZdProjectColumnsVisibility,
+				...ZdProjectColumnsVisibility,
 				...TimeStampColumnVisibility,
 			}
 		}
 	}
-
+	
 	// 获取数据
 	try {
-		const response = await entityApis.project.getByPage(0, 100)
+		const response = await projectApi.getByPage(0, 100)
 		data.value = response.content
 	} catch (error) {
 		console.error('获取数据失败:', error)
@@ -120,9 +230,19 @@ const onClick = (row: ZdProject) => {
 </script>
 <template>
 	<div>
-		<TableToolbar :on-reset="handleReset" :on-refresh="handleRefresh" :on-export="handleExport"
-			:on-batch-delete="handleBatchDelete" :selected-rows="selectedRows" />
-		<abstract-data-table ref="dataTable" :data="data" :columns="ZdProjectColumns" v-model:selected-rows="selectedRows"
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-xl font-bold">项目列表</h2>
+			<shadcn-button @click="handleAddProject">新建项目</shadcn-button>
+		</div>
+		
+		<abstract-data-table ref="dataTable" :data="data" :columns="projectColumns" v-model:selected-rows="selectedRows"
 			:on-row-click="onClick"></abstract-data-table>
+			
+		<!-- 编辑对话框 -->
+		<project-dialog
+			v-model:isOpen="dialogVisible"
+			:project="editingProject"
+			@submit="handleProjectSubmit"
+		/>
 	</div>
 </template>

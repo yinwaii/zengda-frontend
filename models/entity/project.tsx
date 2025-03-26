@@ -1,4 +1,8 @@
 import { z } from "zod"
+import { h } from 'vue'
+import type { ColumnDef } from '@tanstack/vue-table'
+import type { BasicProperty, TimeStamp } from '../entity'
+import { getColumns, packHeader, TimeStampColumnVisibility } from '../column'
 
 export interface ZdProject extends BasicProperty, TimeStamp {
 	productTypeId: number
@@ -18,20 +22,76 @@ export interface ZdProject extends BasicProperty, TimeStamp {
 }
 
 export const ZdProjectColumns = getColumns<ZdProject>([
-	{ accessorKey: 'productTypeId', header: packHeader<ZdProject>('产品类型') },
-	{ accessorKey: 'templateId', header: packHeader<ZdProject>('模板ID') },
-	{ accessorKey: 'quantity', header: packHeader<ZdProject>('数量') },
-	{ accessorKey: 'model', header: packHeader<ZdProject>('模型') },
-	{ accessorKey: 'attention', header: packHeader<ZdProject>('注意力') },
-	{ accessorKey: 'company', header: packHeader<ZdProject>('公司') },
-	{ accessorKey: 'tel', header: packHeader<ZdProject>('电话') },
-	{ accessorKey: 'mob', header: packHeader<ZdProject>('手机') },
-	{ accessorKey: 'fax', header: packHeader<ZdProject>('传真') },
-	{ accessorKey: 'email', header: packHeader<ZdProject>('邮件') },
-	{ accessorKey: 'number', header: packHeader<ZdProject>('号码') },
-	{ accessorKey: 'date', header: packHeader<ZdProject>('日期') },
-	{ accessorKey: 'valid', header: packHeader<ZdProject>('是否合法') },
-	{ accessorKey: 'price', header: packHeader<ZdProject>('价格') },
+	{ 
+		accessorKey: 'productTypeId', 
+		header: packHeader<ZdProject>('产品类型'),
+		meta: { width: '120px' }
+	},
+	{ 
+		accessorKey: 'templateId', 
+		header: packHeader<ZdProject>('模板ID'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'quantity', 
+		header: packHeader<ZdProject>('数量'),
+		meta: { width: '80px' } 
+	},
+	{ 
+		accessorKey: 'model', 
+		header: packHeader<ZdProject>('模型'),
+		meta: { width: '120px' } 
+	},
+	{ 
+		accessorKey: 'attention', 
+		header: packHeader<ZdProject>('注意力'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'company', 
+		header: packHeader<ZdProject>('公司'),
+		meta: { width: '120px' } 
+	},
+	{ 
+		accessorKey: 'tel', 
+		header: packHeader<ZdProject>('电话'),
+		meta: { width: '120px' } 
+	},
+	{ 
+		accessorKey: 'mob', 
+		header: packHeader<ZdProject>('手机'),
+		meta: { width: '120px' } 
+	},
+	{ 
+		accessorKey: 'fax', 
+		header: packHeader<ZdProject>('传真'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'email', 
+		header: packHeader<ZdProject>('邮件'),
+		meta: { width: '150px' } 
+	},
+	{ 
+		accessorKey: 'number', 
+		header: packHeader<ZdProject>('号码'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'date', 
+		header: packHeader<ZdProject>('日期'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'valid', 
+		header: packHeader<ZdProject>('是否合法'),
+		meta: { width: '100px' } 
+	},
+	{ 
+		accessorKey: 'price', 
+		header: packHeader<ZdProject>('价格'),
+		meta: { width: '100px' } 
+	}
 ], true, true)
 
 export const ZdProjectFormZod = z.object({
@@ -97,4 +157,4 @@ export class ZdProject implements ZdProject {
 		this.productTypeId = 0
 		this.templateId = 0
 	}
-}
+} 

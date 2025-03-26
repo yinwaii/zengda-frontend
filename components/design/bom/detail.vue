@@ -1,0 +1,329 @@
+<template>
+	<div class="space-y-6">
+		<shadcn-card>
+			<shadcn-card-header>
+				<div class="flex items-center justify-between">
+					<div>
+						<h2 class="text-2xl font-bold">{{ bom.number }}</h2>
+						<p class="text-sm text-muted-foreground mt-1">{{ bom.note || '暂无描述' }}</p>
+					</div>
+					<div class="flex items-center gap-2">
+						<shadcn-button @click="$emit('edit')">
+							<LucidePencil class="mr-2 h-4 w-4" />
+							编辑
+						</shadcn-button>
+					</div>
+				</div>
+			</shadcn-card-header>
+			<shadcn-card-content>
+				<template v-if="isEditing">
+					<form @submit.prevent="handleSubmit" class="space-y-4">
+						<div class="grid grid-cols-2 gap-4">
+							<div class="space-y-2">
+								<shadcn-label for="number">料单编号</shadcn-label>
+								<shadcn-input id="number" v-model="editForm.number" />
+							</div>
+							<div class="space-y-2">
+								<shadcn-label for="version">版本</shadcn-label>
+								<shadcn-input id="version" v-model="editForm.version" />
+							</div>
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="note">描述</shadcn-label>
+							<shadcn-textarea id="note" v-model="editForm.note" />
+						</div>
+						<div class="flex justify-end gap-2">
+							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
+								取消
+							</shadcn-button>
+							<shadcn-button type="submit">
+								保存
+							</shadcn-button>
+						</div>
+					</form>
+				</template>
+				<template v-else>
+					<div class="grid grid-cols-2 gap-4">
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">ID</dt>
+							<dd class="mt-1">{{ bom.id }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">版本</dt>
+							<dd class="mt-1">{{ bom.version || '暂无版本号' }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">组件ID</dt>
+							<dd class="mt-1">{{ bom.componentId }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">接口ID</dt>
+							<dd class="mt-1">{{ bom.interId }}</dd>
+						</div>
+						<div class="col-span-2 space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">描述</dt>
+							<dd class="mt-1">{{ bom.note || '暂无描述' }}</dd>
+						</div>
+					</div>
+				</template>
+			</shadcn-card-content>
+		</shadcn-card>
+
+		<shadcn-separator />
+
+		<shadcn-card>
+			<shadcn-card-header>
+				<shadcn-card-title class="text-xl font-semibold">BOM信息</shadcn-card-title>
+			</shadcn-card-header>
+			<shadcn-card-content>
+				<div class="grid grid-cols-2 gap-4">
+					<div class="space-y-2 p-4 border rounded-lg">
+						<dt class="text-sm font-medium text-muted-foreground">创建人</dt>
+						<dd class="mt-1">{{ bom.createdBy || '暂无创建人' }}</dd>
+					</div>
+					<div class="space-y-2 p-4 border rounded-lg">
+						<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
+						<dd class="mt-1">{{ formatDate(bom.createdTime) || '暂无创建时间' }}</dd>
+					</div>
+					<div class="space-y-2 p-4 border rounded-lg">
+						<dt class="text-sm font-medium text-muted-foreground">修改人</dt>
+						<dd class="mt-1">{{ bom.updatedBy || '暂无修改人' }}</dd>
+					</div>
+					<div class="space-y-2 p-4 border rounded-lg">
+						<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
+						<dd class="mt-1">{{ formatDate(bom.updatedTime) || '暂无修改时间' }}</dd>
+					</div>
+				</div>
+			</shadcn-card-content>
+		</shadcn-card>
+
+		<shadcn-separator />
+
+		<shadcn-card>
+			<shadcn-card-header>
+				<div class="flex items-center justify-between">
+					<shadcn-card-title class="text-xl font-semibold">BOM表信息</shadcn-card-title>
+					<shadcn-button size="sm" @click="handleAddItem">
+						<LucidePlus class="mr-2 h-4 w-4" />
+						添加物料
+					</shadcn-button>
+				</div>
+			</shadcn-card-header>
+			<shadcn-card-content>
+				<abstract-data-table
+					:columns="bomItemColumns"
+					:data="bom.items || []"
+					search-column="itemName"
+					search-placeholder="根据物料名称检索..."
+				/>
+			</shadcn-card-content>
+		</shadcn-card>
+
+		<shadcn-separator />
+
+		<design-parameter-preview :parameters="parameters" />
+	</div>
+	
+	<!-- 物料项查看/编辑对话框 -->
+	<design-bom-item-dialog
+		v-model:is-open="itemDialogOpen"
+		:is-editing="itemDialogMode === 'edit'"
+		:item="selectedBomItem"
+		title="查看物料详情"
+		description="查看BOM中的物料项信息"
+		@submit="handleItemSubmit"
+	>
+		<div class="grid grid-cols-2 gap-4" v-if="selectedBomItem">
+			<div class="space-y-2 p-4 border rounded-lg">
+				<dt class="text-sm font-medium text-muted-foreground">物料ID</dt>
+				<dd class="mt-1">{{ selectedBomItem.itemId }}</dd>
+			</div>
+			<div class="space-y-2 p-4 border rounded-lg">
+				<dt class="text-sm font-medium text-muted-foreground">物料名称</dt>
+				<dd class="mt-1">{{ selectedBomItem.itemName }}</dd>
+			</div>
+			<div class="col-span-2 space-y-2 p-4 border rounded-lg">
+				<dt class="text-sm font-medium text-muted-foreground">备注</dt>
+				<dd class="mt-1">{{ selectedBomItem.note || '暂无备注' }}</dd>
+			</div>
+		</div>
+	</design-bom-item-dialog>
+	
+	<!-- 物料详情查询对话框 -->
+	<design-bom-item-query
+		v-model:is-open="itemQueryDialogOpen"
+		:item-id="selectedItemId"
+	/>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, h } from 'vue'
+import { resolveComponent } from 'vue'
+import { LucidePencil, LucidePlus } from 'lucide-vue-next'
+import type { ZdBom, ZdBomChild } from '~/models/entity/bom'
+import type { ZdParameter } from '~/models/entity/parameter'
+import { formatDate } from '~/utils/date'
+import { packHeader } from '~/models/column'
+
+// 导入自定义组件
+import DesignBomItemDialog from '~/components/design/bom/item-dialog.vue'
+import DesignBomItemQuery from '~/components/design/bom/item-query.vue'
+import DesignBomItemActions from '~/components/design/bom/item-actions.vue'
+
+const props = defineProps<{
+	bom: ZdBom
+	isEditing: boolean
+	parameters: ZdParameter[]
+}>()
+
+const emit = defineEmits<{
+	edit: []
+	cancel: []
+	submit: [form: Partial<ZdBom>]
+}>()
+
+const entityApis = useEntityApis()
+const editForm = ref<Partial<ZdBom>>({
+	number: props.bom.number,
+	note: props.bom.note,
+	version: props.bom.version
+})
+
+// 物料项对话框状态
+const itemDialogOpen = ref(false)
+const itemDialogMode = ref<'view' | 'add' | 'edit'>('view')
+const selectedBomItem = ref<ZdBomChild | undefined>(undefined)
+const selectedItemIndex = ref<number>(-1)
+
+// 物料查询对话框状态
+const itemQueryDialogOpen = ref(false)
+const selectedItemId = ref<number>(0)
+
+// 处理查看物料项
+const handleViewItem = (item: ZdBomChild, index: number) => {
+	selectedBomItem.value = { ...item }
+	selectedItemIndex.value = index
+	itemDialogMode.value = 'view'
+	itemDialogOpen.value = true
+}
+
+// 处理编辑物料项
+const handleEditItem = (item: ZdBomChild, index: number) => {
+	selectedBomItem.value = { ...item }
+	selectedItemIndex.value = index
+	itemDialogMode.value = 'edit'
+	itemDialogOpen.value = true
+}
+
+// 处理删除物料项
+const handleDeleteItem = async (item: ZdBomChild, index: number) => {
+	if (!confirm('确定要删除此物料项吗？')) return
+	
+	try {
+		// 创建一个新的BOM对象，移除指定索引的物料项
+		const updatedBom: ZdBom = {
+			...props.bom,
+			items: [...props.bom.items]
+		}
+		updatedBom.items.splice(index, 1)
+		
+		// 调用API更新BOM
+		await entityApis.bom.update(updatedBom)
+		
+		// 发出事件通知更新
+		emit('submit', updatedBom)
+	} catch (error) {
+		console.error('删除物料项失败:', error)
+		alert('删除物料项失败，请重试')
+	}
+}
+
+// 处理添加物料项
+const handleAddItem = () => {
+	selectedBomItem.value = {
+		bomId: props.bom.id,
+		itemId: 0,
+		itemName: '',
+		note: ''
+	}
+	selectedItemIndex.value = -1
+	itemDialogMode.value = 'edit'
+	itemDialogOpen.value = true
+}
+
+// 处理物料项查询
+const handleQueryItem = (item: ZdBomChild) => {
+	selectedItemId.value = item.itemId
+	itemQueryDialogOpen.value = true
+}
+
+// 处理物料项表单提交
+const handleItemSubmit = async (updatedItem: ZdBomChild) => {
+	try {
+		// 创建一个新的BOM对象，更新或添加物料项
+		const updatedBom: ZdBom = {
+			...props.bom,
+			items: [...props.bom.items]
+		}
+		
+		if (selectedItemIndex.value >= 0) {
+			// 更新现有物料项
+			updatedBom.items[selectedItemIndex.value] = updatedItem
+		} else {
+			// 添加新物料项
+			updatedBom.items.push(updatedItem)
+		}
+		
+		// 调用API更新BOM
+		await entityApis.bom.update(updatedBom)
+		
+		// 发出事件通知更新
+		emit('submit', updatedBom)
+	} catch (error) {
+		console.error('更新物料项失败:', error)
+		alert('更新物料项失败，请重试')
+	}
+}
+
+// BOM表格的列定义
+const bomItemColumns = computed(() => [
+	{
+		accessorKey: 'itemId',
+		header: packHeader<ZdBomChild>('物料ID'),
+		meta: { width: '100px' }
+	},
+	{
+		accessorKey: 'itemName',
+		header: packHeader<ZdBomChild>('物料名称'),
+		meta: { width: '180px' }
+	},
+	{
+		accessorKey: 'note',
+		header: packHeader<ZdBomChild>('备注'),
+		meta: { width: '200px' }
+	},
+	{
+		id: 'actions',
+		enableHiding: false,
+		cell: ({ row }: { row: any }) => {
+			const item = row.original as ZdBomChild
+			const index = props.bom.items.findIndex(i => 
+				i.itemId === item.itemId && i.bomId === item.bomId
+			)
+			return h('div', { class: 'flex justify-end' }, [
+				h(resolveComponent('design-bom-item-actions'), {
+					onView: () => handleViewItem(item, index),
+					onEdit: () => handleEditItem(item, index),
+					onDelete: () => handleDeleteItem(item, index),
+					onQuery: () => handleQueryItem(item)
+				})
+			])
+		},
+		meta: { width: '80px' }
+	}
+])
+
+const handleSubmit = () => {
+	emit('submit', editForm.value)
+}
+</script> 

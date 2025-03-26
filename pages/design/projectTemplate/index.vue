@@ -1,6 +1,9 @@
-<script setup lang="ts">
-import TableToolbar from '@/components/design/table/TableToolbar.vue'
+<script setup lang="tsx">
 import { navigateTo } from '#app'
+import { h, ref } from 'vue'
+import { ZdTemplate, ZdTemplateColumns } from '~/models/entity/template'
+import { TimeStampColumnVisibility } from '~/models/column'
+import { useToast } from '@/components/ui/toast'
 
 definePageMeta({
 	name: 'design-project-template-total',
@@ -13,6 +16,11 @@ definePageMeta({
 const dataTableRef = useTemplateRef<any>('dataTable')
 const { template: templateApi } = useEntityApis()
 const data = ref<ZdTemplate[]>([])
+const { toast } = useToast()
+
+// 对话框控制
+const dialogVisible = ref(false)
+const editingTemplate = ref<ZdTemplate | undefined>(undefined)
 
 // 使用持久化状态管理
 const { loadState, saveState, clearState } = useTableState('design-project-template-total')
@@ -47,8 +55,17 @@ const handleRefresh = async () => {
 	try {
 		const response = await templateApi.getByPage(0, 100)
 		data.value = response.content
+		toast({
+			title: '刷新成功',
+			description: `已获取 ${response.content.length} 条数据`
+		})
 	} catch (error) {
 		console.error('刷新数据失败:', error)
+		toast({
+			title: '刷新失败',
+			description: '无法获取数据，请稍后重试',
+			variant: 'destructive'
+		})
 	}
 }
 
@@ -72,6 +89,98 @@ const handleBatchDelete = async () => {
 	}
 }
 
+// 处理编辑操作
+const handleEdit = (template: ZdTemplate) => {
+	editingTemplate.value = { ...template }
+	dialogVisible.value = true
+}
+
+// 处理删除操作
+const handleDelete = async (template: ZdTemplate) => {
+	if (!template.id) {
+		toast({
+			title: '删除失败',
+			description: '无效的模板ID',
+			variant: 'destructive'
+		})
+		return
+	}
+
+	try {
+		if (confirm('确定要删除此模板吗？')) {
+			await templateApi.delete(template.id)
+			toast({
+				title: '删除成功',
+				description: `模板 "${template.name}" 已被删除`
+			})
+			await handleRefresh()
+		}
+	} catch (error) {
+		console.error('删除模板失败:', error)
+		toast({
+			title: '删除失败',
+			description: '无法删除模板，请稍后重试',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 处理表单提交
+const handleTemplateSubmit = async (template: ZdTemplate) => {
+	try {
+		let result
+		if (template.id && template.id > 0) {
+			// 更新现有模板
+			result = await templateApi.update(template)
+			toast({
+				title: '更新成功',
+				description: `模板 "${template.name}" 已更新`
+			})
+		} else {
+			// 创建新模板
+			result = await templateApi.create(template)
+			toast({
+				title: '创建成功',
+				description: `模板 "${template.name}" 已创建`
+			})
+		}
+		await handleRefresh()
+	} catch (error) {
+		console.error('保存模板失败:', error)
+		toast({
+			title: '保存失败',
+			description: '无法保存模板，请稍后重试',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 添加新模板
+const handleAddTemplate = () => {
+	editingTemplate.value = undefined
+	dialogVisible.value = true
+}
+
+// 准备列定义，注入编辑和删除的逻辑
+const templateColumns = ref([
+	...ZdTemplateColumns,
+	{
+			id: 'actions',
+			enableHiding: false,
+			enableSorting: false,
+			cell: ({ row }: { row: any }) => {
+				return <div class="relative">
+					<abstract-data-table-drop-down
+						onExpand={row.toggleExpanded}
+						onEdit={() => handleEdit(row.original)}
+						onDelete={() => handleDelete(row.original)}
+					/>
+				</div>
+			},
+			meta: { width: '80px' }
+	},
+])
+
 onMounted(async () => {
 	if (dataTableRef.value) {
 		// 尝试从 localStorage 加载状态
@@ -88,7 +197,7 @@ onMounted(async () => {
 			}
 		}
 	}
-	
+
 	// 获取数据
 	try {
 		const response = await templateApi.getByPage(0, 100)
@@ -118,9 +227,19 @@ const onClick = (row: ZdTemplate) => {
 </script>
 <template>
 	<div>
-		<TableToolbar :on-reset="handleReset" :on-refresh="handleRefresh" :on-export="handleExport"
-			:on-batch-delete="handleBatchDelete" :selected-rows="selectedRows" />
-		<abstract-data-table ref="dataTable" :data="data" :columns="ZdTemplateColumns" v-model:selected-rows="selectedRows"
+		<div class="flex justify-between items-center mb-4">
+			<h2 class="text-xl font-bold">项目模板列表</h2>
+			<shadcn-button @click="handleAddTemplate">新建模板</shadcn-button>
+		</div>
+		
+		<abstract-data-table ref="dataTable" :data="data" :columns="templateColumns" v-model:selected-rows="selectedRows"
 			:on-row-click="onClick"></abstract-data-table>
+			
+		<!-- 编辑对话框 -->
+		<project-template-dialog
+			v-model:isOpen="dialogVisible"
+			:template="editingTemplate"
+			@submit="handleTemplateSubmit"
+		/>
 	</div>
 </template>

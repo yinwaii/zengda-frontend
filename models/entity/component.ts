@@ -5,6 +5,7 @@ export interface ZdComponent extends BasicProperty, TimeStamp {
 	isRequired: boolean
 	price?: string
 	value?: string
+	bomId?: number
 }
 
 export const ZdComponentColumns = getColumns<ZdComponent>([
