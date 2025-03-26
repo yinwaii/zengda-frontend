@@ -29,8 +29,9 @@ export default defineNuxtConfig({
     shim: false,
   },
   runtimeConfig: {
+    dufsServer: process.env.DUFS_SERVER || 'http://localhost:6990',
     public: {
-      baseUrl: process.env.NUXT_PUBLIC_API_BASE
+      apiBase: process.env.API_BASE || '',
     }
   },
   experimental: {
@@ -61,6 +62,16 @@ export default defineNuxtConfig({
     prerender: {
       crawlLinks: true,
       routes: ['/']
+    }
+  },
+  vite: {
+    optimizeDeps: {
+      include: ['tinymce/tinymce']
+    },
+    build: {
+      rollupOptions: {
+        external: ['tinymce/tinymce']
+      }
     }
   }
 })

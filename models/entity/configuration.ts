@@ -47,24 +47,4 @@ export class ZdConfiguration implements ZdConfiguration {
 		this.componentConfig = '';
 		this.isShow = false;
 	}
-
-	static getById(tid: string, pid: string) {
-		return useApis().get<VOList<ZdConfiguration>>('/configuration/', { tid, pid });
-	}
-
-	static get(id: number) {
-		return useApis().get<ZdConfiguration>(`/configuration/${id}`);
-	}
-
-	static post(data: ZdConfiguration) {
-		return useApis().post<ZdConfiguration>('/configuration/', data);
-	}
-
-	static put(data: ZdConfiguration) {
-		return useApis().put<ZdConfiguration>('/configuration', data);
-	}
-
-	static delete(id: number) {
-		return useApis().delete<ZdConfiguration>(`/configuration/${id}`);
-	}
 }

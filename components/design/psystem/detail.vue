@@ -8,11 +8,9 @@
 						<p class="text-sm text-muted-foreground mt-1">{{ system.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
-						<shadcn-button v-if="system.docsUrl" variant="outline" as-child>
-							<a :href="system.docsUrl" target="_blank">
-								<LucideFileText class="mr-2 h-4 w-4" />
-								查看文档
-							</a>
+						<shadcn-button v-if="system.docsUrl" variant="outline" @click="showSpecificationEditor = true">
+							<LucideFileText class="mr-2 h-4 w-4" />
+							编辑规格
 						</shadcn-button>
 						<shadcn-button @click="$emit('edit')">
 							<LucidePencil class="mr-2 h-4 w-4" />
@@ -106,6 +104,28 @@
 		<shadcn-separator />
 
 		<design-parameter-preview :parameters="parameters" />
+
+		<!-- 规格书编辑器对话框 -->
+		<shadcn-dialog v-model:open="showSpecificationEditor">
+			<shadcn-dialog-content class="max-w-4xl">
+				<shadcn-dialog-header>
+					<shadcn-dialog-title>编辑规格书</shadcn-dialog-title>
+					<shadcn-dialog-description>
+						编辑系统规格书内容
+					</shadcn-dialog-description>
+				</shadcn-dialog-header>
+				<div class="py-4">
+					<design-specification-editor
+						v-if="system.docsUrl"
+						:spec-id="system.id"
+						:file-tag="system.docsUrl"
+						:name="system.name"
+						:latest-version-id="1"
+						@save="handleSpecificationSave"
+					/>
+				</div>
+			</shadcn-dialog-content>
+		</shadcn-dialog>
 	</div>
 </template>
 
@@ -115,7 +135,6 @@ import { LucideFileText, LucidePencil } from 'lucide-vue-next'
 import { ZdPSystem } from '~/models/entity/psystem'
 import { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
-// import ParameterPreview from '~/components/design/parameter/parameter-preview.vue'
 
 const props = defineProps<{
 	system: ZdPSystem
@@ -143,7 +162,13 @@ const editFormDocsUrl = computed({
 	}
 })
 
+const showSpecificationEditor = ref(false)
+
 const handleSubmit = () => {
 	emit('submit', editForm.value)
+}
+
+const handleSpecificationSave = () => {
+	showSpecificationEditor.value = false
 }
 </script> 

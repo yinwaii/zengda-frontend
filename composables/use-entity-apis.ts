@@ -1,18 +1,45 @@
 export const useEntityApis = () => {
-  const api = useApis()
+  const api = useApis(), systemApi = useApis('http://localhost:6990')
+  const config = useRuntimeConfig()
+  const apiBase = config.public.apiBase as string || ''
 
   return {
     // User APIs
     user: {
-      login: (username: string, password: string) => {
+      login: async (username: string, password: string) => {
         const formData = new URLSearchParams()
         formData.append('username', username)
         formData.append('password', password)
-        return api.postRaw<ZdSession>('/user/login', formData, {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
+        
+        // 创建AbortController用于超时控制
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), 10000) // 10秒超时
+        
+        try {
+          // 使用原生fetch替代api.postRaw
+          const response = await fetch(`${apiBase}/user/login`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: formData,
+            signal: controller.signal
+          })
+          
+          // 清除超时
+          clearTimeout(timeoutId)
+          
+          if (!response.ok) {
+            const errorText = await response.text()
+            throw new Error(`登录失败: ${response.status} - ${errorText}`)
           }
-        })
+          
+          return await response.json()
+        } catch (error) {
+          clearTimeout(timeoutId)
+          console.error('登录请求失败:', error)
+          throw error
+        }
       },
       logout: () => api.get<null>('/sysUser/logout'),
     },
@@ -140,18 +167,42 @@ export const useEntityApis = () => {
     },
 
     system: {
-      hash: (filename: string, hash: string) => api.get<object>(`/${filename}`, { hash }, {
-        baseUrl: ''
+      hash: (filename: string, hash: string) => systemApi.getRaw<ArrayBuffer>(`/${filename}`, { hash }, {
+        responseType: 'arrayBuffer'
       }),
-      download: (filename: string) => api.get<object>(`/${filename}`, {}, {
-        baseUrl: ''
-      }),
-      upload: (filename: string, file: File) => api.put<object>(`/${filename}`, file, {
+      download: (filename: string) => {
+        // 使用服务端代理而不是直接调用外部服务
+        return api.getRaw<Blob>(`/api/proxy/${filename}`, {}, {
+          headers: {
+            'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          }
+        })
+      },
+      upload: (filename: string, file: File) => systemApi.put<object>(`/${filename}`, file, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       }),
-      delete: (filename: string) => api.delete<object>(`/${filename}`)
+      delete: (filename: string) => systemApi.delete<object>(`/${filename}`),
+      downloadAsHtml: async (filename: string) => {
+        try {
+          // filename可能是编码后的完整URL或单纯的文件名
+          // 直接使用缓存API进行转换
+          const response = await fetch(`/api/cached-docx-to-html/${filename}`)
+          
+          if (!response.ok) {
+            console.error(`文档转换请求失败: ${response.status} ${response.statusText}`)
+            throw new Error(`下载并转换文件失败: ${response.statusText}`)
+          }
+          
+          // 获取HTML内容
+          const html = await response.text()
+          return html
+        } catch (error) {
+          console.error('下载并转换文件失败:', error)
+          throw error
+        }
+      }
     }
   }
 } 

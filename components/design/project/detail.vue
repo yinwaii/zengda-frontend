@@ -65,7 +65,7 @@
 
 		<shadcn-separator />
 
-		<parameter-preview :parameters="parameters" />
+		<design-parameter-preview :parameters="parameters" />
 	</div>
 </template>
 
@@ -75,7 +75,7 @@ import { LucidePencil } from 'lucide-vue-next'
 import { ZdProject } from '~/models/entity/project'
 import { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
-import ParameterPreview from '~/components/design/parameter/preview.vue'
+// import ParameterPreview from '~/components/design/parameter/preview.vue'
 
 const props = defineProps<{
 	project: ZdProject

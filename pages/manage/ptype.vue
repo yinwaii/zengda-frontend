@@ -1,7 +1,10 @@
 <script setup lang="ts">
 definePageMeta({
 	name: 'manage-ptype',
-	keepalive: true
+	keepalive: {
+		max: 5, // 设置最大缓存数量
+		include: ['manage-ptype']
+	}
 })
 
 const table = useTemplateRef<any>('table')

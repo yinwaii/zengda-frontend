@@ -39,28 +39,4 @@ export class ZdTComponent implements ZdTComponent {
 		this.templateId = -1;
 		this.componentId = -1;
 	}
-
-	static getByTemplateId(template_id: number) {
-		return useApis().get<VOList<ZdTComponent>>('/tComponent/', {tid: template_id});
-	}
-	
-	static post(data: ZdTComponent) {
-		return useApis().post<ZdTComponent>('/tComponent/', data);
-	}
-
-	static postByBatch(data: Array<ZdTComponent>) {
-		return useApis().post<boolean>('/tComponent/batch', data);
-	}
-	
-	static put(data: ZdTComponent) {
-		return useApis().put<ZdTComponent>('/tComponent', data);
-	}
-
-	static putByBatch(data: Array<ZdTComponent>) {
-		return useApis().put<boolean>('/tComponent/batch', data);
-	}
-	
-	static delete(id: number) {
-		return useApis().delete<ZdTComponent>(`/tComponent/${id}`);
-	}
 }

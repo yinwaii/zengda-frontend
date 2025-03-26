@@ -4,7 +4,10 @@ import { navigateTo } from '#app'
 
 definePageMeta({
 	name: 'design-project-project-total',
-	keepalive: true
+	keepalive: {
+		max: 10, // 设置最大缓存数量
+		include: ['design-project-project-total']
+	}
 })
 
 const dataTableRef = useTemplateRef<any>('dataTable')

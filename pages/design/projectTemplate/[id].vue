@@ -81,7 +81,8 @@ import type { ZdSpecification } from '~/models/entity/specification'
 
 // 添加 keepalive 配置
 definePageMeta({
-	name: 'psystem-detail'
+	name: 'psystem-detail',
+	keepalive: false
 })
 
 const { id } = useRoute().params
@@ -329,12 +330,33 @@ const handleSpecificationSubmit = async (form: Partial<ZdSpecification>) => {
 			lastVersionId: selectedSpecification.value.latestVersionId
 		}
 		
-		// 使用update方法更新规格书
-		await entityApis.specification.update(
-			specMeta.fileTag,
-			null as any, // 这里应该传文件，但当前只是更新元数据
-			specMeta
-		)
+		// 如果form中包含url，且以blob:开头，说明是本地编辑的文档内容
+		if (form.url && form.url.startsWith('blob:')) {
+			try {
+				// 获取blob内容
+				const response = await fetch(form.url)
+				const htmlContent = await response.text()
+				
+				// 转换为文件对象
+				const file = new File([htmlContent], `${specMeta.name}.html`, { type: 'text/html' })
+				
+				// 使用update方法上传规格书
+				await entityApis.specification.update(
+					specMeta.fileTag,
+					file,
+					specMeta
+				)
+			} catch (error) {
+				console.error('处理规格书内容失败:', error)
+			}
+		} else {
+			// 如果没有新内容，只更新元数据
+			await entityApis.specification.update(
+				specMeta.fileTag,
+				null as any, // 这里应该传文件，但当前只是更新元数据
+				specMeta
+			)
+		}
 		
 		// 刷新规格书数据
 		if (selectedTemplate.value?.specId) {

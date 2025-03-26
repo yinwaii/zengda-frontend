@@ -8,11 +8,9 @@
             <p class="text-sm text-muted-foreground mt-1">{{ specification.description || '暂无描述' }}</p>
           </div>
           <div class="flex items-center gap-2">
-            <shadcn-button v-if="specification.url" variant="outline" as-child>
-              <a :href="specification.url" target="_blank">
-                <LucideExternalLink class="mr-2 h-4 w-4" />
-                查看规格
-              </a>
+            <shadcn-button v-if="specification.url" variant="outline" @click="showEditor = true">
+              <LucidePencil class="mr-2 h-4 w-4" />
+              编辑规格
             </shadcn-button>
             <shadcn-button @click="$emit('edit')">
               <LucidePencil class="mr-2 h-4 w-4" />
@@ -24,19 +22,34 @@
       <shadcn-card-content>
         <template v-if="isEditing">
           <form @submit.prevent="handleSubmit" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <shadcn-label for="name">名称</shadcn-label>
-                <shadcn-input id="name" v-model="editForm.name" />
-              </div>
-              <div class="space-y-2">
-                <shadcn-label for="fileTag">文件标签</shadcn-label>
-                <shadcn-input id="fileTag" v-model="editForm.fileTag" />
-              </div>
+            <div class="space-y-2">
+              <shadcn-label for="name">名称</shadcn-label>
+              <shadcn-input id="name" v-model="editForm.name" />
             </div>
             <div class="space-y-2">
-              <shadcn-label for="url">URL</shadcn-label>
-              <shadcn-input id="url" v-model="editFormUrl" />
+              <shadcn-label for="description">描述</shadcn-label>
+              <shadcn-textarea id="description" v-model="editForm.description" />
+            </div>
+            <div class="space-y-2">
+              <div class="flex items-center justify-between">
+                <shadcn-label>内容</shadcn-label>
+                <div class="flex gap-2">
+                  <shadcn-button type="button" variant="outline" size="sm" @click="handleImportDocx">
+                    <LucideFileUp class="mr-2 h-4 w-4" />
+                    导入DOCX
+                  </shadcn-button>
+                  <shadcn-button type="button" variant="outline" size="sm" @click="handleExportDocx">
+                    <LucideFileDown class="mr-2 h-4 w-4" />
+                    导出DOCX
+                  </shadcn-button>
+                </div>
+              </div>
+              <design-editor-tiny-editor
+                :model-value="editForm.content || ''"
+                @update:model-value="(value) => editForm.content = value"
+                :disabled="false"
+                @change="handleContentChange"
+              />
             </div>
             <div class="flex justify-end gap-2">
               <shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -78,6 +91,14 @@
             <div v-if="specification.attributes" class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">属性</dt>
               <dd class="mt-1">{{ specification.attributes }}</dd>
+            </div>
+            <div class="col-span-2 space-y-2 p-4 border rounded-lg">
+              <dt class="text-sm font-medium text-muted-foreground">描述</dt>
+              <dd class="mt-1">{{ specification.description || '暂无描述' }}</dd>
+            </div>
+            <div class="col-span-2 space-y-2 p-4 border rounded-lg">
+              <dt class="text-sm font-medium text-muted-foreground">内容</dt>
+              <dd class="mt-1" v-html="specification.content"></dd>
             </div>
           </div>
         </template>
@@ -177,15 +198,39 @@
     <shadcn-separator />
 
     <design-parameter-preview v-if="parameters && parameters.length > 0" :parameters="parameters" />
+
+    <!-- 规格书编辑器对话框 -->
+    <shadcn-dialog v-model:open="showEditor">
+      <shadcn-dialog-content class="max-w-5xl editor-dialog-content">
+        <shadcn-dialog-header>
+          <shadcn-dialog-title>编辑规格书</shadcn-dialog-title>
+          <shadcn-dialog-description>
+            编辑规格书内容，支持富文本编辑
+          </shadcn-dialog-description>
+        </shadcn-dialog-header>
+        <div class="py-2 h-full">
+          <design-specification-editor
+            :spec-id="specification.id"
+            :file-tag="specification.fileTag"
+            :name="specification.name"
+            :latest-version-id="specification.latestVersionId"
+            @save="handleEditorSave"
+          />
+        </div>
+      </shadcn-dialog-content>
+    </shadcn-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { LucidePencil, LucideExternalLink } from 'lucide-vue-next'
+import { LucidePencil, LucideExternalLink, LucideFileUp, LucideFileDown } from 'lucide-vue-next'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
+import { docxToHtml, htmlToDocx } from '~/utils/document'
+import TinyEditor from '~/components/design/editor/TinyEditor.vue'
+import DesignSpecificationEditor from '~/components/design/specification/editor.vue'
 
 const props = defineProps<{
   specification: ZdSpecification
@@ -201,18 +246,89 @@ const emit = defineEmits<{
 
 const editForm = ref<Partial<ZdSpecification>>({
   name: props.specification.name,
-  fileTag: props.specification.fileTag,
-  url: props.specification.url
+  description: props.specification.description,
+  content: props.specification.content || ''
 })
 
-const editFormUrl = computed({
-  get: () => editForm.value.url || '',
-  set: (value) => {
-    editForm.value.url = value
+const showEditor = ref(false)
+
+// 处理 DOCX 导入
+const handleImportDocx = async () => {
+  try {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = '.docx'
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0]
+      if (file) {
+        const html = await docxToHtml(file)
+        editForm.value.content = html
+      }
+    }
+    input.click()
+  } catch (error) {
+    console.error('导入 DOCX 失败:', error)
   }
-})
+}
+
+// 处理 DOCX 导出
+const handleExportDocx = async () => {
+  try {
+    if (!editForm.value.content) return
+    
+    const file = await htmlToDocx(editForm.value.content, `${props.specification.name}.docx`)
+    
+    // 创建下载链接
+    const url = URL.createObjectURL(file)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = file.name
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  } catch (error) {
+    console.error('导出 DOCX 失败:', error)
+  }
+}
+
+const handleContentChange = (content: string) => {
+  editForm.value.content = content
+}
 
 const handleSubmit = () => {
   emit('submit', editForm.value)
 }
-</script> 
+
+// 处理编辑器保存
+const handleEditorSave = async () => {
+  showEditor.value = false
+  // 刷新规格书数据
+  emit('submit', {
+    ...props.specification,
+    content: editForm.value.content
+  })
+}
+</script>
+
+<style scoped>
+:deep(.editor-dialog-content) {
+  height: 85vh;
+  max-height: 85vh;
+  width: 90vw;
+  max-width: 1400px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+:deep(.shadcn-dialog-content) {
+  padding: 1rem;
+}
+
+:deep(.shadcn-dialog-header) {
+  padding: 0;
+  margin-bottom: 0.5rem;
+}
+</style> 

@@ -11,6 +11,7 @@ export interface ZdSpecification extends BasicProperty, TimeStamp {
 	bools: object
 	imgs: object
 	versionLink: Array<ZdVersionNode>
+	content?: string
 }
 
 export interface ZdSpecificationQuery extends BasicProperty {

@@ -32,8 +32,13 @@ import { ZdPSystem } from '~/models/entity/psystem'
 import { ZdTComponent } from '~/models/entity/tcompoment'
 import { LucideChevronRight, LucideFolder, LucidePuzzle } from 'lucide-vue-next'
 
+// 定义扩展的 ZdPSystem 类型，包含 components 属性
+type ZdPSystemWithComponents = ZdPSystem & {
+	components?: ZdTComponent[]
+}
+
 const props = defineProps<{
-	items: (ZdPSystem & { components?: ZdTComponent[] })[]
+	items: ZdPSystemWithComponents[]
 }>()
 
 const emit = defineEmits<{
@@ -47,40 +52,60 @@ const entityApis = useEntityApis()
 
 // 获取组件名称
 const fetchComponentName = async (componentId: number) => {
-	if (componentNames.value[componentId]) return
 	try {
 		const component = await entityApis.component.get(componentId)
-		componentNames.value[componentId] = component.name
+		if (component) {
+			componentNames.value[componentId] = component.name
+		} else {
+			componentNames.value[componentId] = `组件${componentId}`
+		}
 	} catch (error) {
-		console.error('获取组件名称失败:', error)
-		componentNames.value[componentId] = `组件 ${componentId}`
+		console.warn(`获取组件(${componentId})名称失败:`, error)
+		componentNames.value[componentId] = `组件${componentId}`
 	}
 }
 
 // 获取所有组件名称
-const fetchAllComponentNames = async (items: (ZdPSystem & { components?: ZdTComponent[] })[]) => {
-	for (const item of items) {
-		if (item.components) {
-			for (const comp of item.components) {
-				await fetchComponentName(comp.componentId)
-			}
+const fetchAllComponentNames = async () => {
+	try {
+		const componentIds = new Set<number>()
+		
+		// 收集所有组件ID
+		const collectComponentIds = (items: ZdPSystemWithComponents[]) => {
+			items.forEach(item => {
+				if (item.components) {
+					item.components.forEach((comp: ZdTComponent) => {
+						if (comp.componentId) {
+							componentIds.add(comp.componentId)
+						}
+					})
+				}
+				if (item.children) {
+					collectComponentIds(item.children)
+				}
+			})
 		}
-		if (item.children) {
-			await fetchAllComponentNames(item.children)
-		}
+		
+		collectComponentIds(props.items)
+		
+		// 获取所有组件名称
+		const promises = Array.from(componentIds).map(fetchComponentName)
+		await Promise.allSettled(promises)
+	} catch (error) {
+		console.warn('获取组件名称列表失败:', error)
 	}
 }
 
 // 监听items变化，获取组件名称
 watch(() => props.items, async (newItems) => {
-	await fetchAllComponentNames(newItems)
+	await fetchAllComponentNames()
 }, { immediate: true })
 
 const getKey = (item: ZdPSystem) => item.id.toString()
 
 const getTitle = (item: ZdPSystem) => item.name
 
-const hasChildren = (item: ZdPSystem & { components?: ZdTComponent[] }) => {
+const hasChildren = (item: ZdPSystemWithComponents) => {
 	return (item.children && item.children.length > 0) || (item.components && item.components.length > 0)
 }
 

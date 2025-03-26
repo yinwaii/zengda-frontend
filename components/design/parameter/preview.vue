@@ -4,24 +4,7 @@
 			<shadcn-card-title>参数列表</shadcn-card-title>
 		</shadcn-card-header>
 		<shadcn-card-content>
-			<shadcn-table v-if="parameters.length > 0">
-				<shadcn-table-header>
-					<shadcn-table-row>
-						<shadcn-table-head>参数名</shadcn-table-head>
-						<shadcn-table-head>描述</shadcn-table-head>
-						<shadcn-table-head>值</shadcn-table-head>
-						<shadcn-table-head>类型</shadcn-table-head>
-					</shadcn-table-row>
-				</shadcn-table-header>
-				<shadcn-table-body>
-					<shadcn-table-row v-for="param in parameters" :key="param.id">
-						<shadcn-table-cell>{{ param.name }}</shadcn-table-cell>
-						<shadcn-table-cell>{{ param.description || '-' }}</shadcn-table-cell>
-						<shadcn-table-cell>{{ param.value }}</shadcn-table-cell>
-						<shadcn-table-cell>{{ param.dtype || '-' }}</shadcn-table-cell>
-					</shadcn-table-row>
-				</shadcn-table-body>
-			</shadcn-table>
+			<abstract-data-table v-if="parameters.length > 0" :columns="columns" :data="parameters" />
 			<div v-else class="text-center text-muted-foreground py-4">
 				暂无参数
 			</div>
@@ -31,8 +14,54 @@
 
 <script setup lang="ts">
 import { ZdParameter } from '~/models/entity/parameter'
+import type { ColumnDef } from '@tanstack/vue-table'
+import { ref, h } from 'vue'
 
-defineProps<{
+const props = defineProps<{
 	parameters: ZdParameter[]
 }>()
+
+const emit = defineEmits<{
+	(e: 'edit', parameter: ZdParameter): void
+	(e: 'delete', parameter: ZdParameter): void
+}>()
+
+// 列配置
+const columns = ref<ColumnDef<ZdParameter>[]>([
+	{
+		accessorKey: 'name',
+		header: '参数名',
+	},
+	{
+		accessorKey: 'description',
+		header: '描述',
+		cell: ({ row }) => row.original.description || '-',
+	},
+	{
+		accessorKey: 'value',
+		header: '值',
+	},
+	{
+		accessorKey: 'dtype',
+		header: '类型',
+		cell: ({ row }) => row.original.dtype || '-',
+	},
+	{
+		id: 'actions',
+		header: '操作',
+		// 使用渲染函数
+		cell: ({ row }) => {
+			const parameter = row.original
+			
+			// 返回自定义渲染内容
+			return h('div', { class: 'flex justify-end' }, [
+				h('design-parameter-actions', {
+					parameter,
+					onEdit: () => emit('edit', parameter),
+					onDelete: () => emit('delete', parameter)
+				})
+			])
+		}
+	},
+])
 </script> 

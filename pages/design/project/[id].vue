@@ -38,7 +38,9 @@ import { useEntityApis } from '~/composables/use-entity-apis'
 
 // 添加 keepalive 配置
 definePageMeta({
-	name: 'project-detail'
+	name: 'project-detail',
+	// 禁用缓存，减少内存占用
+	keepalive: false
 })
 
 const { id } = useRoute().params
