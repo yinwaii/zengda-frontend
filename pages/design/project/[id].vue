@@ -1,106 +1,108 @@
 <template>
-	<div class="flex gap-4 p-4 h-full">
-		<div class="w-1/4 border-r overflow-auto">
-			<div class="space-y-1">
-				<div v-if="pageLoading" class="flex items-center justify-center py-10">
-					<div class="animate-pulse flex space-x-4">
-						<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
-						<div class="flex-1 space-y-3 py-1">
-							<div class="h-2 bg-accent-foreground/10 rounded"></div>
-							<div class="space-y-1">
+	<div class="project-wrapper">
+		<div class="flex gap-4 p-4 h-full">
+			<div class="w-1/4 border-r overflow-auto">
+				<div class="space-y-1">
+					<div v-if="pageLoading" class="flex items-center justify-center py-10">
+						<div class="animate-pulse flex space-x-4">
+							<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
+							<div class="flex-1 space-y-3 py-1">
 								<div class="h-2 bg-accent-foreground/10 rounded"></div>
+								<div class="space-y-1">
+									<div class="h-2 bg-accent-foreground/10 rounded"></div>
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-				<design-project-tree
-					v-else-if="selectedProject"
-					:project="selectedProject"
-					:selectedProjectId="projectId"
-					@select="handleProjectSelect"
-					@template-select="handleTemplateSelect"
-					@system-select="handleSystemSelect"
-					@component-select="handleComponentSelect"
-					@bom-select="handleBOMSelect"
-					@specification-select="handleSpecificationSelect"
-					@specification-node-select="handleSpecificationNodeSelect"
-				/>
-				<div v-else class="p-4 text-center text-muted-foreground">
-					加载项目失败，请刷新页面重试
+					<design-project-tree
+						v-else-if="selectedProject"
+						:project="selectedProject"
+						:selectedProjectId="projectId"
+						@select="handleProjectSelect"
+						@template-select="handleTemplateSelect"
+						@system-select="handleSystemSelect"
+						@component-select="handleComponentSelect"
+						@bom-select="handleBOMSelect"
+						@specification-select="handleSpecificationSelect"
+						@specification-node-select="handleSpecificationNodeSelect"
+					/>
+					<div v-else class="p-4 text-center text-muted-foreground">
+						加载项目失败，请刷新页面重试
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="flex-1 overflow-auto">
-			<template v-if="showProjectDetail && selectedProject">
-				<div class="space-y-6">
-					<div class="flex justify-between items-center mb-4">
-						<h2 class="text-xl font-bold">项目详情</h2>
-						<div class="flex gap-2">
-							<!-- 添加配置生成按钮 -->
-							<shadcn-button variant="outline" @click="openConfigDialog">
-								<lucide-settings class="mr-2 h-4 w-4" />
-								生成配置
-							</shadcn-button>
+			<div class="flex-1 overflow-auto">
+				<template v-if="showProjectDetail && selectedProject">
+					<div class="space-y-6">
+						<div class="flex justify-between items-center mb-4">
+							<h2 class="text-xl font-bold">项目详情</h2>
+							<div class="flex gap-2">
+								<!-- 添加配置生成按钮 -->
+								<shadcn-button variant="outline" @click="openConfigDialog">
+									<lucide-settings class="mr-2 h-4 w-4" />
+									生成配置
+								</shadcn-button>
+							</div>
+						</div>
+						
+						<design-project-detail :project="selectedProject" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleProjectSubmit" :parameters="parameterDetails" />
+						
+						<!-- 项目配置详情 -->
+						<div v-if="projectConfiguration">
+							<project-configuration-detail 
+								:configuration="projectConfiguration" 
+								:is-editing="false" 
+								@edit="openConfigDialog" 
+								@load="handleLoadConfiguration"
+							/>
 						</div>
 					</div>
-					
-					<design-project-detail :project="selectedProject" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleProjectSubmit" :parameters="parameterDetails" />
-					
-					<!-- 项目配置详情 -->
-					<div v-if="projectConfiguration">
-						<project-configuration-detail 
-							:configuration="projectConfiguration" 
-							:is-editing="false" 
-							@edit="openConfigDialog" 
-							@load="handleLoadConfiguration"
-						/>
+				</template>
+				<template v-else-if="selectedTemplate">
+					<div class="space-y-6">
+						<design-template-detail :template="selectedTemplate" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleTemplateSubmit" :parameters="parameterDetails" />
 					</div>
+				</template>
+				<template v-else-if="selectedSystem">
+					<div class="space-y-6">
+						<design-psystem-detail :system="selectedSystem" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleSystemSubmit" :parameters="parameterDetails" />
+					</div>
+				</template>
+				<template v-else-if="selectedComponent">
+					<div class="space-y-6">
+						<design-component-detail :component="selectedComponent" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleComponentSubmit" :parameters="parameterDetails" />
+					</div>
+				</template>
+				<template v-else-if="selectedBom">
+					<div class="space-y-6">
+						<design-bom-detail :bom="selectedBom" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleBomSubmit" :parameters="parameterDetails" />
+					</div>
+				</template>
+				<template v-else-if="selectedSpecification">
+					<div class="space-y-6">
+						<design-specification-detail :specification="selectedSpecification" :is-editing="isEditing" @edit="isEditing = true"
+							@cancel="isEditing = false" @submit="handleSpecificationSubmit" :parameters="parameterDetails" />
+					</div>
+				</template>
+				<div v-else class="flex items-center justify-center h-full text-muted-foreground">
+					请从左侧选择项目或其子节点
 				</div>
-			</template>
-			<template v-else-if="selectedTemplate">
-				<div class="space-y-6">
-					<design-template-detail :template="selectedTemplate" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleTemplateSubmit" :parameters="parameterDetails" />
-				</div>
-			</template>
-			<template v-else-if="selectedSystem">
-				<div class="space-y-6">
-					<design-psystem-detail :system="selectedSystem" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleSystemSubmit" :parameters="parameterDetails" />
-				</div>
-			</template>
-			<template v-else-if="selectedComponent">
-				<div class="space-y-6">
-					<design-component-detail :component="selectedComponent" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleComponentSubmit" :parameters="parameterDetails" />
-				</div>
-			</template>
-			<template v-else-if="selectedBom">
-				<div class="space-y-6">
-					<design-bom-detail :bom="selectedBom" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleBomSubmit" :parameters="parameterDetails" />
-				</div>
-			</template>
-			<template v-else-if="selectedSpecification">
-				<div class="space-y-6">
-					<design-specification-detail :specification="selectedSpecification" :is-editing="isEditing" @edit="isEditing = true"
-						@cancel="isEditing = false" @submit="handleSpecificationSubmit" :parameters="parameterDetails" />
-				</div>
-			</template>
-			<div v-else class="flex items-center justify-center h-full text-muted-foreground">
-				请从左侧选择项目或其子节点
 			</div>
 		</div>
+		
+		<!-- 配置生成对话框 -->
+		<project-configuration-dialog 
+			:is-open="isConfigDialogOpen" 
+			:project-id="projectId"
+			@update:is-open="isConfigDialogOpen = $event"
+			@submit="handleConfigSubmit"
+		/>
 	</div>
-	
-	<!-- 配置生成对话框 -->
-	<project-configuration-dialog 
-		:is-open="isConfigDialogOpen" 
-		:project-id="projectId"
-		@update:is-open="isConfigDialogOpen = $event"
-		@submit="handleConfigSubmit"
-	/>
 </template>
 
 <script setup lang="ts">
@@ -120,7 +122,9 @@ import { Settings } from 'lucide-vue-next'
 definePageMeta({
 	name: 'project-detail',
 	// 禁用缓存，减少内存占用
-	keepalive: false
+	keepalive: false,
+	// 禁用页面过渡动画
+	pageTransition: false
 })
 
 const { id } = useRoute().params

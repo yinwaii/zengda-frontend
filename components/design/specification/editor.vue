@@ -39,14 +39,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import { ref, onMounted, computed, watch, nextTick, onBeforeUnmount, defineAsyncComponent } from 'vue'
 import { LucideDownload, LucideFileDown, LucideSave } from 'lucide-vue-next'
 import type { TinyMCEEditor } from 'tinymce'
 import { docxToHtml, htmlToDocx } from '~/utils/document'
 import { useEntityApis } from '~/composables/use-entity-apis'
 import { useApis } from '~/composables/use-apis'
 import type { ZdSpecificationMeta } from '~/models/entity/specification'
-import TinyEditor from '~/components/design/specification/TinyEditor.vue'
+// 使用defineAsyncComponent惰性加载TinyEditor组件
+const TinyEditor = defineAsyncComponent(() => import('~/components/design/specification/TinyEditor.vue'))
 import { useDocumentApis } from '~/composables/use-document-apis'
 import MemoryGC from '~/components/utils/MemoryGC.vue'
 
@@ -86,14 +87,14 @@ const editorConfig = computed(() => {
     plugins: [
       'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
       'searchreplace', 'visualblocks', 'code', 'fullscreen', 'insertdatetime',
-      'media', 'table', 'wordcount', 'pagebreak', 'nonbreaking', 'template', 'help',
-      'hr', 'paste', 'print', 'textpattern', 'visualchars', 'emoticons', 'directionality'
+      'media', 'table', 'wordcount', 'pagebreak', 'nonbreaking', 'help',
+      'emoticons', 'directionality', 'visualchars'
     ],
     extended_valid_elements: 'img[class|src|border=0|alt|title|width|height|style|role]',
     toolbar: [
       'undo redo | formatselect fontselect fontsizeselect | forecolor backcolor | removeformat',
       'bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | outdent indent | numlist bullist',
-      'link image media table | pagebreak nonbreaking | code fullscreen | preview print'
+      'link image media table | pagebreak nonbreaking | code fullscreen | preview'
     ].join(' | '),
     toolbar_mode: 'wrap',
     promotion: false,
@@ -118,7 +119,9 @@ const editorConfig = computed(() => {
       'border-collapse': 'collapse',
       'width': '100%'
     },
-    table_responsive_width: true,
+    table_sizing_mode: 'relative', // 替换废弃的 table_responsive_width
+    // 开源许可声明
+    license_key: 'gpl',
     // 配置内容样式
     content_style: `
       body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }

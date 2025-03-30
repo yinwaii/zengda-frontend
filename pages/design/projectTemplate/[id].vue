@@ -118,28 +118,38 @@ const selectedBom = ref<ZdBom | null>(null)
 // 计算选中系统的关联组件
 const selectedComponents = computed(() => {
 	if (!selectedPSystem.value) return []
-	return components.value.filter(comp => comp.psystemId === selectedPSystem.value?.id)
+	const systemId = selectedPSystem.value.id
+	return components.value.filter(comp => comp.psystemId === systemId)
 })
 
-// 将扁平列表转换为树形结构，并关联组件
-const buildTree = (items: ZdPSystem[]): (ZdPSystem & { components?: ZdTComponent[] })[] => {
-	return items.map(item => ({
-		...item,
-		children: item.children ? buildTree(item.children) : null,
-		parameters: item.parameters ? [...item.parameters] : null,
-		components: components.value.filter(comp => comp.psystemId === item.id)
-	}))
+// 优化树形结构的构建
+const buildTree = (items: ZdPSystem[]): ZdPSystem[] => {
+	if (!items || !items.length) return []
+	
+	return items.map(item => {
+		const node: ZdPSystem = { ...item }
+		
+		// 只在有子节点时递归构建
+		if (item.children && item.children.length) {
+			node.children = buildTree(item.children)
+		}
+		
+		return node
+	})
 }
 
 // 计算树形数据
-const treeData = computed(() => buildTree(data.value))
+const treeData = computed(() => {
+	if (!data.value || !data.value.length) return []
+	return buildTree(data.value)
+})
 
 // 切换模板展开状态
 const toggleTemplateExpand = () => {
 	isTemplateExpanded.value = !isTemplateExpanded.value
 }
 
-// 获取数据
+// 修改数据获取方法
 const fetchData = async () => {
 	try {
 		const [systemResponse, componentResponse, templateResponse] = await Promise.all([
@@ -147,10 +157,14 @@ const fetchData = async () => {
 			entityApis.template_component.getByTemplateId(templateId),
 			entityApis.template.get(templateId)
 		])
-		data.value = systemResponse.list
-		components.value = componentResponse.list
-		selectedTemplate.value = templateResponse
-		template.value = templateResponse
+		
+		// 使用 nextTick 来避免同步更新导致的递归
+		await nextTick(() => {
+			data.value = systemResponse.list || []
+			components.value = componentResponse.list || []
+			selectedTemplate.value = templateResponse
+			template.value = templateResponse
+		})
 		
 		// 如果模板有规格书ID，获取规格书数据
 		if (templateResponse.specId) {
@@ -173,6 +187,7 @@ const fetchSpecificationData = async (specId: number) => {
 
 // 处理模板选择
 const handleTemplateSelect = async () => {
+	// 先重置所有状态
 	selectedPSystem.value = null
 	selectedComponent.value = null
 	selectedSpecification.value = null
@@ -192,6 +207,7 @@ const handleTemplateSelect = async () => {
 
 // 处理系统选择
 const handleSelect = async (system: ZdPSystem) => {
+	// 先重置所有状态
 	selectedPSystem.value = system
 	selectedComponent.value = null
 	selectedSpecification.value = null
@@ -213,6 +229,7 @@ const handleSelect = async (system: ZdPSystem) => {
 const handleComponentSelect = async (componentId: number) => {
 	try {
 		const component = await entityApis.component.get(componentId)
+		// 先重置所有状态
 		selectedComponent.value = component
 		selectedPSystem.value = null
 		selectedSpecification.value = null

@@ -21,6 +21,15 @@ declare module 'tinymce' {
       }
     };
     
+    // 添加通知管理器
+    notificationManager?: {
+      open(config: {
+        text: string;
+        type?: 'success' | 'info' | 'warning' | 'error';
+        timeout?: number;
+      }): any;
+    };
+    
     // 添加执行命令方法
     execCommand?(cmd: string, ui?: boolean, value?: any): any;
     
@@ -78,4 +87,11 @@ interface Window {
   tinymce: import('tinymce').TinyMCE;
   requestIdleCallback: (callback: () => void, options?: { timeout: number }) => number;
   cancelIdleCallback: (handle: number) => void;
-} 
+}
+
+declare module 'tinymce/icons/default/icons' {}
+declare module 'tinymce/themes/silver/theme' {}
+declare module 'tinymce/models/dom/model' {}
+
+// 插件声明
+declare module 'tinymce/plugins/*' {} 

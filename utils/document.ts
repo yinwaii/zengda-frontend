@@ -55,125 +55,43 @@ export const docxToHtml = async (file: File): Promise<string> => {
       `
       document.head.appendChild(style)
       document.body.appendChild(loadingEl)
-      
+
       try {
-        // 首先尝试使用docx-preview进行处理
-        console.log('使用docx-preview转换DOCX文件...')
-        
-        // 创建临时容器
-        const tempContainer = document.createElement('div')
-        tempContainer.style.position = 'absolute'
-        tempContainer.style.left = '-9999px'
-        document.body.appendChild(tempContainer)
-        
-        // 将文件读取为ArrayBuffer
-        const arrayBuffer = await file.arrayBuffer()
-        
-        // 使用docx-preview渲染
-        await renderAsync(arrayBuffer, tempContainer, undefined, {
-          className: 'docx-viewer',
-          inWrapper: true,
-          ignoreWidth: true,
-          ignoreHeight: true,
-          ignoreFonts: false,
-          breakPages: true,
-          debug: false
-        })
-        
-        // 添加自定义样式
-        const styleElement = document.createElement('style')
-        styleElement.textContent = `
-          .docx-viewer {
-            width: 100%;
-            margin: 0 auto;
-            font-family: "Segoe UI", Arial, sans-serif;
-          }
-          .docx-viewer table {
-            border-collapse: collapse;
-            width: 100%;
-          }
-          .docx-viewer td, .docx-viewer th {
-            padding: 8px;
-          }
-          .docx-viewer img {
-            max-width: 100%;
-            height: auto;
-          }
-          .docx-viewer p {
-            margin: 0;
-            padding: 0;
-            min-height: 1em;
-          }
-          .docx-wrapper {
-            padding: 20px;
-            background-color: white;
-          }
-        `
-        tempContainer.prepend(styleElement)
-        
-        // 创建完整的HTML文档
-        const htmlContent = `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="UTF-8">
-            ${styleElement.outerHTML}
-          </head>
-          <body>
-            ${tempContainer.innerHTML}
-          </body>
-          </html>
-        `
-        
-        // 清理
-        document.body.removeChild(tempContainer)
+        // 首先尝试使用 docx-preview
+        const container = document.createElement('div')
+        await renderAsync(file, container)
+        const html = container.innerHTML
         
         // 移除加载提示
         document.body.removeChild(loadingEl)
         document.head.removeChild(style)
         
-        console.log('DOCX转换为HTML成功 (使用docx-preview)')
-        resolve(htmlContent)
-      } catch (error) {
-        console.warn('docx-preview转换失败，尝试使用服务端API:', error)
+        resolve(html)
+      } catch (previewError) {
+        console.warn('docx-preview 渲染失败，尝试使用 mammoth:', previewError)
         
-        // 如果docx-preview失败，使用服务端API
         try {
-          const textElement = loadingEl.querySelector('div:last-child')
-          if (textElement) {
-            textElement.textContent = '正在使用备选方法转换...'
-          }
-          
-          // 使用服务端API上传并转换文件
-          const formData = new FormData()
-          formData.append('file', file)
-          
-          const response = await fetch('/api/docx-to-html-upload', {
-            method: 'POST',
-            body: formData
-          })
-          
-          if (!response.ok) {
-            throw new Error(`文件转换失败: ${response.status} ${response.statusText}`)
-          }
-          
-          const html = await response.text()
+          // 使用 mammoth 作为备选方案
+          const arrayBuffer = await file.arrayBuffer()
+          const result = await mammoth.convertToHtml({ arrayBuffer })
           
           // 移除加载提示
           document.body.removeChild(loadingEl)
           document.head.removeChild(style)
           
-          console.log('DOCX转换为HTML成功 (使用服务端API)')
-          resolve(html)
-        } catch (uploadError) {
-          document.body.removeChild(loadingEl)
-          document.head.removeChild(style)
-          console.error('所有转换方法均失败:', uploadError)
-          reject(uploadError)
+          resolve(result.value)
+        } catch (mammothError) {
+          console.error('mammoth 转换失败:', mammothError)
+          throw new Error('文档转换失败，请检查文件格式是否正确')
         }
       }
     } catch (error) {
-      console.error('转换DOCX失败:', error)
+      console.error('文档处理失败:', error)
+      // 确保移除加载提示
+      const loadingEl = document.querySelector('.docx-loading')
+      const styleEl = document.querySelector('style')
+      if (loadingEl) document.body.removeChild(loadingEl)
+      if (styleEl) document.head.removeChild(styleEl)
       reject(error)
     }
   })

@@ -33,7 +33,7 @@ export default defineComponent({
     const initialized = ref(false)
     
     // 获取tinymce实例
-    const { initTiny } = useTinymce()
+    const { tinymce: tinyMCE, initTiny } = useTinymce()
     
     // 配置
     const editorConfig = computed(() => {

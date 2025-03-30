@@ -49,7 +49,7 @@
                           class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
                           :class="{ 'bg-accent': activeNode === 'template' }"
                           @click="setActiveNode('template')">
-                          <LucideBookTemplate class="h-4 w-4" />
+                          <BookTemplate class="h-4 w-4" />
                           <span class="flex-1 truncate">{{ template.name }}</span>
                         </div>
                       </div>
@@ -226,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { z } from 'zod'
 import { AutoForm } from '~/components/ui/auto-form'
 import { Loader2, ChevronRight, Folder, BookTemplate, LayoutGrid, Puzzle, FileText, Check } from 'lucide-vue-next'
@@ -518,26 +518,32 @@ const loadData = async () => {
 
 // 更新参数配置
 const updateParameterConfig = (type: 'project' | 'template' | 'system', values: any, systemId?: number) => {
-  if (type === 'project') {
-    valueConfig.value.project = values
-  } else if (type === 'template') {
-    valueConfig.value.template = values
-  } else if (type === 'system' && systemId) {
-    if (!valueConfig.value.systems) {
-      valueConfig.value.systems = {}
+  // 使用 nextTick 来避免递归更新
+  nextTick(() => {
+    if (type === 'project') {
+      valueConfig.value.project = values
+    } else if (type === 'template') {
+      valueConfig.value.template = values
+    } else if (type === 'system' && systemId) {
+      if (!valueConfig.value.systems) {
+        valueConfig.value.systems = {}
+      }
+      valueConfig.value.systems[systemId] = values
     }
-    valueConfig.value.systems[systemId] = values
-  }
+  })
 }
 
 // 更新组件配置
 const updateComponentConfig = () => {
-  componentConfig.value = {}
-  Object.entries(componentSelections.value).forEach(([id, selection]) => {
-    componentConfig.value[Number(id)] = {
-      enabled: selection.enabled,
-      quantity: selection.quantity
-    }
+  // 使用 nextTick 来避免递归更新
+  nextTick(() => {
+    componentConfig.value = {}
+    Object.entries(componentSelections.value).forEach(([id, selection]) => {
+      componentConfig.value[Number(id)] = {
+        enabled: selection.enabled,
+        quantity: selection.quantity
+      }
+    })
   })
 }
 
@@ -595,7 +601,7 @@ const handleSubmit = async () => {
     
     // 创建配置对象
     const configuration: ZdConfiguration = {
-      id: existingConfig.value?.id || 0,  // 使用0作为新配置的默认id
+      id: existingConfig.value?.id || -1,
       name: `${project.value.name}-配置`,
       description: `${project.value.name}的配置`,
       isShow: true,

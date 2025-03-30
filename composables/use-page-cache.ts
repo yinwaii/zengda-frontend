@@ -79,28 +79,37 @@ export const usePageCache = () => {
   
   // 应用缓存限制(按时间戳排序，移除最旧的或超时的)
   const applyLimits = () => {
-    const now = Date.now()
-    const { max, ttl } = globalOptions.value
-    
-    // 先移除过期页面
-    if (ttl) {
-      activePages.value = activePages.value.filter(page => {
-        return (now - page.timestamp) < ttl
-      })
-    }
-    
-    // 如果超过最大数量，按时间戳排序后移除最旧的
-    if (max && activePages.value.length > max) {
-      // 按时间戳降序排序
-      activePages.value.sort((a, b) => b.timestamp - a.timestamp)
-      // 只保留max个缓存页面
-      activePages.value = activePages.value.slice(0, max)
+    try {
+      const now = Date.now()
+      const { max, ttl } = globalOptions.value
+      
+      // 先移除过期页面
+      if (ttl) {
+        activePages.value = activePages.value.filter(page => {
+          return (now - page.timestamp) < ttl
+        })
+      }
+      
+      // 如果超过最大数量，按时间戳排序后移除最旧的
+      if (max && activePages.value.length > max) {
+        // 按时间戳降序排序
+        activePages.value.sort((a, b) => b.timestamp - a.timestamp)
+        // 只保留max个缓存页面
+        activePages.value = activePages.value.slice(0, max)
+      }
+    } catch (error) {
+      console.error('缓存限制应用失败:', error)
     }
   }
   
   // 获取要缓存的页面名称列表
   const getIncludedPages = () => {
-    return activePages.value.map(p => p.name)
+    try {
+      return activePages.value.map(p => p.name)
+    } catch (error) {
+      console.error('获取缓存页面列表失败:', error)
+      return []
+    }
   }
   
   // 定期检查缓存
