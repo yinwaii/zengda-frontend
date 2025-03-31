@@ -1,57 +1,68 @@
 <template>
-	<div class="space-y-1">
-		<div v-for="item in items" :key="getKey(item)" class="space-y-1">
-			<div class="flex items-center gap-1">
-				<button v-if="hasChildren(item)" class="p-1 hover:bg-accent rounded-sm" @click="toggleExpand(item)">
-					<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': expandedKeys.includes(getKey(item)) }]" />
-				</button>
-				<div v-else class="w-6"></div>
-				<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="handleClick(item)">
+	<abstract-tree
+		:items="treeItems"
+		:get-node-key="getKey"
+		:get-node-label="getTitle"
+		:has-children="hasChildren"
+		@node-click="handleClick"
+	>
+		<!-- 自定义图标 -->
+		<template #icon="{ node }">
+			<LucideFolder class="h-4 w-4" />
+		</template>
+		
+		<!-- 子节点渲染 -->
+		<template #children="{ node }">
+			<!-- 常规子节点渲染（递归） -->
+			<abstract-tree
+				v-if="node.children?.length"
+				:items="node.children"
+				:get-node-key="getKey"
+				:get-node-label="getTitle"
+				:has-children="hasChildren"
+				@node-click="handleClick"
+			>
+				<template #icon="{ node }">
 					<LucideFolder class="h-4 w-4" />
-					<span class="flex-1">{{ getTitle(item) }}</span>
-				</div>
+				</template>
+			</abstract-tree>
+			
+			<!-- 组件节点渲染 -->
+			<div v-if="getOriginalSystem(node).components?.length" class="space-y-1">
+				<design-component-tree-node 
+					v-for="comp in getOriginalSystem(node).components || []" 
+					:key="comp.id"
+					:component="{ 
+						componentId: comp.componentId, 
+						description: componentDescriptions[comp.componentId], 
+						bomId: componentBomIds[comp.componentId] 
+					}" 
+					@select="$emit('componentSelect', $event)"
+					@bom-select="$emit('bomSelect', $event)"
+				/>
 			</div>
-			<div v-if="hasChildren(item) && expandedKeys.includes(getKey(item))" class="ml-6 space-y-1">
-				<design-template-tree v-if="item.children" :items="item.children" @select="$emit('select', $event)" @component-select="$emit('componentSelect', $event)" @bom-select="$emit('bomSelect', $event)" />
-			</div>
-			<div v-if="item.components?.length && expandedKeys.includes(getKey(item))" class="ml-6 space-y-1">
-				<div v-for="comp in item.components" :key="comp.id" class="space-y-1">
-					<design-component-tree-node 
-						:component="{ 
-							componentId: comp.componentId, 
-							description: componentDescriptions[comp.componentId], 
-							bomId: componentBomIds[comp.componentId] 
-						}" 
-						@select="$emit('componentSelect', $event)"
-						@bom-select="$emit('bomSelect', $event)"
-					/>
-				</div>
-			</div>
-		</div>
-	</div>
+		</template>
+	</abstract-tree>
 </template>
 
 <script setup lang="ts">
-import { ZdPSystem } from '~/models/entity/psystem'
-import { ZdTComponent } from '~/models/entity/tcompoment'
-import { LucideChevronRight, LucideFolder } from 'lucide-vue-next'
-
-// 定义扩展的 ZdPSystem 类型，包含 components 属性
-type ZdPSystemWithComponents = ZdPSystem & {
-	components?: ZdTComponent[]
-}
+import { ref, watch, computed } from 'vue'
+import type { ZdPSystem } from '~/models/entity/psystem'
+import type { ZdTComponent } from '~/models/entity/tcompoment'
+import { LucideFolder } from 'lucide-vue-next'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
+import { adaptSystemToTreeNode, getOriginalSystem } from './adapter'
+import type { ZdPSystemWithComponents } from './types'
 
 const props = defineProps<{
-	items: ZdPSystemWithComponents[]
+	items: TreeNodeData[]
 }>()
 
-const emit = defineEmits<{
-	select: [system: ZdPSystem]
-	componentSelect: [componentId: number]
-	bomSelect: [bomId: number]
-}>()
+const emit = defineEmits(['select', 'componentSelect', 'bomSelect'])
 
-const expandedKeys = ref<string[]>([])
+// treeItems现在直接使用items，因为已经适配过
+const treeItems = computed(() => props.items)
+
 const componentDescriptions = ref<Record<number, string>>({})
 const componentBomIds = ref<Record<number, number>>({})
 const entityApis = useEntityApis()
@@ -82,17 +93,18 @@ const fetchAllComponentDetails = async () => {
 		const componentIds = new Set<number>()
 		
 		// 收集所有组件ID
-		const collectComponentIds = (items: ZdPSystemWithComponents[]) => {
-			items.forEach(item => {
-				if (item.components) {
-					item.components.forEach((comp: ZdTComponent) => {
+		const collectComponentIds = (items: TreeNodeData[]) => {
+			items.forEach(node => {
+				const system = getOriginalSystem(node);
+				if (system.components) {
+					system.components.forEach((comp: ZdTComponent) => {
 						if (comp.componentId) {
 							componentIds.add(comp.componentId)
 						}
 					})
 				}
-				if (item.children) {
-					collectComponentIds(item.children)
+				if (node.children) {
+					collectComponentIds(node.children)
 				}
 			})
 		}
@@ -112,25 +124,34 @@ watch(() => props.items, async (newItems) => {
 	await fetchAllComponentDetails()
 }, { immediate: true })
 
-const getKey = (item: ZdPSystem) => item.id.toString()
-
-const getTitle = (item: ZdPSystem) => item.name
-
-const hasChildren = (item: ZdPSystemWithComponents) => {
-	return (item.children && item.children.length > 0) || (item.components && item.components.length > 0)
+// 节点属性函数
+const getKey = (item: TreeNodeData): string => {
+	return String(item.id)
 }
 
-const toggleExpand = (item: ZdPSystem) => {
-	const key = getKey(item)
-	const index = expandedKeys.value.indexOf(key)
-	if (index === -1) {
-		expandedKeys.value.push(key)
-	} else {
-		expandedKeys.value.splice(index, 1)
+const getTitle = (item: TreeNodeData): string => {
+	return item.label || String(item.id)
+}
+
+const hasChildren = (item: TreeNodeData): boolean => {
+	// 检查常规子节点
+	if (item.children && item.children.length > 0) {
+		return true
 	}
+	
+	// 检查组件子节点
+	const system = getOriginalSystem(item)
+	return !!(system.components && system.components.length > 0)
 }
 
-const handleClick = (item: ZdPSystem) => {
-	emit('select', item)
+// 事件处理
+const handleClick = (item: TreeNodeData) => {
+	const original = getOriginalSystem(item)
+	// 转换为兼容格式并传给父组件
+	emit('select', {
+		...original,
+		id: original.systemId || (original as any).id, // 确保id属性存在
+		children: original.children as (ZdPSystem[] | null) // 类型强制转换
+	})
 }
 </script> 

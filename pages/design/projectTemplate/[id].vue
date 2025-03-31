@@ -14,11 +14,10 @@
 				</div>
 			</div>
 			<div v-if="isTemplateExpanded" class="ml-6 mt-1">
-				<design-template-tree 
+				<design-template-tree-wrapper
 					:items="treeData" 
-					@select="handleSelect" 
-					@component-select="handleComponentSelect"
-					@bom-select="handleBomSelect"
+					@update:selected="handleSelectedNodes"
+					@update:open="handleNodeExpanded"
 				/>
 				
 				<!-- 规格书项 -->
@@ -86,6 +85,7 @@
 import { LucideBookTemplate, LucideChevronRight, LucideFileText, LucideClipboardList } from 'lucide-vue-next'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdBom } from '~/models/entity/bom'
+import type { ZdPSystemWithComponents } from '~/components/design/template/types'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -456,6 +456,26 @@ const handleBomSubmit = async (form: Partial<ZdBom>) => {
 	} catch (error) {
 		console.error('更新BOM失败:', error)
 	}
+}
+
+// 处理节点选择事件
+const handleSelectedNodes = (systems: ZdPSystemWithComponents[]) => {
+	if (systems.length === 0) return
+	
+	const selectedSystem = systems[0]
+	// 如果是组件节点
+	if (selectedSystem.components && selectedSystem.components.length > 0) {
+		handleComponentSelect(selectedSystem.components[0].id)
+	} else {
+		// 如果是系统节点
+		handleSelect(selectedSystem as unknown as ZdPSystem)
+	}
+}
+
+// 处理节点展开事件
+const handleNodeExpanded = (system: ZdPSystemWithComponents) => {
+	// 处理节点展开逻辑，如果需要
+	console.log('Node expanded:', system)
 }
 
 // 页面加载时，默认选择模板

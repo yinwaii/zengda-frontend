@@ -1,81 +1,78 @@
 <template>
-	<div class="space-y-1">
-		<div class="flex items-center gap-1">
-			<button v-if="hasChildren" class="p-1 hover:bg-accent rounded-sm" @click="toggleExpand">
-				<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': isExpanded }]" />
-			</button>
-			<div v-else class="w-6"></div>
-			<div
-				class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
-				:class="{ 'bg-accent': isSelected }"
-				@click="$emit('select', project)"
-			>
-				<LucideFolder class="h-4 w-4" />
-				<span class="flex-1 truncate">{{ project.name }}</span>
-			</div>
-		</div>
+	<abstract-tree
+		:items="[project]"
+		:has-children="nodeHasChildren"
+		:get-node-key="getNodeKey"
+		:get-node-label="getNodeLabel"
+		@node-click="handleNodeClick"
+	>
+		<!-- 自定义项目节点图标 -->
+		<template #icon="{ node }">
+			<LucideFolder v-if="isProject(node)" class="h-4 w-4" />
+			<LucideBookTemplate v-else-if="isTemplate(node)" class="h-4 w-4" />
+			<LucideFileText v-else-if="isSpecification(node)" class="h-4 w-4" />
+		</template>
 		
-		<div v-if="isExpanded" class="ml-6 space-y-1">
-			<!-- 模板节点 -->
-			<div v-if="template" class="space-y-1">
-				<div class="flex items-center gap-1">
-					<button v-if="hasTemplateChildren" class="p-1 hover:bg-accent rounded-sm" @click="toggleTemplateExpand">
-						<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': isTemplateExpanded }]" />
-					</button>
-					<div v-else class="w-6"></div>
-					<div
-						class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
-						@click="$emit('template-select', template)"
-					>
-						<LucideBookTemplate class="h-4 w-4" />
-						<span class="flex-1 truncate">{{ template.name }}</span>
-					</div>
-				</div>
+		<!-- 自定义子节点渲染 -->
+		<template #children="{ node }">
+			<!-- 项目子节点（模板） -->
+			<abstract-tree-node
+				v-if="isProject(node) && template"
+				:node="template"
+				:has-children="() => !!templateSystems.length || !!specification"
+				@click="handleTemplateClick"
+				@toggle="handleTemplateToggle"
+			>
+				<template #icon>
+					<LucideBookTemplate class="h-4 w-4" />
+				</template>
 				
-				<!-- 模板子树 -->
-				<div v-if="isTemplateExpanded && templateSystems.length > 0" class="ml-6 space-y-1">
-					<design-template-tree 
-						:items="templateSystems" 
-						@select="$emit('system-select', $event)"
-						@component-select="$emit('component-select', $event)"
-						@bom-select="$emit('bom-select', $event)"
-					/>
-				</div>
-				
-				<!-- 规格书节点 -->
-				<div v-if="isTemplateExpanded && specification" class="ml-6 space-y-1 mt-2">
-					<div class="flex items-center gap-1">
-						<button v-if="specificationHasChildren" class="p-1 hover:bg-accent rounded-sm" @click="toggleSpecificationExpand">
-							<LucideChevronRight :class="['h-4 w-4 transition-transform', { 'rotate-90': isSpecificationExpanded }]" />
-						</button>
-						<div v-else class="w-6"></div>
-						<div 
-							class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
-							@click="$emit('specification-select', specification)"
-						>
-							<LucideFileText class="h-4 w-4" />
-							<span class="flex-1 truncate">规格书</span>
-						</div>
+				<template #children>
+					<!-- 模板子节点（系统） -->
+					<div v-if="templateSystems.length > 0" class="space-y-1">
+						<design-template-tree-wrapper
+							:items="adaptedSystems as unknown as ZdPSystem[]" 
+							@update:selected="handleTreeSelectedNodes"
+							@update:open="handleTreeNodeExpanded"
+						/>
 					</div>
 					
-					<div v-if="isSpecificationExpanded && specification.children" class="ml-6 space-y-1">
-						<div v-for="(child, index) in specification.children" :key="index" class="space-y-1">
-							<design-specification-node 
-								:spec="child" 
-								@select="$emit('specification-node-select', $event)"
-							/>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+					<!-- 规格书节点 -->
+					<abstract-tree-node
+						v-if="specification"
+						:node="specification"
+						:has-children="() => !!(specification?.children?.length)"
+						@click="handleSpecificationClick"
+						@toggle="handleSpecificationToggle"
+					>
+						<template #icon>
+							<LucideFileText class="h-4 w-4" />
+						</template>
+						
+						<template #label>
+							<span class="flex-1 truncate">规格书</span>
+						</template>
+						
+						<template #children>
+							<div v-if="specification.children" class="space-y-1">
+								<design-specification-node 
+									v-for="(child, index) in specification.children" 
+									:key="index" 
+									:spec="child" 
+									@select="$emit('specification-node-select', $event)"
+								/>
+							</div>
+						</template>
+					</abstract-tree-node>
+				</template>
+			</abstract-tree-node>
+		</template>
+	</abstract-tree>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { 
-	LucideChevronRight, 
 	LucideFolder, 
 	LucideBookTemplate, 
 	LucideFileText 
@@ -84,6 +81,10 @@ import type { ZdProject } from '~/models/entity/project'
 import type { ZdTemplate } from '~/models/entity/template'
 import type { ZdPSystem } from '~/models/entity/psystem'
 import type { ZdSpecification } from '~/models/entity/specification'
+import type { ZdTComponent } from '~/models/entity/tcompoment'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdPSystemWithComponents } from '~/components/design/template/types'
+import { extendSystem } from '~/components/design/template/adapter'
 
 const props = defineProps<{
 	project: ZdProject
@@ -110,34 +111,79 @@ const template = ref<ZdTemplate | null>(null)
 const templateSystems = ref<ZdPSystem[]>([])
 const specification = ref<ZdSpecification | null>(null)
 
-// 计算是否选中
-const isSelected = computed(() => props.selectedProjectId === props.project.id)
-
 // 计算是否有子节点
-const hasChildren = computed(() => props.project.templateId != null)
 const hasTemplateChildren = computed(() => templateSystems.value.length > 0 || !!specification.value)
 const specificationHasChildren = computed(() => specification.value?.children && specification.value.children.length > 0)
 
 // 实体API
 const entityApis = useEntityApis()
 
-// 切换展开状态
-const toggleExpand = () => {
-	isExpanded.value = !isExpanded.value
-	if (isExpanded.value && !template.value && props.project.templateId) {
-		fetchTemplateData()
+// 类型检查
+const isProject = (node: any): node is ZdProject => {
+	return node && node.id === props.project.id
+}
+
+const isTemplate = (node: any): node is ZdTemplate => {
+	return node && template.value && node.id === template.value.id
+}
+
+const isSpecification = (node: any): node is ZdSpecification => {
+	return node && specification.value && node.id === specification.value.id
+}
+
+// 节点属性获取函数
+const nodeHasChildren = (node: TreeNodeData): boolean => {
+	if (isProject(node)) {
+		return !!props.project.templateId
+	}
+	if (isTemplate(node)) {
+		return !!templateSystems.value.length || !!specification.value
+	}
+	if (isSpecification(node)) {
+		return !!(specification.value?.children && specification.value.children.length > 0)
+	}
+	return false
+}
+
+const getNodeKey = (node: TreeNodeData) => {
+	if (isProject(node)) return `project-${node.id}`
+	if (isTemplate(node)) return `template-${node.id}`
+	if (isSpecification(node)) return `spec-${node.id}`
+	return String(node.id)
+}
+
+const getNodeLabel = (node: TreeNodeData) => {
+	return node.name || String(node.id)
+}
+
+// 事件处理函数
+const handleNodeClick = (node: TreeNodeData) => {
+	if (isProject(node)) {
+		emit('select', node)
 	}
 }
 
-const toggleTemplateExpand = () => {
-	isTemplateExpanded.value = !isTemplateExpanded.value
-	if (isTemplateExpanded.value && templateSystems.value.length === 0 && template.value) {
+const handleTemplateClick = (node: TreeNodeData) => {
+	if (isTemplate(node)) {
+		emit('template-select', node)
+	}
+}
+
+const handleTemplateToggle = (node: TreeNodeData, expanded: boolean) => {
+	isTemplateExpanded.value = expanded
+	if (expanded && templateSystems.value.length === 0 && template.value) {
 		fetchTemplateSystems()
 	}
 }
 
-const toggleSpecificationExpand = () => {
-	isSpecificationExpanded.value = !isSpecificationExpanded.value
+const handleSpecificationClick = (node: TreeNodeData) => {
+	if (isSpecification(node)) {
+		emit('specification-select', node)
+	}
+}
+
+const handleSpecificationToggle = (node: TreeNodeData, expanded: boolean) => {
+	isSpecificationExpanded.value = expanded
 }
 
 // 获取模板数据
@@ -189,10 +235,41 @@ const fetchSpecificationData = async (specId: number) => {
 	}
 }
 
+// 修改适配系统列表的计算属性
+const adaptedSystems = computed(() => {
+	return templateSystems.value.map(system => extendSystem(system))
+})
+
+// 添加处理树节点选择的函数
+const handleTreeSelectedNodes = (systems: ZdPSystemWithComponents[]) => {
+	if (systems.length === 0) return
+	
+	const selectedSystem = systems[0]
+	// 如果是组件节点
+	if (selectedSystem.components && selectedSystem.components.length > 0) {
+		emit('component-select', selectedSystem.components[0].componentId)
+	} else {
+		// 如果是系统节点，需要转换回ZdPSystem类型
+		emit('system-select', {
+			...selectedSystem,
+			id: selectedSystem.systemId, // 确保有id字段
+			children: selectedSystem.children as any // 类型兼容处理
+		})
+	}
+}
+
+// 添加处理树节点展开的函数
+const handleTreeNodeExpanded = (system: ZdPSystemWithComponents) => {
+	console.log('Tree node expanded:', system)
+}
+
 // 如果有selectedProjectId匹配当前项目，则自动展开
 watch(() => props.selectedProjectId, (newId) => {
 	if (newId === props.project.id && !isExpanded.value) {
-		toggleExpand()
+		isExpanded.value = true
+		if (!template.value && props.project.templateId) {
+			fetchTemplateData()
+		}
 	}
 }, { immediate: true })
 
@@ -205,7 +282,7 @@ watch(() => props.project, async (newProject) => {
 		
 		// 如果获取到了模板，自动展开模板节点
 		if (template.value) {
-			isTemplateExpanded.value = true
+			isTemplateExpanded.value = true 
 			await fetchTemplateSystems() // 获取模板系统数据
 		}
 	}
