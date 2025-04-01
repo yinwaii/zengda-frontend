@@ -175,6 +175,7 @@ onMounted(() => {
           <shadcn-table-head class="w-[120px]">负责人</shadcn-table-head>
           <shadcn-table-head class="w-[150px]">联系电话</shadcn-table-head>
           <shadcn-table-head class="w-[200px]">邮箱</shadcn-table-head>
+          <shadcn-table-head class="w-[200px]">地址</shadcn-table-head>
           <shadcn-table-head class="w-[100px] text-center">状态</shadcn-table-head>
           <shadcn-table-head class="w-[120px] text-center">操作</shadcn-table-head>
         </shadcn-table-row>
@@ -207,6 +208,7 @@ onMounted(() => {
           <shadcn-table-cell>{{ item.leader }}</shadcn-table-cell>
           <shadcn-table-cell>{{ item.phone }}</shadcn-table-cell>
           <shadcn-table-cell>{{ item.email }}</shadcn-table-cell>
+          <shadcn-table-cell>{{ item.address }}</shadcn-table-cell>
           <shadcn-table-cell class="text-center">
             <Badge :variant="item.status === '0' ? 'outline' : 'destructive'">
               {{ item.status === '0' ? '正常' : '停用' }}

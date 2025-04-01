@@ -33,7 +33,8 @@ const formData = ref<ZdDept>({
   leader: '',
   phone: '',
   email: '',
-  status: '0'
+  status: '0',
+  address: '',
 })
 
 const showAlertDialog = ref(false)
@@ -70,7 +71,8 @@ watch(() => props.editData, (newVal) => {
       leader: '',
       phone: '',
       email: '',
-      status: '0'
+      status: '0',
+      address: '',
     }
   }
 }, { immediate: true })
@@ -174,6 +176,15 @@ function onSubmit() {
             v-model="formData.email"
             class="col-span-3"
             placeholder="请输入邮箱"
+          />
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <Label class="text-right" for="address">地址</Label>
+          <Input
+            id="address"
+            v-model="formData.address"
+            class="col-span-3"
+            placeholder="请输入地址"
           />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
