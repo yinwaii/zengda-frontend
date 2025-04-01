@@ -17,7 +17,11 @@ export default defineNuxtPlugin({
         
         // 可以添加项目中存在的路由
         '/design/project',
-        '/design/projectTemplate'
+        '/design/projectTemplate',
+        '/system/dept',
+        '/system/menu',
+        '/system/role',
+        '/system/user'
       ]
       
       const prefetchAll = () => {

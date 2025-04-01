@@ -204,6 +204,26 @@ export const useEntityApis = () => {
           throw error
         }
       }
-    }
+    },
+
+    // 部门 APIs
+    dept: {
+      getDeptTree: () => api.get('/dept/tree'),
+      // 获取部门列表
+      getDeptList: (param: any) => api.get<ZdDept[]>('/system/dept/list', param),
+      // 获取所属部门列表
+      getParentTreeList: () => api.get<ZdDept[]>('/system/dept/parent/list'),
+      // 添加部门
+      addDept: (param: ZdDept) => api.post<ZdDept>('/system/dept/add', param),
+      // 修改部门
+      updateDept: (param: ZdDept) => api.put<ZdDept>('/system/dept/update', param),
+      // 查询某个部门下是否存在子部门
+      getCheckDept: (deptId: number) => api.get(`/system/dept/check/${deptId}`),
+      // 删除部门
+      deleteDept: (deptId: number) => api.delete<boolean>(`/system/dept/delete/${deptId}`)
+   }
   }
+
+
+
 } 

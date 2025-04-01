@@ -1,4 +1,5 @@
 import type { SearchParameters } from 'ofetch';
+import { useGlobalAlert } from './use-global-alert'
 
 export interface ResOptions<T> {
 	data: T;
@@ -83,7 +84,15 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 		clearTimeout(timeoutId)
 
 		if (response.code !== 200) {
-			throw new Error(response.err?.join(', ') ?? response.message);
+			const errorMessage = response.err?.join(', ') ?? response.message ?? '请求失败'
+			useGlobalAlert().show(errorMessage)
+			throw new Error(errorMessage);
+		}
+
+		if (response.success === false) {
+			const errorMessage = response.message ?? '操作失败'
+			useGlobalAlert().show(errorMessage)
+			throw new Error(errorMessage)
 		}
 
 		return response.data;
@@ -93,6 +102,8 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 		
 		// 区分超时错误和其他错误
 		if (error.name === 'AbortError') {
+			const errorMessage = `请求超时: ${url}`
+			useGlobalAlert().show(errorMessage)
 			console.error('请求超时:', url)
 			throw new Error(`请求超时: ${url}`)
 		}
