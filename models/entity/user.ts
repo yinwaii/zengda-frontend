@@ -24,3 +24,19 @@ export class ZdUser implements ZdUser {
 		this.role = '';
 	}
 }
+
+export interface User {
+	userId: number
+	deptId: number
+	userName: string
+	nickName: string
+	userType: string
+	phonenumber: string
+	email: string
+	sex: string // 0: 女, 1: 男
+	avatar: string
+	password: string
+	status: string // 0: 正常, 1: 停用
+	isAdmin: number // 0: 否, 1: 是
+	remark: string
+}

@@ -1,3 +1,5 @@
+import type { User } from "~/models/entity/user"
+
 export const useEntityApis = () => {
   const api = useApis(), systemApi = useApis('http://localhost:6990')
   const config = useRuntimeConfig()
@@ -221,9 +223,17 @@ export const useEntityApis = () => {
       getCheckDept: (deptId: number) => api.get(`/system/dept/check/${deptId}`),
       // 删除部门
       deleteDept: (deptId: number) => api.delete<boolean>(`/system/dept/delete/${deptId}`)
-   }
+   },
+
+
+   // userinfo
+   userinfo: {
+      getUserPage: (param: any) => api.post('/system/user/page', param),
+      addUser: (user: User) => api.post<User>('/system/user/add', user),
+      updateUser: (user: User) => api.put<User>('/system/user/update', user),
+      deleteUser: (id: number) => api.delete<User>(`/system/user/delete/${id}`),
+    }
+
   }
-
-
 
 } 

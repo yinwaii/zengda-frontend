@@ -43,3 +43,11 @@ export interface VOPaged<T> {
 	first: boolean
 	empty: boolean
 }
+
+export interface SysPage<T>{
+	records: Array<T>,
+	current: number,
+	pages: number,
+	size: number,
+	total: number
+}
