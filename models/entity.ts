@@ -51,3 +51,12 @@ export interface SysPage<T>{
 	size: number,
 	total: number
 }
+
+export interface BaseEntity {
+	params?: string
+	searchValue?: string
+    createdBy?: string
+    createdTime?: string
+    updatedBy?: string
+    updatedTime?: string
+}

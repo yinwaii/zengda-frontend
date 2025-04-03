@@ -232,8 +232,26 @@ export const useEntityApis = () => {
       addUser: (user: User) => api.post<User>('/system/user/add', user),
       updateUser: (user: User) => api.put<User>('/system/user/update', user),
       deleteUser: (id: number) => api.delete<User>(`/system/user/delete/${id}`),
+    },
+
+    role: {
+      getRolePage: (param: any) => api.post('/system/role/page', param),
+      addRole: (role: Role) => api.post<Role>('/system/role/add', role),
+      updateRole: (role: Role) => api.put<Role>('/system/role/update', role),
+      deleteRole: (id: number) => api.delete<Role>(`/system/role/delete/${id}`),
+      getCheckRole: (roleId: number) => api.get(`/system/role/getCheckRole/${roleId}`), // 用于删除前检查角色是否已被使用
+    },
+
+    menu: {
+      getMenuById: (id: number) => api.get<Menu>(`/system/menu/${id}`),
+      addMenu: (menu: Menu) => api.post<Menu>('/system/menu/add', menu),
+      check: (id: number) => api.get(`/system/menu/check/${id}`),
+      deleteMenu: (id: number) => api.delete<Menu>(`/system/menu/delete/${id}`),
+      updateMenu: (menu: Menu) => api.put<Menu>('/system/menu/update', menu),
+      
+      getAssignMenuTree: (roleId: number) => api.get<Menu[]>(`/system/menu/assignMenuTree/${roleId}`), // 分配权限，查询权限树数据
+      getMenuList: () => api.get<Menu[]>('/system/menu/list'), // 查询菜单列表
+      getParentList: () => api.get<Menu[]>('/system/menu/parent/list'), // 查询上级菜单列表
     }
-
   }
-
 } 
