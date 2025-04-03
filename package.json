@@ -26,9 +26,14 @@
     "js-cookie": "^3.0.5",
     "jsdom": "^26.0.0",
     "lucide-vue-next": "^0.477.0",
+<<<<<<< Updated upstream
     "mammoth": "^1.9.0",
     "pinia-plugin-persistedstate": "^4.2.0",
     "reka-ui": "^2.1.1",
+=======
+    "pinia": "^3.0.1",
+    "reka-ui": "^2.0.2",
+>>>>>>> Stashed changes
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "tinymce": "^7.7.2",

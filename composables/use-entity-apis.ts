@@ -232,6 +232,11 @@ export const useEntityApis = () => {
       addUser: (user: User) => api.post<User>('/system/user/add', user),
       updateUser: (user: User) => api.put<User>('/system/user/update', user),
       deleteUser: (id: number) => api.delete<User>(`/system/user/delete/${id}`),
+   //获取分配角色列表数据
+      getRoleIdByUserId: (userId: number) => api.get(`/system/user/getRoleByUserId/${userId}`),
+
+      //用户分配角色
+      assignRoleSave: (params: {userId: number, roleIds: number[]}) => api.post("/system/user/saveUserRole", params)
     },
 
     role: {
@@ -240,6 +245,8 @@ export const useEntityApis = () => {
       updateRole: (role: Role) => api.put<Role>('/system/role/update', role),
       deleteRole: (id: number) => api.delete<Role>(`/system/role/delete/${id}`),
       getCheckRole: (roleId: number) => api.get(`/system/role/getCheckRole/${roleId}`), // 用于删除前检查角色是否已被使用
+      getAssignMenuTree: (roleId: number) => api.get<{checkList: number[], menuList: Menu[]}>(`/system/menu/getAssignMenuTree/${roleId}`), // 分配权限，查询权限树数据
+      saveRoleAssign: (param: {roleId: number, list: number[]}) => api.post("/system/role/saveRoleAssign", param)
     },
 
     menu: {
@@ -249,7 +256,6 @@ export const useEntityApis = () => {
       deleteMenu: (id: number) => api.delete<Menu>(`/system/menu/delete/${id}`),
       updateMenu: (menu: Menu) => api.put<Menu>('/system/menu/update', menu),
       
-      getAssignMenuTree: (roleId: number) => api.get<Menu[]>(`/system/menu/assignMenuTree/${roleId}`), // 分配权限，查询权限树数据
       getMenuList: () => api.get<Menu[]>('/system/menu/list'), // 查询菜单列表
       getParentList: () => api.get<Menu[]>('/system/menu/parent/list'), // 查询上级菜单列表
     }

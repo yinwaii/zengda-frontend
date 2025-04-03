@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>()
 
 const formData = ref<Role>({
-  roleId: undefined,
+  roleId: 0,
   roleName: '',
   roleKey: '',
   status: '0',
@@ -47,7 +47,7 @@ watch(() => props.editData, (newVal) => {
     formData.value = { ...newVal }
   } else {
     formData.value = {
-      roleId: undefined,
+      roleId: 0,
       roleName: '',
       roleKey: '',
       status: '0',

@@ -1,5 +1,5 @@
 export interface Role extends BaseEntity {
-    roleId?: number
+    roleId: number
     roleName: string         // 角色名称
     roleKey: string          // 角色权限字符串
     status: string           // 状态: 0: 正常, 1: 停用
@@ -12,7 +12,6 @@ export interface Role extends BaseEntity {
 
 export class Role implements Role {
     constructor() {
-        this.roleId = undefined
         this.roleName = ''
         this.roleKey = ''
         this.status = '0'
@@ -26,9 +25,9 @@ export class Role implements Role {
 // 菜单管理
 
 export interface Menu extends BaseEntity {
-    menuId?: number
+    menuId: number
     label?: string
-    parentId?: number
+    parentId: number
     parentName?: string
     code?: string
     path?: string
@@ -45,5 +44,12 @@ export interface Menu extends BaseEntity {
 
 export class Menu implements Menu {
     constructor() {
+        this.menuId = 0
+        this.label = ''
+        this.parentId = 0
+        this.parentName = ''
+        this.code = ''
+        this.path = ''
+        this.name = ''
     }
 }

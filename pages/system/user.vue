@@ -16,7 +16,6 @@
           <shadcn-table-head class="w-[150px]">性别</shadcn-table-head>
           <shadcn-table-head class="w-[200px]">邮箱</shadcn-table-head>
           <shadcn-table-head class="w-[150px]">电话</shadcn-table-head>
-          <shadcn-table-head class="w-[200px]">所属部门</shadcn-table-head>
           <shadcn-table-head class="w-[120px] text-center">操作</shadcn-table-head>
           
         </shadcn-table-row>
@@ -29,7 +28,6 @@
           <shadcn-table-cell>{{ item.sex === '0' ? '女' : '男' }}</shadcn-table-cell>
           <shadcn-table-cell>{{ item.email }}</shadcn-table-cell>
           <shadcn-table-cell>{{ item.phonenumber }}</shadcn-table-cell>
-          <shadcn-table-cell>{{ item.deptId }}</shadcn-table-cell>
           <shadcn-table-cell class="text-center">
             <div class="flex items-center justify-center gap-2">
               <Button variant="ghost" size="icon" @click="handleEdit(item)">
@@ -37,6 +35,9 @@
               </Button>
               <Button variant="ghost" size="icon" @click="handleDelete(item)">
                 <TrashIcon class="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon" @click="handleAssignRole(item)">
+                <PersonIcon class="h-4 w-4" />
               </Button>
             </div>
           </shadcn-table-cell>
@@ -103,6 +104,12 @@
       :edit-data="editingUser"
       @submit="handleSubmit"
     />
+
+    <AssignRoleDialog 
+      v-model="showAssignRoleDialog"
+      :user="assigningUser"
+      @success="handleAssignRoleSuccess"
+    />
   </div>
 </template>
 
@@ -110,7 +117,7 @@
 import { Button } from '@/components/ui/button'
 import { useEntityApis } from '@/composables/use-entity-apis'
 import { ref, computed } from 'vue'
-import { Pencil1Icon, TrashIcon } from '@radix-icons/vue'
+import { Pencil1Icon, TrashIcon, PersonIcon } from '@radix-icons/vue'
 import type { User } from '@/models/entity/user'
 import { useToast } from '@/components/ui/toast/use-toast'
 import {
@@ -132,6 +139,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import type { SysPage } from '@/models/entity'
 import UserDialog from '@/components/user/user-dialog.vue'
+import AssignRoleDialog from '@/components/user/assign-role-dialog.vue'
 
 const { userinfo } = useEntityApis()
 const { toast } = useToast()
@@ -142,6 +150,8 @@ const deletingUser = ref<User>()
 const total = ref(0)
 const showDialog = ref(false)
 const editingUser = ref<User>()
+const showAssignRoleDialog = ref(false)
+const assigningUser = ref<User>()
 
 const userQueryParams = ref({
   page: {
@@ -224,6 +234,15 @@ async function handleSubmit(data: User) {
       variant: "destructive",
     })
   }
+}
+
+function handleAssignRole(item: User) {
+  assigningUser.value = item
+  showAssignRoleDialog.value = true
+}
+
+function handleAssignRoleSuccess() {
+  reload()
 }
 
 // 监听页面大小变化

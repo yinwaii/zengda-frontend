@@ -43,6 +43,9 @@
                             <Button variant="ghost" size="icon" @click="handleDelete(role)">
                                 <TrashIcon class="h-4 w-4" />
                             </Button>
+                            <Button variant="ghost" size="icon" @click="handleAssignPermission(role)">
+                                <LockClosedIcon class="h-4 w-4" />
+                            </Button>
                         </div>
                     </shadcn-table-cell>
                 </shadcn-table-row>
@@ -55,6 +58,11 @@
             @submit="handleSubmit"
         />
 
+        <PermissionTreeDialog
+            v-model="showPermissionDialog"
+            :role="currentRole"
+        />
+
         <AlertDialog :open="showDeleteDialog" @update:open="showDeleteDialog = $event">
             <AlertDialogContent>
                 <AlertDialogHeader>
@@ -64,8 +72,10 @@
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel>取消</AlertDialogCancel>
-                    <AlertDialogAction @click="confirmDelete">确定</AlertDialogAction>
+                    <AlertDialogCancel @click="showDeleteDialog = false" :disabled="isDeleting">取消</AlertDialogCancel>
+                    <AlertDialogAction @click="confirmDelete" :disabled="isDeleting">
+                        {{ isDeleting ? '删除中...' : '确定' }}
+                    </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -76,8 +86,9 @@
 import { ref, onMounted } from 'vue';
 import { useEntityApis } from '@/composables/use-entity-apis';
 import { Role } from '@/models/entity/system';
-import { Pencil1Icon, TrashIcon } from '@radix-icons/vue';
+import { Pencil1Icon, TrashIcon, LockClosedIcon } from '@radix-icons/vue';
 import RoleDialog from '@/components/role/role-dialog.vue';
+import PermissionTreeDialog from '@/components/role/permission-tree-dialog.vue';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast/use-toast';
 import {
@@ -96,9 +107,11 @@ const { role: roleApi } = useEntityApis();
 
 const roleList = ref<Role[]>([]);
 const showDialog = ref(false);
+const showPermissionDialog = ref(false);
 const currentRole = ref<Role>();
 const showDeleteDialog = ref(false);
 const deleteRole = ref<Role>();
+const isDeleting = ref(false);
 
 interface RoleQueryParams {
     page: {
@@ -133,7 +146,17 @@ function handleEdit(role: Role) {
     showDialog.value = true;
 }
 
-function handleDelete(role: Role) {
+async function handleDelete(role: Role) {
+    // 先检查角色是否已被使用
+    const checkResult = await roleApi.getCheckRole(role.roleId);
+    if (checkResult) {
+        toast({
+            title: '删除失败',
+            description: '该角色已被使用，无法删除',
+            variant: 'destructive',
+        });
+        return;
+    }
     deleteRole.value = role;
     showDeleteDialog.value = true;
 }
@@ -141,17 +164,8 @@ function handleDelete(role: Role) {
 async function confirmDelete() {
     if (!deleteRole.value?.roleId) return;
     
+    isDeleting.value = true;
     try {
-        // 先检查角色是否已被使用
-        const checkResult = await roleApi.getCheckRole(deleteRole.value.roleId);
-        if (checkResult) {
-            toast({
-                title: '删除失败',
-                description: '该角色已被使用，无法删除',
-                variant: 'destructive',
-            });
-            return;
-        }
         
         // 删除角色
         await roleApi.deleteRole(deleteRole.value.roleId);
@@ -168,6 +182,7 @@ async function confirmDelete() {
             variant: 'destructive',
         });
     } finally {
+        isDeleting.value = false;
         showDeleteDialog.value = false;
     }
 }
@@ -197,6 +212,11 @@ async function handleSubmit(role: Role) {
         });
     }
 }
+
+const handleAssignPermission = (role: Role) => {
+    currentRole.value = role;
+    showPermissionDialog.value = true;
+};
 
 onMounted(() => {
     search();
