@@ -1,5 +1,5 @@
 <template>
-  <shadcn-dialog :open="isOpen" @update:open="updateOpen">
+  <shadcn-dialog :open="open" @update:open="setIsOpen">
     <shadcn-dialog-content class="w-[90%] sm:w-[70%] md:w-[60%] lg:w-[50%] xl:w-[40%] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ isEdit ? '编辑参数' : '添加参数' }}</shadcn-dialog-title>
@@ -73,13 +73,13 @@ import { ZdParameter } from '~/models/entity/parameter'
 import { ref, computed, watch } from 'vue'
 
 const props = defineProps<{
+  open: boolean
   parameter?: ZdParameter
-  isOpen: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:isOpen', value: boolean): void
-  (e: 'submit', parameter: ZdParameter): void
+  (e: 'update:open', value: boolean): void
+  (e: 'save', parameter: ZdParameter): void
 }>()
 
 // 表单状态
@@ -96,7 +96,19 @@ watch(() => props.parameter, (newVal) => {
   }
 }, { immediate: true })
 
-// 表单提交处理
+// 监听对话框开关状态
+watch(() => props.open, (isOpen) => {
+  if (!isOpen) {
+    // ... reset code
+  }
+})
+
+// 设置对话框开关状态
+const setIsOpen = (value: boolean) => {
+  emit('update:open', value)
+}
+
+// 处理表单提交
 const onSubmit = async () => {
   isSubmitting.value = true
   try {
@@ -107,7 +119,7 @@ const onSubmit = async () => {
     }
     
     // 触发提交事件
-    emit('submit', submitData)
+    emit('save', submitData)
     
     // 关闭对话框
     closeDialog()
@@ -118,12 +130,7 @@ const onSubmit = async () => {
   }
 }
 
-// 对话框控制
-const updateOpen = (value: boolean) => {
-  emit('update:isOpen', value)
-}
-
 const closeDialog = () => {
-  emit('update:isOpen', false)
+  setIsOpen(false)
 }
 </script> 

@@ -2,44 +2,17 @@
 	<div class="flex gap-4 p-4 h-full">
 		<div class="w-1/4 border-r overflow-auto">
 			<div class="space-y-1">
-				<div class="flex items-center gap-1">
-					<button class="p-1 hover:bg-accent rounded-sm" @click="toggleTemplateExpand">
-						<lucide-chevron-right :class="['h-4 w-4 transition-transform', { 'rotate-90': isTemplateExpanded }]" />
-					</button>
-					<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer"
-						@click="handleTemplateSelect">
-						<lucide-book-template class="h-4 w-4" />
-						<span class="flex-1">{{ selectedTemplate?.name }}</span>
-					</div>
-				</div>
-			</div>
-			<div v-if="isTemplateExpanded" class="ml-6 mt-1">
-				<design-template-tree-wrapper
-					:items="treeData" 
-					@update:selected="handleSelectedNodes"
-					@update:open="handleNodeExpanded"
+				<design-template-tree 
+					v-if="selectedTemplate"
+					:template="selectedTemplate"
+					@template-select="handleTemplateSelect"
+					@system-select="handleSelect"
+					@component-select="handleComponentSelect"
+					@specification-select="handleRootSpecificationSelect" 
+					@specification-node-select="handleSpecificationNodeSelect"
 				/>
-				
-				<!-- 规格书项 -->
-				<div v-if="selectedTemplate?.specId && specificationData" class="space-y-1 mt-2">
-					<div class="flex items-center gap-1">
-						<button class="p-1 hover:bg-accent rounded-sm" @click="isSpecificationExpanded = !isSpecificationExpanded">
-							<lucide-chevron-right :class="['h-4 w-4 transition-transform', { 'rotate-90': isSpecificationExpanded }]" />
-						</button>
-						<div class="flex items-center gap-1 flex-1 p-1 hover:bg-accent rounded-sm cursor-pointer" @click="handleRootSpecificationSelect">
-							<lucide-file-text class="h-4 w-4" />
-							<span class="flex-1">规格书</span>
-						</div>
-					</div>
-					
-					<div v-if="isSpecificationExpanded" class="ml-6 space-y-1">
-						<div v-for="(child, index) in specificationData.children" :key="index" class="space-y-1">
-							<design-specification-node 
-								:spec="child" 
-								@select="handleSpecificationNodeSelect" 
-							/>
-						</div>
-					</div>
+				<div v-else class="p-4 text-center text-muted-foreground">
+					正在加载模板数据...
 				</div>
 			</div>
 		</div>
@@ -82,10 +55,6 @@
 </template>
 
 <script setup lang="ts">
-import { LucideBookTemplate, LucideChevronRight, LucideFileText, LucideClipboardList } from 'lucide-vue-next'
-import type { ZdSpecification } from '~/models/entity/specification'
-import type { ZdBom } from '~/models/entity/bom'
-import type { ZdPSystemWithComponents } from '~/components/design/template/types'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -100,17 +69,14 @@ const components = ref<ZdTComponent[]>([])
 const selectedPSystem = ref<ZdPSystem | null>(null)
 const selectedComponent = ref<ZdComponent | null>(null)
 const selectedTemplate = ref<ZdTemplate | null>(null)
-const template = ref<ZdTemplate | null>(null)
 const parameterDetails = ref<ZdParameter[]>([])
 const isEditing = ref(false)
-const isTemplateExpanded = ref(true)
 const entityApis = useEntityApis()
 const showTemplateDetail = ref(false)
 
 // 规格书相关状态
 const specificationData = ref<ZdSpecification | null>(null)
 const selectedSpecification = ref<ZdSpecification | null>(null)
-const isSpecificationExpanded = ref(true)
 
 // 添加BOM相关状态
 const selectedBom = ref<ZdBom | null>(null)
@@ -122,71 +88,21 @@ const selectedComponents = computed(() => {
 	return components.value.filter(comp => comp.psystemId === systemId)
 })
 
-// 优化树形结构的构建
-const buildTree = (items: ZdPSystem[]): ZdPSystem[] => {
-	if (!items || !items.length) return []
-	
-	return items.map(item => {
-		const node: ZdPSystem = { ...item }
-		
-		// 只在有子节点时递归构建
-		if (item.children && item.children.length) {
-			node.children = buildTree(item.children)
-		}
-		
-		return node
-	})
-}
-
-// 计算树形数据
-const treeData = computed(() => {
-	if (!data.value || !data.value.length) return []
-	return buildTree(data.value)
-})
-
-// 切换模板展开状态
-const toggleTemplateExpand = () => {
-	isTemplateExpanded.value = !isTemplateExpanded.value
-}
-
 // 修改数据获取方法
 const fetchData = async () => {
 	try {
-		const [systemResponse, componentResponse, templateResponse] = await Promise.all([
-			entityApis.template_psystem.getByTemplateId(templateId),
-			entityApis.template_component.getByTemplateId(templateId),
-			entityApis.template.get(templateId)
-		])
+		const templateResponse = await entityApis.template.get(templateId)
+		selectedTemplate.value = templateResponse
 		
-		// 使用 nextTick 来避免同步更新导致的递归
-		await nextTick(() => {
-			data.value = systemResponse.list || []
-			components.value = componentResponse.list || []
-			selectedTemplate.value = templateResponse
-			template.value = templateResponse
-		})
-		
-		// 如果模板有规格书ID，获取规格书数据
-		if (templateResponse.specId) {
-			await fetchSpecificationData(templateResponse.specId)
-		}
+		// 如果模板已选中，默认显示模板详情
+		showTemplateDetail.value = true
 	} catch (error) {
 		console.error('获取数据失败:', error)
 	}
 }
 
-// 获取规格书数据
-const fetchSpecificationData = async (specId: number) => {
-	try {
-		const response = await entityApis.specification.getAll(specId)
-		specificationData.value = response
-	} catch (error) {
-		console.error('获取规格书数据失败:', error)
-	}
-}
-
 // 处理模板选择
-const handleTemplateSelect = async () => {
+const handleTemplateSelect = async (template: ZdTemplate) => {
 	// 先重置所有状态
 	selectedPSystem.value = null
 	selectedComponent.value = null
@@ -251,23 +167,21 @@ const handleComponentSelect = async (componentId: number) => {
 }
 
 // 处理根规格书选择
-const handleRootSpecificationSelect = async () => {
-	if (specificationData.value) {
-		selectedSpecification.value = specificationData.value
-		selectedPSystem.value = null
-		selectedComponent.value = null
-		selectedBom.value = null
-		showTemplateDetail.value = false
-		isEditing.value = false
-		
-		// 获取规格书参数列表
-		try {
-			const response = await entityApis.parameter.get(specificationData.value.id, 'specification')
-			parameterDetails.value = response || []
-		} catch (error) {
-			console.error('获取规格书参数列表失败:', error)
-			parameterDetails.value = []
-		}
+const handleRootSpecificationSelect = async (spec: ZdSpecification) => {
+	selectedSpecification.value = spec
+	selectedPSystem.value = null
+	selectedComponent.value = null
+	selectedBom.value = null
+	showTemplateDetail.value = false
+	isEditing.value = false
+	
+	// 获取规格书参数列表
+	try {
+		const response = await entityApis.parameter.get(spec.id, 'specification')
+		parameterDetails.value = response || []
+	} catch (error) {
+		console.error('获取规格书参数列表失败:', error)
+		parameterDetails.value = []
 	}
 }
 
@@ -458,24 +372,14 @@ const handleBomSubmit = async (form: Partial<ZdBom>) => {
 	}
 }
 
-// 处理节点选择事件
-const handleSelectedNodes = (systems: ZdPSystemWithComponents[]) => {
-	if (systems.length === 0) return
-	
-	const selectedSystem = systems[0]
-	// 如果是组件节点
-	if (selectedSystem.components && selectedSystem.components.length > 0) {
-		handleComponentSelect(selectedSystem.components[0].id)
-	} else {
-		// 如果是系统节点
-		handleSelect(selectedSystem as unknown as ZdPSystem)
+// 获取规格书数据
+const fetchSpecificationData = async (specId: number) => {
+	try {
+		const response = await entityApis.specification.getAll(specId)
+		specificationData.value = response
+	} catch (error) {
+		console.error('获取规格书数据失败:', error)
 	}
-}
-
-// 处理节点展开事件
-const handleNodeExpanded = (system: ZdPSystemWithComponents) => {
-	// 处理节点展开逻辑，如果需要
-	console.log('Node expanded:', system)
 }
 
 // 页面加载时，默认选择模板

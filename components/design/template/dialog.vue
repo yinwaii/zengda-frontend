@@ -1,5 +1,5 @@
 <template>
-  <shadcn-dialog :open="isOpen" @update:open="setIsOpen">
+  <shadcn-dialog :open="open" @update:open="setIsOpen">
     <shadcn-dialog-content class="sm:max-w-[500px]">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ template?.id ? '编辑项目模板' : '新建项目模板' }}</shadcn-dialog-title>
@@ -41,13 +41,13 @@ import { ZdTemplate } from '~/models/entity/template'
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  isOpen: boolean
-  template?: ZdTemplate
+  open: boolean
+  template?: ZdTemplate | null
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:isOpen', value: boolean): void
-  (e: 'submit', template: ZdTemplate): void
+  (e: 'update:open', value: boolean): void
+  (e: 'save', template: ZdTemplate): void
 }>()
 
 const form = ref<ZdTemplate>(new ZdTemplate())
@@ -62,7 +62,7 @@ watch(() => props.template, (newTemplate) => {
 }, { immediate: true })
 
 // 监听对话框开关状态
-watch(() => props.isOpen, (isOpen) => {
+watch(() => props.open, (isOpen) => {
   if (!isOpen) {
     form.value = new ZdTemplate()
   }
@@ -70,12 +70,12 @@ watch(() => props.isOpen, (isOpen) => {
 
 // 设置对话框开关状态
 const setIsOpen = (value: boolean) => {
-  emit('update:isOpen', value)
+  emit('update:open', value)
 }
 
 // 处理表单提交
 const handleSubmit = () => {
-  emit('submit', form.value)
+  emit('save', form.value)
   setIsOpen(false)
 }
 </script> 

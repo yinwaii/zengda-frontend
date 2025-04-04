@@ -1,5 +1,5 @@
 export interface TreeNodeData {
-  id: string | number
+  id: number | string
   label?: string
   children?: TreeNodeData[]
   [key: string]: any // 允许存储任意额外数据
@@ -7,7 +7,7 @@ export interface TreeNodeData {
 
 export interface TreeProps {
   // 数据源
-  items?: TreeNodeData[]
+  items: TreeNodeData[]
   // 默认展开的节点键值
   defaultExpandedKeys?: (string | number)[]
   // 自定义获取节点唯一标识的函数
@@ -20,11 +20,15 @@ export interface TreeProps {
 
 export interface TreeEmits {
   // 节点点击事件
-  'node-click': [node: TreeNodeData]
+  (e: 'node-click', node: TreeNodeData): void
   // 节点展开/折叠事件
-  'node-toggle': [node: TreeNodeData, expanded: boolean]
+  (e: 'node-toggle', node: TreeNodeData, expanded: boolean): void
   // 节点展开事件
-  'node-expand': [node: TreeNodeData]
+  (e: 'node-expand', node: TreeNodeData): void
   // 节点折叠事件
-  'node-collapse': [node: TreeNodeData]
+  (e: 'node-collapse', node: TreeNodeData): void
+  // 更新选中节点
+  (e: 'update:selected', nodes: TreeNodeData[]): void
+  // 更新展开节点
+  (e: 'update:open', node: TreeNodeData): void
 } 

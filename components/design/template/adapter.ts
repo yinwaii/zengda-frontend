@@ -16,6 +16,48 @@ export function extendSystem(system: ZdPSystem): ZdPSystemWithComponents {
 }
 
 /**
+ * 更新系统的组件数据
+ */
+export function addComponentsToSystem(system: ZdPSystemWithComponents, components: ZdTComponent[]): ZdPSystemWithComponents {
+  // 系统的有效ID
+  const validIds = [
+    system.id, 
+    system.systemId, 
+    String(system.id), 
+    String(system.systemId)
+  ].filter(Boolean);
+  
+  // 过滤出属于当前系统的组件
+  const systemComponents = components.filter(comp => {
+    // 检查各种可能的ID匹配情况
+    const psystemIdMatches = validIds.includes(comp.psystemId);
+    const templateIdMatches = validIds.includes(comp.templateId);
+    
+    return psystemIdMatches || templateIdMatches;
+  });
+  
+  if (systemComponents.length > 0) {
+    console.log(`系统${system.name || system.id}(ID:${system.id || system.systemId})匹配到${systemComponents.length}个组件`);
+  }
+  
+  // 创建新的系统对象，添加组件
+  const updatedSystem: ZdPSystemWithComponents = {
+    ...system,
+    components: systemComponents,
+    _rawComponents: components // 存储原始组件列表用于调试
+  }
+  
+  // 递归处理子系统
+  if (updatedSystem.children && updatedSystem.children.length) {
+    updatedSystem.children = updatedSystem.children.map(child => 
+      addComponentsToSystem(child, components)
+    )
+  }
+  
+  return updatedSystem
+}
+
+/**
  * 将标准ZdPSystem对象适配为TreeNodeData，用于抽象树组件
  */
 export function adaptSystemToTreeNode(system: ZdPSystemWithComponents): ZdPSystemTreeNode {

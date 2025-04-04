@@ -10,6 +10,8 @@ export type ZdPSystemWithComponents = Omit<ZdPSystem, 'children'> & {
   systemId: number
   // 组件列表
   components?: ZdTComponent[]
+  // 原始原始components列表的引用（用于调试）
+  _rawComponents?: ZdTComponent[]
   // 重新定义children属性，确保类型兼容
   children?: ZdPSystemWithComponents[] | null
 }

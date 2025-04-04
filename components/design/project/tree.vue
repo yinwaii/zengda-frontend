@@ -5,12 +5,14 @@
 		:get-node-key="getNodeKey"
 		:get-node-label="getNodeLabel"
 		@node-click="handleNodeClick"
+		class="project-tree"
 	>
 		<!-- 自定义项目节点图标 -->
 		<template #icon="{ node }">
-			<LucideFolder v-if="isProject(node)" class="h-4 w-4" />
-			<LucideBookTemplate v-else-if="isTemplate(node)" class="h-4 w-4" />
-			<LucideFileText v-else-if="isSpecification(node)" class="h-4 w-4" />
+			<LucideFolder v-if="isProject(node)" class="h-4 w-4 text-amber-500" />
+			<LucideBookTemplate v-else-if="isTemplate(node)" class="h-4 w-4 text-blue-500" />
+			<LucideFileText v-else-if="isSpecification(node)" class="h-4 w-4 text-green-500" />
+			<LucideFolder v-else class="h-4 w-4 text-gray-500" />
 		</template>
 		
 		<!-- 自定义子节点渲染 -->
@@ -22,19 +24,34 @@
 				:has-children="() => !!templateSystems.length || !!specification"
 				@click="handleTemplateClick"
 				@toggle="handleTemplateToggle"
+				class="tree-node"
 			>
 				<template #icon>
-					<LucideBookTemplate class="h-4 w-4" />
+					<LucideBookTemplate class="h-4 w-4 text-blue-500" />
+				</template>
+				
+				<template #label>
+					<span class="flex-1 truncate">{{ template.name || '模板' }}</span>
 				</template>
 				
 				<template #children>
 					<!-- 模板子节点（系统） -->
-					<div v-if="templateSystems.length > 0" class="space-y-1">
+					<div v-if="templateSystems.length > 0" class="space-y-1 tree-children">
 						<design-template-tree-wrapper
 							:items="adaptedSystems as unknown as ZdPSystem[]" 
-							@update:selected="handleTreeSelectedNodes"
-							@update:open="handleTreeNodeExpanded"
-						/>
+							@select="handleTreeSelectedNodes"
+							@component-select="$emit('component-select', $event)"
+						>
+							<!-- 自定义图标 -->
+							<template #icon="{ node }">
+								<LucideLayoutGrid class="h-4 w-4 text-purple-500" />
+							</template>
+							
+							<!-- 自定义组件图标 -->
+							<template #component-icon="{ component }">
+								<LucidePuzzle class="h-4 w-4 text-green-500" />
+							</template>
+						</design-template-tree-wrapper>
 					</div>
 					
 					<!-- 规格书节点 -->
@@ -44,9 +61,10 @@
 						:has-children="() => !!(specification?.children?.length)"
 						@click="handleSpecificationClick"
 						@toggle="handleSpecificationToggle"
+						class="tree-node"
 					>
 						<template #icon>
-							<LucideFileText class="h-4 w-4" />
+							<LucideFileText class="h-4 w-4 text-green-500" />
 						</template>
 						
 						<template #label>
@@ -54,7 +72,7 @@
 						</template>
 						
 						<template #children>
-							<div v-if="specification.children" class="space-y-1">
+							<div v-if="specification.children" class="space-y-1 tree-children">
 								<design-specification-node 
 									v-for="(child, index) in specification.children" 
 									:key="index" 
@@ -75,7 +93,9 @@ import { ref, computed, watch } from 'vue'
 import { 
 	LucideFolder, 
 	LucideBookTemplate, 
-	LucideFileText 
+	LucideFileText,
+	LucideLayoutGrid,
+	LucidePuzzle
 } from 'lucide-vue-next'
 import type { ZdProject } from '~/models/entity/project'
 import type { ZdTemplate } from '~/models/entity/template'
@@ -84,7 +104,7 @@ import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdTComponent } from '~/models/entity/tcompoment'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdPSystemWithComponents } from '~/components/design/template/types'
-import { extendSystem } from '~/components/design/template/adapter'
+import { extendSystem, addComponentsToSystem } from '~/components/design/template/adapter'
 
 const props = defineProps<{
 	project: ZdProject
@@ -110,6 +130,7 @@ const isSpecificationExpanded = ref(false)
 const template = ref<ZdTemplate | null>(null)
 const templateSystems = ref<ZdPSystem[]>([])
 const specification = ref<ZdSpecification | null>(null)
+const components = ref<ZdTComponent[]>([])
 
 // 计算是否有子节点
 const hasTemplateChildren = computed(() => templateSystems.value.length > 0 || !!specification.value)
@@ -220,8 +241,58 @@ const fetchTemplateSystems = async () => {
 		const response = await entityApis.template_psystem.getByTemplateId(template.value.id)
 		templateSystems.value = response.list
 		console.log('获取到模板系统数据, 数量:', response.list.length)
+		
+		// 获取模板组件数据
+		await fetchTemplateComponents()
 	} catch (error) {
 		console.error('获取模板系统数据失败:', error)
+	}
+}
+
+// 获取模板组件数据
+const fetchTemplateComponents = async () => {
+	if (!template.value) return
+	
+	try {
+		console.log('正在获取模板组件数据，模板ID:', template.value.id)
+		const response = await entityApis.template_component.getByTemplateId(template.value.id)
+		// 确保组件数据有效
+		components.value = (response.list || []).map(comp => {
+			// 如果组件没有psystemId但有templateId或componentId，尝试使用它们
+			if (!comp.psystemId && (comp.templateId || comp.componentId)) {
+				return { ...comp, psystemId: comp.templateId || comp.componentId };
+			}
+			return comp;
+		});
+		
+		console.log('获取到模板组件数据, 数量:', components.value.length)
+		
+		// 调试组件数据
+		if (components.value.length > 0) {
+			console.log('组件数据样例:', components.value[0])
+			console.log('组件字段列表:', Object.keys(components.value[0]))
+			console.log('组件psystemId字段类型:', typeof components.value[0].psystemId)
+			
+			// 打印所有组件的psystemId
+			const psystemIds = components.value.map(c => c.psystemId);
+			console.log('所有组件的psystemId列表:', psystemIds);
+			
+			// 系统ID列表
+			const systemIds = templateSystems.value.map(s => s.id);
+			console.log('所有系统的ID列表:', systemIds);
+			
+			// 检查是否有匹配
+			const matches = components.value.filter(c => 
+				templateSystems.value.some(s => 
+					s.id === c.psystemId || 
+					String(s.id) === String(c.psystemId)
+				)
+			);
+			
+			console.log('直接匹配的组件数量:', matches.length);
+		}
+	} catch (error) {
+		console.error('获取模板组件数据失败:', error)
 	}
 }
 
@@ -237,25 +308,20 @@ const fetchSpecificationData = async (specId: number) => {
 
 // 修改适配系统列表的计算属性
 const adaptedSystems = computed(() => {
-	return templateSystems.value.map(system => extendSystem(system))
+	// 先转换系统，再添加组件数据
+	const systemsWithType = templateSystems.value.map(system => extendSystem(system))
+	// 添加组件数据到各系统
+	return systemsWithType.map(system => addComponentsToSystem(system, components.value))
 })
 
 // 添加处理树节点选择的函数
-const handleTreeSelectedNodes = (systems: ZdPSystemWithComponents[]) => {
-	if (systems.length === 0) return
-	
-	const selectedSystem = systems[0]
-	// 如果是组件节点
-	if (selectedSystem.components && selectedSystem.components.length > 0) {
-		emit('component-select', selectedSystem.components[0].componentId)
-	} else {
-		// 如果是系统节点，需要转换回ZdPSystem类型
-		emit('system-select', {
-			...selectedSystem,
-			id: selectedSystem.systemId, // 确保有id字段
-			children: selectedSystem.children as any // 类型兼容处理
-		})
-	}
+const handleTreeSelectedNodes = (system: ZdPSystemWithComponents) => {
+	// 将扩展的系统类型转换为ZdPSystem类型
+	emit('system-select', {
+		...system,
+		id: system.systemId || (system as any).id, // 确保有id字段
+		children: system.children as any // 类型兼容处理
+	})
 }
 
 // 添加处理树节点展开的函数
@@ -287,4 +353,30 @@ watch(() => props.project, async (newProject) => {
 		}
 	}
 }, { immediate: true, deep: true })
-</script> 
+</script>
+
+<style scoped>
+.project-tree {
+	@apply w-full;
+}
+
+.tree-node {
+	@apply pl-4;
+}
+
+.tree-children {
+	@apply pl-4;
+}
+
+:deep(.abstract-tree-node) {
+	@apply flex items-center;
+}
+
+:deep(.abstract-tree-node-content) {
+	@apply flex items-center w-full;
+}
+
+:deep(.abstract-tree-node-children) {
+	@apply pl-4;
+}
+</style> 

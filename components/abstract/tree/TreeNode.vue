@@ -23,7 +23,7 @@
       >
         <!-- 节点图标插槽 -->
         <slot name="icon" :node="node">
-          <LucideFolder class="h-4 w-4" />
+          <LucideFolder class="h-4 w-4 text-blue-400" />
         </slot>
 
         <!-- 节点标签插槽 -->
@@ -48,6 +48,10 @@ import { ref, computed, watch } from 'vue'
 import { LucideChevronRight, LucideFolder } from 'lucide-vue-next'
 import type { TreeNodeData } from './types'
 
+defineOptions({
+  name: 'TreeNode'
+})
+
 const props = defineProps<{
   node: TreeNodeData
   expanded?: boolean
@@ -55,6 +59,22 @@ const props = defineProps<{
   hasChildren?: (node: TreeNodeData) => boolean
   getNodeKey?: (node: TreeNodeData) => string | number
   getNodeLabel?: (node: TreeNodeData) => string
+}>()
+
+// 定义插槽，使它们有正确的类型
+interface ToggleProps {
+  expanded: boolean
+  node: TreeNodeData
+  toggle: (e: MouseEvent) => void
+}
+
+defineSlots<{
+  icon(props: { node: TreeNodeData }): any
+  label(props: { node: TreeNodeData; label: string }): any
+  actions(props: { node: TreeNodeData }): any
+  children(props: { node: TreeNodeData }): any
+  'toggle-icon'(props: ToggleProps): any
+  'toggle-button'(props: ToggleProps): any
 }>()
 
 const emit = defineEmits<{

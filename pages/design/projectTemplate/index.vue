@@ -4,6 +4,7 @@ import { h, ref } from 'vue'
 import { ZdTemplate, ZdTemplateColumns } from '~/models/entity/template'
 import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
+import { Dialog as ProjectTemplateDialog } from '~/components/design/projectTemplate'
 
 definePageMeta({
 	name: 'design-project-template-total',
@@ -231,15 +232,12 @@ const onClick = (row: ZdTemplate) => {
 			<h2 class="text-xl font-bold">项目模板列表</h2>
 			<shadcn-button @click="handleAddTemplate">新建模板</shadcn-button>
 		</div>
-		
+
 		<abstract-data-table ref="dataTable" :data="data" :columns="templateColumns" v-model:selected-rows="selectedRows"
 			:on-row-click="onClick"></abstract-data-table>
-			
+
 		<!-- 编辑对话框 -->
-		<project-template-dialog
-			v-model:isOpen="dialogVisible"
-			:template="editingTemplate"
-			@submit="handleTemplateSubmit"
-		/>
+		<design-project-template-dialog v-model:open="dialogVisible" :template="editingTemplate"
+			@save="handleTemplateSubmit" />
 	</div>
 </template>

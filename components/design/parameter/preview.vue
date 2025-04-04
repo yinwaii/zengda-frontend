@@ -16,9 +16,9 @@
 	
 	<!-- 编辑对话框 -->
 	<design-parameter-dialog
-		v-model:isOpen="dialogVisible"
+		v-model:open="dialogVisible"
 		:parameter="editingParameter"
-		@submit="handleParameterSubmit"
+		@save="handleParameterSubmit"
 	/>
 </template>
 

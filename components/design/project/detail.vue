@@ -70,12 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
-import { ZdProject } from '~/models/entity/project'
-import { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
-// import ParameterPreview from '~/components/design/parameter/preview.vue'
 
 const props = defineProps<{
 	project: ZdProject

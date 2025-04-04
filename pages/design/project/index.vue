@@ -239,10 +239,10 @@ const onClick = (row: ZdProject) => {
 			:on-row-click="onClick"></abstract-data-table>
 			
 		<!-- 编辑对话框 -->
-		<project-dialog
-			v-model:isOpen="dialogVisible"
+		<design-project-dialog
+			v-model:open="dialogVisible"
 			:project="editingProject"
-			@submit="handleProjectSubmit"
+			@save="handleProjectSubmit"
 		/>
 	</div>
 </template>
