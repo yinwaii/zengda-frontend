@@ -11,8 +11,8 @@
     @update:expanded="$emit('update:expanded', $event)"
   >
     <template #icon="{ node }">
-      <LucidePuzzle v-if="!node.children?.length" class="h-4 w-4 text-purple-500" />
-      <LucidePackageCheck v-else class="h-4 w-4 text-purple-500" />
+      <LucidePackage v-if="!node.children?.length" class="h-4 w-4 text-orange-500" />
+      <LucideBoxes v-else class="h-4 w-4 text-orange-500" />
     </template>
     
     <template #actions="{ node }">
@@ -23,24 +23,18 @@
         >
           <LucidePencil class="h-3.5 w-3.5" />
         </button>
-        <button 
-          class="p-1 hover:bg-accent rounded-sm opacity-70 hover:opacity-100"
-          @click.stop="handleView(node)"
-        >
-          <LucideEye class="h-3.5 w-3.5" />
-        </button>
       </div>
     </template>
   </TreeNode>
 </template>
 
 <script setup lang="ts">
-import { LucidePuzzle, LucidePackageCheck, LucidePencil, LucideEye } from 'lucide-vue-next'
+import { LucidePackage, LucideBoxes, LucidePencil } from 'lucide-vue-next'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 defineOptions({
-  name: 'ComponentTreeNode'
+  name: 'BomTreeNode'
 })
 
 const props = defineProps<{
@@ -57,7 +51,6 @@ const emit = defineEmits<{
   'toggle': [node: TreeNodeData, expanded: boolean]
   'update:expanded': [expanded: boolean]
   'edit': [node: TreeNodeData]
-  'view': [node: TreeNodeData]
 }>()
 
 const handleClick = (node: TreeNodeData) => {
@@ -70,9 +63,5 @@ const handleToggle = (node: TreeNodeData, expanded: boolean) => {
 
 const handleEdit = (node: TreeNodeData) => {
   emit('edit', node)
-}
-
-const handleView = (node: TreeNodeData) => {
-  emit('view', node)
 }
 </script> 

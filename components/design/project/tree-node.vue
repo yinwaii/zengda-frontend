@@ -11,8 +11,9 @@
     @update:expanded="$emit('update:expanded', $event)"
   >
     <template #icon="{ node }">
-      <LucidePuzzle v-if="!node.children?.length" class="h-4 w-4 text-purple-500" />
-      <LucidePackageCheck v-else class="h-4 w-4 text-purple-500" />
+      <LucideFolder v-if="node.children?.length" class="h-4 w-4 text-blue-500" />
+      <LucideFileText v-else-if="node.type === 'file'" class="h-4 w-4 text-blue-400" />
+      <LucideBriefcase v-else class="h-4 w-4 text-blue-600" />
     </template>
     
     <template #actions="{ node }">
@@ -23,11 +24,12 @@
         >
           <LucidePencil class="h-3.5 w-3.5" />
         </button>
-        <button 
+        <button
+          v-if="node.type !== 'folder'"
           class="p-1 hover:bg-accent rounded-sm opacity-70 hover:opacity-100"
-          @click.stop="handleView(node)"
+          @click.stop="handleOpen(node)"
         >
-          <LucideEye class="h-3.5 w-3.5" />
+          <LucideExternalLink class="h-3.5 w-3.5" />
         </button>
       </div>
     </template>
@@ -35,12 +37,12 @@
 </template>
 
 <script setup lang="ts">
-import { LucidePuzzle, LucidePackageCheck, LucidePencil, LucideEye } from 'lucide-vue-next'
+import { LucideFolder, LucideFileText, LucideBriefcase, LucidePencil, LucideExternalLink } from 'lucide-vue-next'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 defineOptions({
-  name: 'ComponentTreeNode'
+  name: 'ProjectTreeNode'
 })
 
 const props = defineProps<{
@@ -57,7 +59,7 @@ const emit = defineEmits<{
   'toggle': [node: TreeNodeData, expanded: boolean]
   'update:expanded': [expanded: boolean]
   'edit': [node: TreeNodeData]
-  'view': [node: TreeNodeData]
+  'open': [node: TreeNodeData]
 }>()
 
 const handleClick = (node: TreeNodeData) => {
@@ -72,7 +74,7 @@ const handleEdit = (node: TreeNodeData) => {
   emit('edit', node)
 }
 
-const handleView = (node: TreeNodeData) => {
-  emit('view', node)
+const handleOpen = (node: TreeNodeData) => {
+  emit('open', node)
 }
 </script> 

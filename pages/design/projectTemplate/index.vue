@@ -4,7 +4,8 @@ import { h, ref } from 'vue'
 import { ZdTemplate, ZdTemplateColumns } from '~/models/entity/template'
 import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
-import { Dialog as ProjectTemplateDialog } from '~/components/design/projectTemplate'
+// import { Dialog as ProjectTemplateDialog } from '~/components/design/projectTemplate'
+import type { ZdTemplate as ZdTemplateType } from '~/models/entity/template'
 
 definePageMeta({
 	name: 'design-project-template-total',
@@ -16,12 +17,12 @@ definePageMeta({
 
 const dataTableRef = useTemplateRef<any>('dataTable')
 const { template: templateApi } = useEntityApis()
-const data = ref<ZdTemplate[]>([])
+const data = ref<ZdTemplateType[]>([])
 const { toast } = useToast()
 
 // 对话框控制
 const dialogVisible = ref(false)
-const editingTemplate = ref<ZdTemplate | undefined>(undefined)
+const editingTemplate = ref<ZdTemplateType | undefined>(undefined)
 
 // 使用持久化状态管理
 const { loadState, saveState, clearState } = useTableState('design-project-template-total')
@@ -34,7 +35,7 @@ const tableState = ref({
 })
 
 // 选中的行
-const selectedRows = ref<ZdTemplate[]>([])
+const selectedRows = ref<ZdTemplateType[]>([])
 
 // 重置表格设置
 const handleReset = () => {
@@ -91,13 +92,13 @@ const handleBatchDelete = async () => {
 }
 
 // 处理编辑操作
-const handleEdit = (template: ZdTemplate) => {
+const handleEdit = (template: ZdTemplateType) => {
 	editingTemplate.value = { ...template }
 	dialogVisible.value = true
 }
 
 // 处理删除操作
-const handleDelete = async (template: ZdTemplate) => {
+const handleDelete = async (template: ZdTemplateType) => {
 	if (!template.id) {
 		toast({
 			title: '删除失败',
@@ -127,31 +128,22 @@ const handleDelete = async (template: ZdTemplate) => {
 }
 
 // 处理表单提交
-const handleTemplateSubmit = async (template: ZdTemplate) => {
+const handleTemplateSubmit = async (template: any) => {
 	try {
-		let result
-		if (template.id && template.id > 0) {
-			// 更新现有模板
-			result = await templateApi.update(template)
-			toast({
-				title: '更新成功',
-				description: `模板 "${template.name}" 已更新`
-			})
-		} else {
-			// 创建新模板
-			result = await templateApi.create(template)
-			toast({
-				title: '创建成功',
-				description: `模板 "${template.name}" 已创建`
-			})
-		}
+		// 处理模板提交逻辑，根据实际需要修改
+		await templateApi.update(template)
+		toast({ 
+			title: "成功", 
+			description: "模板已更新" 
+		})
+		// 刷新数据
 		await handleRefresh()
-	} catch (error) {
-		console.error('保存模板失败:', error)
-		toast({
-			title: '保存失败',
-			description: '无法保存模板，请稍后重试',
-			variant: 'destructive'
+	} catch (err) {
+		console.error('保存模板失败:', err)
+		toast({ 
+			title: "错误", 
+			description: "保存模板失败", 
+			variant: "destructive"
 		})
 	}
 }
@@ -221,7 +213,7 @@ onDeactivated(() => {
 	}
 })
 
-const onClick = (row: ZdTemplate) => {
+const onClick = (row: ZdTemplateType) => {
 	console.log('Clicking row:', row.id)
 	navigateTo(`/design/projectTemplate/${row.id}`, { replace: true })
 }

@@ -2,9 +2,9 @@
   <shadcn-dialog :open="open" @update:open="setIsOpen">
     <shadcn-dialog-content class="sm:max-w-[500px]">
       <shadcn-dialog-header>
-        <shadcn-dialog-title>{{ template?.id ? '编辑项目模板' : '新建项目模板' }}</shadcn-dialog-title>
+        <shadcn-dialog-title>{{ (system && system.id > 0) ? '编辑产品系统' : '新建产品系统' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
-          {{ template?.id ? '修改项目模板信息' : '创建新的项目模板' }}
+          {{ (system && system.id > 0) ? '修改产品系统信息' : '创建新的产品系统' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
       <div class="grid gap-4 py-4">
@@ -14,30 +14,36 @@
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
           <shadcn-label for="description" class="text-right">描述</shadcn-label>
-          <shadcn-input id="description" v-model="form.description" class="col-span-3" />
+          <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="productTypeId" class="text-right">产品类型</shadcn-label>
-          <shadcn-select v-model="form.productTypeId" class="col-span-3">
+          <shadcn-label for="parentId" class="text-right">父系统</shadcn-label>
+          <shadcn-select v-model="form.parentId" class="col-span-3">
             <shadcn-select-trigger>
-              <shadcn-select-value :placeholder="productTypes.length ? '选择产品类型' : '暂无产品类型'" />
+              <shadcn-select-value :placeholder="parentSystems.length ? '选择父系统' : '无父系统'" />
             </shadcn-select-trigger>
             <shadcn-select-content>
               <shadcn-select-group>
-                <shadcn-select-item v-for="type in productTypes" :key="type.id" :value="type.id">
-                  {{ type.name }}
+                <shadcn-select-item :value="-1">无父系统</shadcn-select-item>
+                <shadcn-select-item 
+                  v-for="parent in parentSystems" 
+                  :key="parent.id" 
+                  :value="parent.id"
+                  :disabled="parent.id === form.id"
+                >
+                  {{ parent.name }}
                 </shadcn-select-item>
               </shadcn-select-group>
             </shadcn-select-content>
           </shadcn-select>
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
-          <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
+          <shadcn-label for="docsUrl" class="text-right">文档链接</shadcn-label>
+          <shadcn-input id="docsUrl" :value="form.docsUrl || ''" @update:model-value="form.docsUrl = typeof $event === 'number' ? String($event) : $event" class="col-span-3" />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isCustomized" class="text-right">是否定制</shadcn-label>
-          <shadcn-checkbox id="isCustomized" v-model="form.isCustomized" class="col-span-3" />
+          <shadcn-label for="isDeleted" class="text-right">已删除</shadcn-label>
+          <shadcn-checkbox id="isDeleted" v-model="form.isDeleted" class="col-span-3" />
         </div>
       </div>
       <shadcn-dialog-footer>
@@ -48,48 +54,47 @@
 </template>
 
 <script setup lang="ts">
-import { ZdTemplate } from '~/models/entity/template'
-import type { ZdPType } from '~/models/entity/ptype'
 import { ref, watch, onMounted } from 'vue'
+import { ZdPSystem } from '~/models/entity/psystem'
 
 const props = defineProps<{
   open: boolean
-  template?: ZdTemplate | null
+  system?: ZdPSystem | null
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'save', template: ZdTemplate): void
+  (e: 'save', system: ZdPSystem): void
 }>()
 
-const form = ref<ZdTemplate>(new ZdTemplate())
-const productTypes = ref<ZdPType[]>([])
+const form = ref<ZdPSystem>(new ZdPSystem())
+const parentSystems = ref<ZdPSystem[]>([])
 const entityApis = useEntityApis()
 
-// 获取产品类型列表
+// 加载可选的父系统列表
 onMounted(async () => {
   try {
-    const response = await entityApis.ptype.getAll()
-    productTypes.value = response || []
+    const response = await entityApis.psystem.getAll(true)
+    parentSystems.value = response || []
   } catch (error) {
-    console.error('获取产品类型失败:', error)
-    productTypes.value = []
+    console.error('获取产品系统列表失败:', error)
+    parentSystems.value = []
   }
 })
 
-// 监听模板变化，初始化表单
-watch(() => props.template, (newTemplate) => {
-  if (newTemplate) {
-    form.value = { ...newTemplate }
+// 监听系统变化，初始化表单
+watch(() => props.system, (newSystem) => {
+  if (newSystem) {
+    form.value = { ...newSystem }
   } else {
-    form.value = new ZdTemplate()
+    form.value = new ZdPSystem()
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = new ZdTemplate()
+    form.value = new ZdPSystem()
   }
 })
 
@@ -102,12 +107,7 @@ const setIsOpen = (value: boolean) => {
 const handleSubmit = () => {
   // 表单验证
   if (!form.value.name) {
-    console.error('模板名称不能为空')
-    return
-  }
-  
-  if (!form.value.productTypeId) {
-    console.error('请选择产品类型')
+    console.error('系统名称不能为空')
     return
   }
   

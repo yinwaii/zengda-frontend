@@ -11,8 +11,8 @@
     @update:expanded="$emit('update:expanded', $event)"
   >
     <template #icon="{ node }">
-      <LucidePuzzle v-if="!node.children?.length" class="h-4 w-4 text-purple-500" />
-      <LucidePackageCheck v-else class="h-4 w-4 text-purple-500" />
+      <LucidePackage2 v-if="!node.children?.length" class="h-4 w-4 text-indigo-500" />
+      <LucideLibrary v-else class="h-4 w-4 text-indigo-600" />
     </template>
     
     <template #actions="{ node }">
@@ -35,12 +35,12 @@
 </template>
 
 <script setup lang="ts">
-import { LucidePuzzle, LucidePackageCheck, LucidePencil, LucideEye } from 'lucide-vue-next'
+import { LucidePackage2, LucideLibrary, LucidePencil, LucideEye } from 'lucide-vue-next'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 defineOptions({
-  name: 'ComponentTreeNode'
+  name: 'PSystemTreeNode'
 })
 
 const props = defineProps<{

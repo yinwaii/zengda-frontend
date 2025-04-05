@@ -4,8 +4,8 @@
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-2xl font-bold">{{ bom.number }}</h2>
-						<p class="text-sm text-muted-foreground mt-1">{{ bom.note || '暂无描述' }}</p>
+						<h2 class="text-2xl font-bold">物料清单</h2>
+						<p class="text-sm text-muted-foreground mt-1">编号: {{ bom.number }} - 版本: {{ bom.version }}</p>
 					</div>
 					<div class="flex items-center gap-2">
 						<shadcn-button @click="$emit('edit')">
@@ -18,18 +18,20 @@
 			<shadcn-card-content>
 				<template v-if="isEditing">
 					<form @submit.prevent="handleSubmit" class="space-y-4">
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
-								<shadcn-label for="number">料单编号</shadcn-label>
-								<shadcn-input id="number" v-model="editForm.number" />
-							</div>
-							<div class="space-y-2">
-								<shadcn-label for="version">版本</shadcn-label>
-								<shadcn-input id="version" v-model="editForm.version" />
-							</div>
+						<div class="space-y-2">
+							<shadcn-label for="number">编号</shadcn-label>
+							<shadcn-input id="number" v-model="editForm.number" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="note">描述</shadcn-label>
+							<shadcn-label for="version">版本</shadcn-label>
+							<shadcn-input id="version" v-model="editForm.version" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="componentId">组件ID</shadcn-label>
+							<shadcn-input id="componentId" v-model="editForm.componentId" type="number" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="note">备注</shadcn-label>
 							<shadcn-textarea id="note" v-model="editForm.note" />
 						</div>
 						<div class="flex justify-end gap-2">
@@ -49,21 +51,37 @@
 							<dd class="mt-1">{{ bom.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">编号</dt>
+							<dd class="mt-1">{{ bom.number }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">版本</dt>
-							<dd class="mt-1">{{ bom.version || '暂无版本号' }}</dd>
+							<dd class="mt-1">{{ bom.version }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">组件ID</dt>
 							<dd class="mt-1">{{ bom.componentId }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">接口ID</dt>
-							<dd class="mt-1">{{ bom.interId }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">备注</dt>
+							<dd class="mt-1">{{ bom.note || '暂无备注' }}</dd>
 						</div>
-						<div class="col-span-2 space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">描述</dt>
-							<dd class="mt-1">{{ bom.note || '暂无描述' }}</dd>
-						</div>
+					</div>
+					
+					<h3 class="text-lg font-medium mt-8 mb-4">子物料项</h3>
+					<div v-if="bom.items && bom.items.length > 0">
+						<ul class="space-y-3">
+							<li v-for="item in bom.items" :key="item.itemId" class="flex justify-between p-3 border rounded-lg">
+								<div>
+									<span class="font-medium">{{ item.itemName }}</span>
+									<p v-if="item.note" class="text-sm text-muted-foreground mt-1">{{ item.note }}</p>
+								</div>
+								<shadcn-badge>ID: {{ item.itemId }}</shadcn-badge>
+							</li>
+						</ul>
+					</div>
+					<div v-else class="text-center p-4 border border-dashed rounded-lg text-muted-foreground">
+						暂无子物料项
 					</div>
 				</template>
 			</shadcn-card-content>
@@ -185,8 +203,9 @@ const emit = defineEmits<{
 const entityApis = useEntityApis()
 const editForm = ref<Partial<ZdBom>>({
 	number: props.bom.number,
+	version: props.bom.version,
+	componentId: props.bom.componentId,
 	note: props.bom.note,
-	version: props.bom.version
 })
 
 // 物料项对话框状态

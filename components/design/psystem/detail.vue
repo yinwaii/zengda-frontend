@@ -8,10 +8,6 @@
 						<p class="text-sm text-muted-foreground mt-1">{{ system.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
-						<shadcn-button v-if="system.docsUrl" variant="outline" @click="showSpecificationEditor = true">
-							<LucideFileText class="mr-2 h-4 w-4" />
-							编辑规格
-						</shadcn-button>
 						<shadcn-button @click="$emit('edit')">
 							<LucidePencil class="mr-2 h-4 w-4" />
 							编辑
@@ -22,23 +18,42 @@
 			<shadcn-card-content>
 				<template v-if="isEditing">
 					<form @submit.prevent="handleSubmit" class="space-y-4">
-						<div class="grid grid-cols-2 gap-4">
-							<div class="space-y-2">
-								<shadcn-label for="name">名称</shadcn-label>
-								<shadcn-input id="name" v-model="editForm.name" />
-							</div>
-							<div class="space-y-2">
-								<shadcn-label for="parentId">父ID</shadcn-label>
-								<shadcn-input id="parentId" v-model="editForm.parentId" type="number" disabled />
-							</div>
+						<div class="space-y-2">
+							<shadcn-label for="name">名称</shadcn-label>
+							<shadcn-input id="name" v-model="editForm.name" />
 						</div>
 						<div class="space-y-2">
 							<shadcn-label for="description">描述</shadcn-label>
 							<shadcn-textarea id="description" v-model="editForm.description" />
 						</div>
 						<div class="space-y-2">
+							<shadcn-label for="parentId">父系统</shadcn-label>
+							<shadcn-select v-model="editForm.parentId">
+								<shadcn-select-trigger>
+									<shadcn-select-value :placeholder="parentSystems.length ? '选择父系统' : '无父系统'" />
+								</shadcn-select-trigger>
+								<shadcn-select-content>
+									<shadcn-select-group>
+										<shadcn-select-item :value="-1">无父系统</shadcn-select-item>
+										<shadcn-select-item 
+											v-for="parent in parentSystems" 
+											:key="parent.id" 
+											:value="parent.id"
+											:disabled="parent.id === system.id"
+										>
+											{{ parent.name }}
+										</shadcn-select-item>
+									</shadcn-select-group>
+								</shadcn-select-content>
+							</shadcn-select>
+						</div>
+						<div class="space-y-2">
 							<shadcn-label for="docsUrl">文档链接</shadcn-label>
-							<shadcn-input id="docsUrl" v-model="editFormDocsUrl" />
+							<shadcn-input id="docsUrl" :value="editForm.docsUrl || ''" @update:model-value="editForm.docsUrl = typeof $event === 'number' ? String($event) : $event" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="isDeleted">已删除</shadcn-label>
+							<shadcn-checkbox id="isDeleted" v-model="editForm.isDeleted" />
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -57,16 +72,58 @@
 							<dd class="mt-1">{{ system.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">父ID</dt>
-							<dd class="mt-1">{{ system.parentId }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">父系统</dt>
+							<dd class="mt-1">{{ getParentSystemName(system.parentId) }}</dd>
 						</div>
-						<div class="col-span-2 space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">描述</dt>
-							<dd class="mt-1">{{ system.description || '暂无描述' }}</dd>
-						</div>
-						<div class="col-span-2 space-y-2 p-4 border rounded-lg">
+						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">文档链接</dt>
-							<dd class="mt-1">{{ system.docsUrl || '暂无文档' }}</dd>
+							<dd class="mt-1">
+								<a 
+									v-if="system.docsUrl" 
+									:href="system.docsUrl" 
+									target="_blank" 
+									class="text-blue-500 hover:underline"
+								>
+									{{ system.docsUrl }}
+								</a>
+								<span v-else>暂无链接</span>
+							</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">状态</dt>
+							<dd class="mt-1">
+								<shadcn-badge :variant="system.isDeleted ? 'destructive' : 'default'">
+									{{ system.isDeleted ? '已删除' : '正常' }}
+								</shadcn-badge>
+							</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg" v-if="system.specId !== null">
+							<dt class="text-sm font-medium text-muted-foreground">规格ID</dt>
+							<dd class="mt-1">{{ system.specId }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
+							<dd class="mt-1">{{ formatDate(system.createdTime) || '暂无' }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
+							<dd class="mt-1">{{ formatDate(system.updatedTime) || '暂无' }}</dd>
+						</div>
+					</div>
+					
+					<div v-if="system.children && system.children.length > 0" class="mt-8">
+						<h3 class="text-lg font-medium mb-4">子系统</h3>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+							<div 
+								v-for="child in system.children" 
+								:key="child.id" 
+								class="p-4 border rounded-lg hover:bg-slate-50 transition-colors"
+							>
+								<h4 class="font-medium">{{ child.name }}</h4>
+								<p class="text-sm text-muted-foreground mt-1 line-clamp-2">
+									{{ child.description || '暂无描述' }}
+								</p>
+							</div>
 						</div>
 					</div>
 				</template>
@@ -75,71 +132,21 @@
 
 		<shadcn-separator />
 
-		<shadcn-card>
-			<shadcn-card-header>
-				<shadcn-card-title class="text-xl font-semibold">系统信息</shadcn-card-title>
-			</shadcn-card-header>
-			<shadcn-card-content>
-				<div class="grid grid-cols-2 gap-4">
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">创建人</dt>
-						<dd class="mt-1">{{ system.createdBy || '暂无创建人' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
-						<dd class="mt-1">{{ formatDate(system.createdTime) || '暂无创建时间' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">修改人</dt>
-						<dd class="mt-1">{{ system.updatedBy || '暂无修改人' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
-						<dd class="mt-1">{{ formatDate(system.updatedTime) || '暂无修改时间' }}</dd>
-					</div>
-				</div>
-			</shadcn-card-content>
-		</shadcn-card>
-
-		<shadcn-separator />
-
-		<design-parameter-preview :parameters="parameters" />
-
-		<!-- 规格书编辑器对话框 -->
-		<shadcn-dialog v-model:open="showSpecificationEditor">
-			<shadcn-dialog-content class="max-w-4xl">
-				<shadcn-dialog-header>
-					<shadcn-dialog-title>编辑规格书</shadcn-dialog-title>
-					<shadcn-dialog-description>
-						编辑系统规格书内容
-					</shadcn-dialog-description>
-				</shadcn-dialog-header>
-				<div class="py-4">
-					<design-specification-editor
-						v-if="system.docsUrl"
-						:spec-id="system.id"
-						:file-tag="system.docsUrl"
-						:name="system.name"
-						:latest-version-id="1"
-						@save="handleSpecificationSave"
-					/>
-				</div>
-			</shadcn-dialog-content>
-		</shadcn-dialog>
+		<design-parameter-preview :parameters="parameters || []" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { LucideFileText, LucidePencil } from 'lucide-vue-next'
-import { ZdPSystem } from '~/models/entity/psystem'
-import { ZdParameter } from '~/models/entity/parameter'
+import { ref, computed, onMounted } from 'vue'
+import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
+import type { ZdPSystem } from '~/models/entity/psystem'
+import type { ZdParameter } from '~/models/entity/parameter'
 
 const props = defineProps<{
 	system: ZdPSystem
 	isEditing: boolean
-	parameters: ZdParameter[]
+	parameters?: ZdParameter[]
 }>()
 
 const emit = defineEmits<{
@@ -148,27 +155,36 @@ const emit = defineEmits<{
 	submit: [form: Partial<ZdPSystem>]
 }>()
 
-const editForm = ref<Partial<ZdPSystem>>({
-	name: props.system.name,
-	description: props.system.description,
-	docsUrl: props.system.docsUrl,
-	parentId: props.system.parentId
-})
+const parentSystems = ref<ZdPSystem[]>([])
+const entityApis = useEntityApis()
 
-const editFormDocsUrl = computed({
-	get: () => editForm.value.docsUrl || '',
-	set: (value) => {
-		editForm.value.docsUrl = value
+// 获取可选父系统列表
+onMounted(async () => {
+	try {
+		const response = await entityApis.psystem.getAll(true)
+		parentSystems.value = response || []
+	} catch (error) {
+		console.error('获取产品系统列表失败:', error)
+		parentSystems.value = []
 	}
 })
 
-const showSpecificationEditor = ref(false)
+// 获取父系统名称
+const getParentSystemName = (parentId: number) => {
+	if (parentId === -1) return '无父系统'
+	const parent = parentSystems.value.find(p => p.id === parentId)
+	return parent ? parent.name : `系统ID: ${parentId}`
+}
+
+const editForm = ref<Partial<ZdPSystem>>({
+	name: props.system.name,
+	description: props.system.description,
+	parentId: props.system.parentId,
+	docsUrl: props.system.docsUrl,
+	isDeleted: props.system.isDeleted
+})
 
 const handleSubmit = () => {
 	emit('submit', editForm.value)
-}
-
-const handleSpecificationSave = () => {
-	showSpecificationEditor.value = false
 }
 </script> 

@@ -1,10 +1,20 @@
+/**
+ * 树节点数据接口
+ */
 export interface TreeNodeData {
-  id: number | string
+  id: string | number      // 复合ID，格式为 `${type}:${id}`
+  originalId?: string | number  // 原始ID
   label?: string
   children?: TreeNodeData[]
-  [key: string]: any // 允许存储任意额外数据
+  components?: any[] // 组件列表，用于显示子组件
+  type?: string // 节点类型，用于决定使用哪个组件
+  originalData?: any // 原始数据对象
+  [key: string]: any // 其他可能的属性
 }
 
+/**
+ * 树组件Props接口
+ */
 export interface TreeProps {
   // 数据源
   items: TreeNodeData[]
@@ -16,8 +26,16 @@ export interface TreeProps {
   getNodeLabel?: (node: TreeNodeData) => string
   // 自定义判断节点是否有子节点的函数
   hasChildren?: (node: TreeNodeData) => boolean
+  currentItem?: TreeNodeData | null
+  currentItemId?: string | number | null
+  nodeComponents?: Record<string, any> // 节点类型对应的组件
+  detailComponents?: Record<string, any> // 节点类型对应的详情组件
+  dialogComponents?: Record<string, any> // 节点类型对应的对话框组件
 }
 
+/**
+ * 树组件Emits接口
+ */
 export interface TreeEmits {
   // 节点点击事件
   (e: 'node-click', node: TreeNodeData): void
@@ -31,4 +49,6 @@ export interface TreeEmits {
   (e: 'update:selected', nodes: TreeNodeData[]): void
   // 更新展开节点
   (e: 'update:open', node: TreeNodeData): void
+  (e: 'update:currentItem', node: TreeNodeData | null): void
+  (e: 'update:currentItemId', id: string | number | null): void
 } 

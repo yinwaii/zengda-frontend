@@ -4,8 +4,8 @@
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-2xl font-bold">{{ component.name }}</h2>
-						<p class="text-sm text-muted-foreground mt-1">{{ component.description || '暂无描述' }}</p>
+						<h2 class="text-2xl font-bold">{{ projectTemplate.name }}</h2>
+						<p class="text-sm text-muted-foreground mt-1">{{ projectTemplate.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
 						<shadcn-button @click="$emit('edit')">
@@ -27,20 +27,12 @@
 							<shadcn-textarea id="description" v-model="editForm.description" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="isShow">是否显示</shadcn-label>
-							<shadcn-checkbox id="isShow" v-model="editForm.isShow" />
+							<shadcn-label for="isPublic">是否公开</shadcn-label>
+							<shadcn-checkbox id="isPublic" v-model="editForm.isPublic" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="isRequired">是否必须</shadcn-label>
-							<shadcn-checkbox id="isRequired" v-model="editForm.isRequired" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="price">价格</shadcn-label>
-							<shadcn-input id="price" v-model="editForm.price" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="value">数量</shadcn-label>
-							<shadcn-input id="value" v-model="editForm.value" />
+							<shadcn-label for="version">版本</shadcn-label>
+							<shadcn-input id="version" v-model="editForm.version" />
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -56,43 +48,27 @@
 					<div class="grid grid-cols-2 gap-4">
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">ID</dt>
-							<dd class="mt-1">{{ component.id }}</dd>
+							<dd class="mt-1">{{ projectTemplate.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
+							<dt class="text-sm font-medium text-muted-foreground">版本</dt>
+							<dd class="mt-1">{{ projectTemplate.version }}</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">是否公开</dt>
 							<dd class="mt-1">
-								<shadcn-badge :variant="component.isShow ? 'default' : 'outline'">
-									{{ component.isShow ? '是' : '否' }}
+								<shadcn-badge :variant="projectTemplate.isPublic ? 'default' : 'outline'">
+									{{ projectTemplate.isPublic ? '是' : '否' }}
 								</shadcn-badge>
 							</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">是否必须</dt>
-							<dd class="mt-1">
-								<shadcn-badge :variant="component.isRequired ? 'default' : 'outline'">
-									{{ component.isRequired ? '是' : '否' }}
-								</shadcn-badge>
-							</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
-							<dd class="mt-1">{{ component.price || '未设置' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">数量</dt>
-							<dd class="mt-1">{{ component.value || '未设置' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">BOM ID</dt>
-							<dd class="mt-1">{{ component.bomId || '未关联BOM' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
-							<dd class="mt-1">{{ formatDate(component.createdTime) || '暂无' }}</dd>
+							<dd class="mt-1">{{ formatDate(projectTemplate.createdTime) || '暂无' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
-							<dd class="mt-1">{{ formatDate(component.updatedTime) || '暂无' }}</dd>
+							<dd class="mt-1">{{ formatDate(projectTemplate.updatedTime) || '暂无' }}</dd>
 						</div>
 					</div>
 				</template>
@@ -106,13 +82,26 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
-import type { ZdComponent } from '~/models/entity/component'
 import type { ZdParameter } from '~/models/entity/parameter'
 
+// 定义项目模板类型，根据实际情况调整
+interface ProjectTemplate {
+  id?: number
+  name: string
+  description?: string
+  isPublic: boolean
+  version: string
+  createdTime?: string
+  updatedTime?: string
+  createdBy?: string
+  updatedBy?: string
+}
+
 const props = defineProps<{
-	component: ZdComponent
+	projectTemplate: ProjectTemplate
 	isEditing: boolean
 	parameters?: ZdParameter[]
 }>()
@@ -120,16 +109,14 @@ const props = defineProps<{
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ZdComponent>]
+	submit: [form: Partial<ProjectTemplate>]
 }>()
 
-const editForm = ref<Partial<ZdComponent>>({
-	name: props.component.name,
-	description: props.component.description,
-	isShow: props.component.isShow,
-	isRequired: props.component.isRequired,
-	price: props.component.price,
-	value: props.component.value
+const editForm = ref<Partial<ProjectTemplate>>({
+	name: props.projectTemplate.name,
+	description: props.projectTemplate.description,
+	isPublic: props.projectTemplate.isPublic,
+	version: props.projectTemplate.version
 })
 
 const handleSubmit = () => {

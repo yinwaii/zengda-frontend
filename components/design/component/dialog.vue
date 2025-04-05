@@ -2,9 +2,9 @@
   <shadcn-dialog :open="open" @update:open="setIsOpen">
     <shadcn-dialog-content class="sm:max-w-[500px]">
       <shadcn-dialog-header>
-        <shadcn-dialog-title>{{ projectTemplate?.id ? '编辑项目模板' : '新建项目模板' }}</shadcn-dialog-title>
+        <shadcn-dialog-title>{{ component?.id ? '编辑组件' : '新建组件' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
-          {{ projectTemplate?.id ? '修改项目模板信息' : '创建新的项目模板' }}
+          {{ component?.id ? '修改组件信息' : '创建新的组件' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
       <div class="grid gap-4 py-4">
@@ -17,12 +17,20 @@
           <shadcn-input id="description" v-model="form.description" class="col-span-3" />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isPublic" class="text-right">是否公开</shadcn-label>
-          <shadcn-checkbox id="isPublic" v-model="form.isPublic" class="col-span-3" />
+          <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
+          <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="version" class="text-right">版本</shadcn-label>
-          <shadcn-input id="version" v-model="form.version" class="col-span-3" />
+          <shadcn-label for="isRequired" class="text-right">是否必须</shadcn-label>
+          <shadcn-checkbox id="isRequired" v-model="form.isRequired" class="col-span-3" />
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="price" class="text-right">价格</shadcn-label>
+          <shadcn-input id="price" v-model="form.price" class="col-span-3" />
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="value" class="text-right">数量</shadcn-label>
+          <shadcn-input id="value" v-model="form.value" class="col-span-3" />
         </div>
       </div>
       <shadcn-dialog-footer>
@@ -34,54 +42,33 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-
-// 定义项目模板类型，根据实际情况调整
-interface ProjectTemplate {
-  id?: number
-  name: string
-  description?: string
-  isPublic: boolean
-  version: string
-  createdTime?: string
-  updatedTime?: string
-  createdBy?: string
-  updatedBy?: string
-}
+import { ZdComponent } from '~/models/entity/component'
 
 const props = defineProps<{
   open: boolean
-  projectTemplate?: ProjectTemplate | null
+  component?: ZdComponent | null
 }>()
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'save', projectTemplate: ProjectTemplate): void
+  (e: 'save', component: ZdComponent): void
 }>()
 
-// 默认模板对象
-const defaultProjectTemplate = (): ProjectTemplate => ({
-  id: undefined,
-  name: '',
-  description: '',
-  isPublic: false,
-  version: '1.0',
-})
+const form = ref<ZdComponent>(new ZdComponent())
 
-const form = ref<ProjectTemplate>(defaultProjectTemplate())
-
-// 监听模板变化，初始化表单
-watch(() => props.projectTemplate, (newTemplate) => {
-  if (newTemplate) {
-    form.value = { ...newTemplate }
+// 监听组件变化，初始化表单
+watch(() => props.component, (newComponent) => {
+  if (newComponent) {
+    form.value = { ...newComponent }
   } else {
-    form.value = defaultProjectTemplate()
+    form.value = new ZdComponent()
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = defaultProjectTemplate()
+    form.value = new ZdComponent()
   }
 })
 
@@ -94,7 +81,7 @@ const setIsOpen = (value: boolean) => {
 const handleSubmit = () => {
   // 表单验证
   if (!form.value.name) {
-    console.error('模板名称不能为空')
+    console.error('组件名称不能为空')
     return
   }
   
