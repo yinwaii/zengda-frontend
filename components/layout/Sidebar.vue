@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar';
+interface SidebarNode {
+	title: string
+	url: string
+	isActive?: boolean
+	items: SidebarNode[]
+}
+export type SidebarData = Array<SidebarNode>
 // import type { SidebarData } from '';
 const props = defineProps<{
 	config?: SidebarProps

@@ -136,7 +136,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :parameters="parameters || []" />
+		<design-parameter-preview :nodeId="system.id" />
 	</div>
 </template>
 

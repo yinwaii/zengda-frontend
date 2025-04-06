@@ -74,8 +74,8 @@ import ComponentDetail from '~/components/design/component/detail.vue'
 import ComponentDialog from '~/components/design/component/dialog.vue'
 import ProjectDetail from '~/components/design/project/detail.vue'
 import ProjectDialog from '~/components/design/project/dialog.vue'
-import TemplateDetail from '~/components/design/projectTemplate/detail.vue'
-import TemplateDialog from '~/components/design/projectTemplate/dialog.vue'
+import TemplateDetail from '~/components/design/template/detail.vue'
+import TemplateDialog from '~/components/design/template/dialog.vue'
 import PsystemDetail from '~/components/design/psystem/detail.vue'
 import PsystemDialog from '~/components/design/psystem/dialog.vue'
 import SpecificationDetail from '~/components/design/specification/detail.vue'
@@ -245,7 +245,7 @@ const getPropNameByType = (type?: string) => {
     case NODE_TYPES.PROJECT:
       return 'project'
     case NODE_TYPES.TEMPLATE:
-      return 'projectTemplate'
+      return 'template'
     case NODE_TYPES.PSYSTEM:
       return 'system'
     case NODE_TYPES.SPECIFICATION:

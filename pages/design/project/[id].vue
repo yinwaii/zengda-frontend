@@ -1,17 +1,17 @@
 <template>
 	<div class="p-4 h-full">
 		<div v-if="pageLoading" class="flex items-center justify-center h-full">
-			<div class="animate-pulse flex space-x-4">
-				<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
-				<div class="flex-1 space-y-3 py-1">
-					<div class="h-2 bg-accent-foreground/10 rounded"></div>
-					<div class="space-y-1">
-						<div class="h-2 bg-accent-foreground/10 rounded"></div>
+					<div class="animate-pulse flex space-x-4">
+						<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
+						<div class="flex-1 space-y-3 py-1">
+							<div class="h-2 bg-accent-foreground/10 rounded"></div>
+							<div class="space-y-1">
+								<div class="h-2 bg-accent-foreground/10 rounded"></div>
+							</div>
+						</div>
+						</div>
 					</div>
-				</div>
-			</div>
-		</div>
-		
+					
 		<design-dynamic-entity-tree
 			v-else
 			:tree-data="projectTreeData"
@@ -26,11 +26,11 @@
 	</div>
 	
 	<!-- 配置生成对话框 -->
-	<design-configuration-dialog 
-		:open="isConfigDialogOpen" 
+		<design-configuration-dialog 
+			:open="isConfigDialogOpen" 
 		:project-id="projectId"
-		@update:open="isConfigDialogOpen = $event"
-		@save="handleConfigSubmit"
+			@update:open="isConfigDialogOpen = $event"
+			@save="handleConfigSubmit"
 	/>
 </template>
 
@@ -225,7 +225,7 @@ const loadSpecificProject = async () => {
 			}
 			expandedKeys.value = expandKeys
 
-            // 加载项目配置
+// 加载项目配置
 			await loadProjectConfiguration()
 			
 			toast.toast({

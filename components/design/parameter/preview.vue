@@ -7,7 +7,11 @@
 			</shadcn-button>
 		</shadcn-card-header>
 		<shadcn-card-content>
-			<abstract-data-table v-if="parameters.length > 0" :columns="columns" :data="parameters" />
+			<div v-if="loading" class="flex justify-center items-center py-4">
+				<span class="mr-2">加载中</span>
+				<div class="animate-spin h-5 w-5 border-2 border-primary rounded-full border-t-transparent"></div>
+			</div>
+			<abstract-data-table v-else-if="parameters.length > 0" :columns="columns" :data="parameters" />
 			<div v-else class="text-center text-muted-foreground py-4">
 				暂无参数
 			</div>
@@ -25,12 +29,13 @@
 <script setup lang="tsx">
 import type { ZdParameter } from '~/models/entity/parameter'
 import type { ColumnDef } from '@tanstack/vue-table'
-import { ref, h } from 'vue'
+import { ref, h, onMounted, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useEntityApis } from '~/composables/use-entity-apis'
+import { toApiId } from '~/utils/idConverter'
 
 const props = defineProps<{
-	parameters: ZdParameter[]
+	nodeId: string | number // 复合ID，格式为 "type:id"
 }>()
 
 const emit = defineEmits<{
@@ -40,11 +45,75 @@ const emit = defineEmits<{
 	(e: 'add', parameter: ZdParameter): void
 }>()
 
-// 对话框控制
+// 状态变量
+const parameters = ref<ZdParameter[]>([])
+const loading = ref(false)
 const dialogVisible = ref(false)
 const editingParameter = ref<ZdParameter | undefined>(undefined)
 const { toast } = useToast()
 const apis = useEntityApis()
+
+// 从复合ID中提取类型和ID
+const parseNodeId = (nodeId: string | number) => {
+	if (typeof nodeId === 'number') {
+		return { type: 'unknown', id: nodeId }
+	}
+
+	const nodeIdStr = String(nodeId)
+	if (nodeIdStr.includes(':')) {
+		const [type, ...rest] = nodeIdStr.split(':')
+		const id = toApiId(rest.join(':'))
+		return { type, id }
+	}
+
+	return { type: 'unknown', id: parseInt(nodeIdStr, 10) }
+}
+
+// 加载参数列表
+const loadParameters = async () => {
+	loading.value = true
+	try {
+		const { type, id } = parseNodeId(props.nodeId)
+		
+		if (!id) {
+			console.warn(`无效的节点ID: ${props.nodeId}`)
+			loading.value = false
+			return
+		}
+		
+		console.log(`正在加载节点参数, 类型: ${type}, ID: ${id}`)
+		
+		// 调用API获取参数列表
+		const result = await apis.parameter.get(id, type)
+		parameters.value = Array.isArray(result) ? result : []
+		
+		console.log(`成功加载${parameters.value.length}个参数`)
+	} catch (error) {
+		console.error('加载参数失败:', error)
+		toast({
+			title: '加载失败',
+			description: '无法加载参数列表，请稍后重试',
+			variant: 'destructive'
+		})
+		parameters.value = []
+	} finally {
+		loading.value = false
+	}
+}
+
+// 监听nodeId变化，重新加载参数
+watch(() => props.nodeId, (newValue) => {
+	if (newValue) {
+		loadParameters()
+	}
+}, { immediate: false })
+
+// 组件挂载时加载参数
+onMounted(() => {
+	if (props.nodeId) {
+		loadParameters()
+	}
+})
 
 // 列配置
 const columns = ref<ColumnDef<ZdParameter>[]>([
@@ -100,13 +169,50 @@ const columns = ref<ColumnDef<ZdParameter>[]>([
 
 // 处理添加新参数
 const handleAddParameter = () => {
-	editingParameter.value = undefined
+	const { type, id } = parseNodeId(props.nodeId)
+	
+	if (!id) {
+		toast({
+			title: '添加失败',
+			description: '未知的节点ID，无法添加参数',
+			variant: 'destructive'
+		})
+		return
+	}
+	
+	// 创建新参数对象，预设类型和关联ID
+	const newParameter = {
+		id: 0, // 新参数的ID设为0，表示未保存
+		name: '',
+		value: '',
+		description: '',
+		dtype: '',
+		type: type, // 参数所属类型
+		typeId: id,  // 参数所属ID
+		isShow: true,
+		objectId: 0,
+		objectType: '',
+		// SQL错误表明is_deleted列不能接收太长的数据，所以使用null
+		isDeleted: 0
+	}
+	
+	// 强制类型转换，让TypeScript编译通过
+	editingParameter.value = newParameter as unknown as ZdParameter
+	
 	dialogVisible.value = true
 }
 
 // 处理编辑操作
 const handleEdit = (parameter: ZdParameter) => {
-	editingParameter.value = parameter
+	// 创建参数的副本，确保isDeleted正确设置
+	const parameterCopy = { ...parameter }
+	
+	// 如果isDeleted不是布尔值，强制转为null
+	if (typeof parameterCopy.isDeleted !== 'boolean') {
+		parameterCopy.isDeleted = null as unknown as boolean
+	}
+	
+	editingParameter.value = parameterCopy
 	dialogVisible.value = true
 	emit('edit', parameter)
 }
@@ -130,6 +236,8 @@ const handleDelete = async (parameter: ZdParameter) => {
 				description: `参数 "${parameter.name}" 已被删除`
 			})
 			emit('delete', parameter)
+			// 删除成功后重新加载参数列表
+			loadParameters()
 		}
 	} catch (error) {
 		console.error('删除参数失败:', error)
@@ -162,6 +270,8 @@ const handleParameterSubmit = async (parameter: ZdParameter) => {
 			})
 			emit('add', result)
 		}
+		// 操作成功后重新加载参数列表
+		loadParameters()
 	} catch (error) {
 		console.error('保存参数失败:', error)
 		toast({

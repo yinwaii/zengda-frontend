@@ -27,27 +27,16 @@
 							<shadcn-textarea id="description" v-model="editForm.description" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="productTypeId">产品类型</shadcn-label>
-							<shadcn-select v-model="editForm.productTypeId">
-								<shadcn-select-trigger>
-									<shadcn-select-value :placeholder="productTypes.length ? '选择产品类型' : '暂无产品类型'" />
-								</shadcn-select-trigger>
-								<shadcn-select-content>
-									<shadcn-select-group>
-										<shadcn-select-item v-for="type in productTypes" :key="type.id" :value="type.id">
-											{{ type.name }}
-										</shadcn-select-item>
-									</shadcn-select-group>
-								</shadcn-select-content>
-							</shadcn-select>
-						</div>
-						<div class="space-y-2">
 							<shadcn-label for="isShow">是否显示</shadcn-label>
 							<shadcn-checkbox id="isShow" v-model="editForm.isShow" />
 						</div>
 						<div class="space-y-2">
 							<shadcn-label for="isCustomized">是否定制</shadcn-label>
 							<shadcn-checkbox id="isCustomized" v-model="editForm.isCustomized" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="productTypeId">产品类型ID</shadcn-label>
+							<shadcn-input id="productTypeId" v-model="editForm.productTypeId" type="number" />
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -66,8 +55,8 @@
 							<dd class="mt-1">{{ template.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">产品类型</dt>
-							<dd class="mt-1">{{ getProductTypeName(template.productTypeId) }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">产品类型ID</dt>
+							<dd class="mt-1">{{ template.productTypeId }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
@@ -85,10 +74,6 @@
 								</shadcn-badge>
 							</dd>
 						</div>
-						<div class="space-y-2 p-4 border rounded-lg" v-if="template.specId">
-							<dt class="text-sm font-medium text-muted-foreground">规格书ID</dt>
-							<dd class="mt-1">{{ template.specId }}</dd>
-						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
 							<dd class="mt-1">{{ formatDate(template.createdTime) || '暂无' }}</dd>
@@ -104,53 +89,21 @@
 
 		<shadcn-separator />
 
-		<shadcn-card>
-			<shadcn-card-header>
-				<shadcn-card-title class="text-xl font-semibold">模板信息</shadcn-card-title>
-			</shadcn-card-header>
-			<shadcn-card-content>
-				<div class="grid grid-cols-2 gap-4">
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">创建人</dt>
-						<dd class="mt-1">{{ template.createdBy || '暂无创建人' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
-						<dd class="mt-1">{{ formatDate(template.createdTime) || '暂无创建时间' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">修改人</dt>
-						<dd class="mt-1">{{ template.updatedBy || '暂无修改人' }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
-						<dd class="mt-1">{{ formatDate(template.updatedTime) || '暂无修改时间' }}</dd>
-					</div>
-				</div>
-			</shadcn-card-content>
-		</shadcn-card>
-
-		<shadcn-separator />
-
-		<design-parameter-preview :parameters="parameters || []" />
+		<design-parameter-preview :nodeId="template.id || 0" />
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { toRaw } from 'vue'
+import { ref, toRaw } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
-import type { ZdTemplate } from '~/models/entity/template'
 import type { ZdParameter } from '~/models/entity/parameter'
-import type { ZdPType } from '~/models/entity/ptype'
-import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdTemplate } from '~/models/entity/template'
 
 const props = defineProps<{
 	template: ZdTemplate
 	isEditing: boolean
 	parameters?: ZdParameter[]
-	data?: TreeNodeData // 可选的树节点数据
 }>()
 
 const emit = defineEmits<{
@@ -159,37 +112,12 @@ const emit = defineEmits<{
 	save: [form: Partial<ZdTemplate>]
 }>()
 
-const productTypes = ref<ZdPType[]>([])
-const entityApis = useEntityApis()
-
-// 计算属性，处理模板数据
-const template = computed(() => {
-	// 优先使用直接传入的template
-	return props.template || {}
-})
-
-// 获取产品类型列表
-onMounted(async () => {
-	try {
-		const response = await entityApis.ptype.getAll()
-		productTypes.value = response || []
-	} catch (error) {
-		console.error('获取产品类型失败:', error)
-		productTypes.value = []
-	}
-})
-
-const getProductTypeName = (typeId: number) => {
-	const productType = productTypes.value.find(type => type.id === typeId)
-	return productType ? productType.name : `类型ID: ${typeId}`
-}
-
 const editForm = ref<Partial<ZdTemplate>>({
-	name: template.value.name,
-	description: template.value.description,
-	productTypeId: template.value.productTypeId,
-	isShow: template.value.isShow,
-	isCustomized: template.value.isCustomized
+	name: props.template.name,
+	description: props.template.description,
+	isShow: props.template.isShow,
+	isCustomized: props.template.isCustomized,
+	productTypeId: props.template.productTypeId
 })
 
 const handleSubmit = (event: Event) => {
@@ -197,11 +125,11 @@ const handleSubmit = (event: Event) => {
 	if (event) event.preventDefault()
 	
 	// 确保有原始ID
-	const originalId = template.value.id
+	const originalId = props.template.id
 	
 	// 创建更新对象，确保包含必要字段
 	const updatedData = {
-		...toRaw(template.value),
+		...toRaw(props.template),
 		...toRaw(editForm.value),
 		id: originalId,
 		originalId: originalId

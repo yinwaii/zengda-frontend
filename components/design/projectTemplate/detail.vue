@@ -4,8 +4,8 @@
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-2xl font-bold">{{ projectTemplate.name }}</h2>
-						<p class="text-sm text-muted-foreground mt-1">{{ projectTemplate.description || '暂无描述' }}</p>
+						<h2 class="text-2xl font-bold">{{ template.name }}</h2>
+						<p class="text-sm text-muted-foreground mt-1">{{ template.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
 						<shadcn-button @click="$emit('edit')">
@@ -27,12 +27,16 @@
 							<shadcn-textarea id="description" v-model="editForm.description" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="isPublic">是否公开</shadcn-label>
-							<shadcn-checkbox id="isPublic" v-model="editForm.isPublic" />
+							<shadcn-label for="isShow">是否显示</shadcn-label>
+							<shadcn-checkbox id="isShow" v-model="editForm.isShow" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="version">版本</shadcn-label>
-							<shadcn-input id="version" v-model="editForm.version" />
+							<shadcn-label for="isCustomized">是否定制</shadcn-label>
+							<shadcn-checkbox id="isCustomized" v-model="editForm.isCustomized" />
+						</div>
+						<div class="space-y-2">
+							<shadcn-label for="productTypeId">产品类型ID</shadcn-label>
+							<shadcn-input id="productTypeId" v-model="editForm.productTypeId" type="number" />
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -48,27 +52,35 @@
 					<div class="grid grid-cols-2 gap-4">
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">ID</dt>
-							<dd class="mt-1">{{ projectTemplate.id }}</dd>
+							<dd class="mt-1">{{ template.id }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">版本</dt>
-							<dd class="mt-1">{{ projectTemplate.version }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">产品类型ID</dt>
+							<dd class="mt-1">{{ template.productTypeId }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">是否公开</dt>
+							<dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
 							<dd class="mt-1">
-								<shadcn-badge :variant="projectTemplate.isPublic ? 'default' : 'outline'">
-									{{ projectTemplate.isPublic ? '是' : '否' }}
+								<shadcn-badge :variant="template.isShow ? 'default' : 'outline'">
+									{{ template.isShow ? '是' : '否' }}
+								</shadcn-badge>
+							</dd>
+						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">是否定制</dt>
+							<dd class="mt-1">
+								<shadcn-badge :variant="template.isCustomized ? 'default' : 'outline'">
+									{{ template.isCustomized ? '是' : '否' }}
 								</shadcn-badge>
 							</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
-							<dd class="mt-1">{{ formatDate(projectTemplate.createdTime) || '暂无' }}</dd>
+							<dd class="mt-1">{{ formatDate(template.createdTime) || '暂无' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
-							<dd class="mt-1">{{ formatDate(projectTemplate.updatedTime) || '暂无' }}</dd>
+							<dd class="mt-1">{{ formatDate(template.updatedTime) || '暂无' }}</dd>
 						</div>
 					</div>
 				</template>
@@ -77,7 +89,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :parameters="parameters || []" />
+		<design-parameter-preview :nodeId="template.id || 0" />
 	</div>
 </template>
 
@@ -86,22 +98,10 @@ import { ref, toRaw } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdParameter } from '~/models/entity/parameter'
-
-// 定义项目模板类型，根据实际情况调整
-interface ProjectTemplate {
-  id?: number
-  name: string
-  description?: string
-  isPublic: boolean
-  version: string
-  createdTime?: string
-  updatedTime?: string
-  createdBy?: string
-  updatedBy?: string
-}
+import type { ZdTemplate } from '~/models/entity/template'
 
 const props = defineProps<{
-	projectTemplate: ProjectTemplate
+	template: ZdTemplate
 	isEditing: boolean
 	parameters?: ZdParameter[]
 }>()
@@ -109,14 +109,15 @@ const props = defineProps<{
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	save: [form: Partial<ProjectTemplate>]
+	save: [form: Partial<ZdTemplate>]
 }>()
 
-const editForm = ref<Partial<ProjectTemplate>>({
-	name: props.projectTemplate.name,
-	description: props.projectTemplate.description,
-	isPublic: props.projectTemplate.isPublic,
-	version: props.projectTemplate.version
+const editForm = ref<Partial<ZdTemplate>>({
+	name: props.template.name,
+	description: props.template.description,
+	isShow: props.template.isShow,
+	isCustomized: props.template.isCustomized,
+	productTypeId: props.template.productTypeId
 })
 
 const handleSubmit = (event: Event) => {
@@ -124,15 +125,15 @@ const handleSubmit = (event: Event) => {
 	if (event) event.preventDefault()
 	
 	// 确保有原始ID
-	const originalId = props.projectTemplate.id
+	const originalId = props.template.id
 	
 	// 创建更新对象，确保包含必要字段
 	const updatedData = {
-		...toRaw(props.projectTemplate),
+		...toRaw(props.template),
 		...toRaw(editForm.value),
 		id: originalId,
 		originalId: originalId
-	} as (Partial<ProjectTemplate> & { originalId: number })
+	} as (Partial<ZdTemplate> & { originalId: number })
 	
 	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
 	const plainData = JSON.parse(JSON.stringify(updatedData))

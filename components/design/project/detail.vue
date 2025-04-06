@@ -65,7 +65,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :parameters="parameters" />
+		<design-parameter-preview :nodeId="project.id" />
 	</div>
 </template>
 

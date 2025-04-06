@@ -139,7 +139,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :parameters="parameters" />
+		<design-parameter-preview :nodeId="bom.id" />
 	</div>
 	
 	<!-- 物料项查看/编辑对话框 -->

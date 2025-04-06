@@ -101,7 +101,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :parameters="parameters || []" />
+		<design-parameter-preview :nodeId="component.id" />
 	</div>
 </template>
 

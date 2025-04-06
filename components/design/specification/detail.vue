@@ -104,7 +104,7 @@
 
     <shadcn-separator />
 
-    <design-parameter-preview :parameters="parameters || []" />
+    <design-parameter-preview :nodeId="specification.id" />
   </div>
 </template>
 

@@ -15,6 +15,10 @@ const sidebarData: any = [
 				title: '首页 / Home',
 				url: '/design',
 			},
+			// {
+			// 	title: '选件清单 / Bom',
+			// 	url: '/design/bom',
+			// },
 			{
 				title: '组件 / Component',
 				url: '/design/component',

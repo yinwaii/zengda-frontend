@@ -90,7 +90,7 @@ export const getBomTreeNodeStruct: TreeNodeFactory<any> = (bom) => {
   return {
     id: compositeId, // 使用复合ID
     originalId: bom.id, // 保留原始ID
-    label: bom.name,
+    label: bom.number || `BOM ${bom.id}`, // 使用编号作为显示标签，如果没有编号则使用ID
     type: NODE_TYPES.BOM,
     children: bom.children?.map(getBomTreeNodeStruct) || [],
     originalData: bom,
