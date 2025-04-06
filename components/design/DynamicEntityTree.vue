@@ -34,7 +34,7 @@
         <component 
           :is="getDetailComponent(currentItem.type)" 
           :key="currentItemId"
-          v-bind="getDetailProps(currentItem)"
+          v-bind="getComponentDataProps(currentItem)"
           :is-editing="isEditing"
           @edit="startEditing"
           @cancel="cancelEditing"
@@ -184,37 +184,55 @@ const getDialogComponent = (type: string = 'default') => {
   return dialogComponents[type] || null
 }
 
-// 获取详情组件的props
-const getDetailProps = (node: TreeNodeData) => {
+// 获取详情组件的数据props
+const getComponentDataProps = (node: TreeNodeData) => {
   if (!node) return {}
   
   const propName = getPropNameByType(node.type)
   
-  // 递归遍历节点树，检查是否有component类型的节点，如果有则加载其BOM信息
-  const traverseAndEnrichNodes = (treeNode: TreeNodeData) => {
+  // 创建节点的深拷贝，避免直接修改原始节点导致反应式更新
+  const nodeCopy = JSON.parse(JSON.stringify(node))
+  
+  // 递归遍历节点树，检查是否有component类型的节点，如果有则标记需要加载其BOM信息
+  const traverseAndEnrichNodes = (treeNode: any) => {
     // 如果是组件节点且有bomId，但没有关联的BOM数据，则标记需要加载
     if (treeNode.type === NODE_TYPES.COMPONENT && 
         treeNode.originalData && 
         treeNode.originalData.bomId && 
         !treeNode.bomData) {
-      // 在这里我们只能标记节点，实际加载需要在父组件中进行
+      // 只记录日志，不修改节点数据
       console.log('发现组件节点需要加载BOM数据:', treeNode.originalData.id, treeNode.originalData.bomId)
     }
     
     // 递归处理子节点
     if (treeNode.children && treeNode.children.length > 0) {
-      treeNode.children.forEach(child => traverseAndEnrichNodes(child))
+      for (let i = 0; i < treeNode.children.length; i++) {
+        traverseAndEnrichNodes(treeNode.children[i])
+      }
     }
   }
   
-  // 开始遍历
-  traverseAndEnrichNodes(node)
-  
-  return {
-    data: node, // 始终传递data属性
-    [propName]: node.originalData || node,
-    parameters: node.parameters || []
+  // 仅在非BOM节点上执行遍历，避免不必要的处理
+  if (node.type !== NODE_TYPES.BOM) {
+    traverseAndEnrichNodes(nodeCopy)
   }
+  
+  // 构建基础属性对象
+  const props: Record<string, any> = {}
+  
+  // 根据节点类型添加特定属性
+  if (node.type === NODE_TYPES.BOM) {
+    // BOM类型只传递bom和parameters属性
+    props.bom = node.originalData || node
+    props.parameters = node.parameters || []
+  } else {
+    // 其他类型
+    props[propName] = node.originalData || node
+    props.parameters = node.parameters || []
+    props.data = node
+  }
+  
+  return props
 }
 
 // 根据类型获取对应的prop名称
@@ -240,7 +258,7 @@ const getPropNameByType = (type?: string) => {
 // 处理节点点击
 const handleNodeClick = (node: TreeNodeData) => {
   emit('node-click', node)
-  isEditing.value = false
+  isEditing.value = false // 点击新节点时退出编辑模式
 }
 
 // 处理节点展开/折叠
@@ -248,22 +266,21 @@ const handleNodeToggle = (node: TreeNodeData, expanded: boolean) => {
   emit('node-toggle', node, expanded)
 }
 
-// 开始编辑
+// 处理编辑
 const startEditing = () => {
   isEditing.value = true
 }
 
-// 取消编辑
+// 处理取消编辑
 const cancelEditing = () => {
   isEditing.value = false
 }
 
-// 处理表单提交
+// 处理提交
 const handleSubmit = (formData: any) => {
   if (!currentItem.value) return
-  
   emit('save', formData, currentItem.value.type || 'default')
-  isEditing.value = false
+  isEditing.value = false // 提交后退出编辑模式
 }
 
 // 处理添加新项

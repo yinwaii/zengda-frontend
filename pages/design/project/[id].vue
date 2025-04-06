@@ -125,49 +125,30 @@ const loadSpecificProject = async () => {
 			return
 		}
 		
-		// 初始化树数据
-		let currentTreeData = [...projectData]
+		// 步骤2: 使用loadEntityChildren一次性加载所有子元素
+		// 这样避免多次修改反应式数据，减少递归更新的可能性
+		console.log('加载项目所有子元素...')
+		const { treeData: completeData } = await entityTree.loadEntityChildren(projectData, {
+			loadSystems: true,
+			loadComponents: true,
+			loadFullComponents: true,
+			loadBoms: true,
+			loadSpecifications: true
+		})
 		
-		// 步骤2: 获取项目关联的模板并添加到项目节点下
-		if (project.templateId) {
-			console.log('加载模板数据...')
-			// 直接使用 loadTemplateByProject 加载模板
-			currentTreeData = await entityTree.loadTemplateByProject(currentTreeData)
-			
-			// 步骤3: 为模板加载产品系统数据
-			console.log('加载产品系统数据...')
-			currentTreeData = await entityTree.loadPSystemByTemplate(currentTreeData)
-			
-			// 步骤4: 为模板加载组件数据
-			console.log('加载组件数据...')
-			currentTreeData = await entityTree.loadComponentByTemplate(currentTreeData)
-			
-			// 步骤5: 获取完整的组件信息
-			console.log('加载完整组件信息...')
-			currentTreeData = await entityTree.loadComponentByComponent(currentTreeData)
-			
-			// 步骤6: 为组件加载BOM数据
-			console.log('加载BOM数据...')
-			currentTreeData = await entityTree.loadBomByComponent(currentTreeData)
-			
-			// 步骤7: 为模板和系统加载规格数据
-			console.log('加载规格数据...')
-			currentTreeData = await entityTree.loadSpecificationByTemplate(currentTreeData)
-		}
-		
-		if (currentTreeData.length > 0) {
-			// 更新树数据
-			projectTreeData.value = currentTreeData
+		if (completeData.length > 0) {
+			// 一次性更新树数据
+			projectTreeData.value = completeData
 			
 			// 设置默认展开根节点和模板节点
-			const expandKeys = [currentTreeData[0].id]
+			const expandKeys = [completeData[0].id]
 			// 如果有子节点，将第一层子节点也设为展开
-			if (currentTreeData[0].children && currentTreeData[0].children.length > 0) {
-				expandKeys.push(currentTreeData[0].children[0].id)
+			if (completeData[0].children && completeData[0].children.length > 0) {
+				expandKeys.push(completeData[0].children[0].id)
 			}
 			expandedKeys.value = expandKeys
 
-// 加载项目配置
+            // 加载项目配置
 			await loadProjectConfiguration()
 			
 			toast.toast({

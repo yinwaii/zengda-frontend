@@ -74,27 +74,15 @@ const loadSpecificTemplate = async () => {
 			return
 		}
 		
-		// 步骤2: 使用更详细的步骤加载子元素，确保加载顺序正确
-		let currentTreeData = [...templateData]
-		
-		// 2.1 加载模板关联的产品系统
-		console.log('加载产品系统数据...')
-		currentTreeData = await entityTree.loadPSystemByTemplate(currentTreeData)
-		
-		// 2.2 加载模板关联的组件
-		console.log('加载模板组件数据...')
-		currentTreeData = await entityTree.loadComponentByTemplate(currentTreeData)
-		
-		// 2.3 加载组件关联的子组件
-		console.log('加载子组件数据...')
-		currentTreeData = await entityTree.loadComponentByComponent(currentTreeData)
-		
-		// 2.4 加载组件关联的BOM
-		console.log('加载BOM数据...')
-		currentTreeData = await entityTree.loadBomByComponent(currentTreeData)
-		
-		// 2.5 使用loadEntityChildren加载其他子元素
-		const { treeData: completeData } = await entityTree.loadEntityChildren(currentTreeData, {
+		// 步骤2: 使用loadEntityChildren一次性加载所有子元素
+		// 由于loadEntityChildren内部会调用loadPSystemByTemplate和loadComponentByTemplate
+		// 所以不需要单独调用这些方法
+		console.log('加载模板所有子元素...')
+		const { treeData: completeData } = await entityTree.loadEntityChildren(templateData, {
+			loadSystems: true,
+			loadComponents: true,
+			loadFullComponents: true,
+			loadBoms: true,
 			loadSpecifications: true
 		})
 		

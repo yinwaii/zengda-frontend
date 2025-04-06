@@ -65,14 +65,4 @@ export const sidebarData = [
 			},
 		],
 	},
-	{
-		title: '个性化系统 / PSystem',
-		url: '/psystem',
-		items: [
-			{
-				title: '首页 / Home',
-				url: '/psystem',
-			},
-		],
-	},
 ]
