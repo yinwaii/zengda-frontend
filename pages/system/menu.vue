@@ -1,34 +1,25 @@
-<template>
-    <div>
-        <h1>菜单管理</h1>
-    </div>
-
-    
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useEntityApis } from '@/composables/use-entity-apis';
-import { Menu } from '@/models/entity/system';
-import { useToast } from '@/components/ui/toast/use-toast';
+import type { Menu } from '@/models/entity/system'
+import { onMounted, ref } from 'vue'
+import { columns } from '@/components/system/menu/columns'
+import DataTable from "~/components/system/menu/data-table.vue";
 
-const { menu: menuApi } = useEntityApis();
-const menuList = ref<Menu[]>([]);
-const showDialog = ref(false);
-const currentMenu = ref<Menu>();
-const showDeleteDialog = ref(false);
-const deleteMenu = ref<Menu>();
+const data = ref<Menu[]>([])
 
-function search(){
-    menuList.value = [];
-    menuApi.getMenuList().then((res) => {
-        menuList.value = res as Menu[];
-    });
-}    
+async function getData(): Promise<Menu[]> {
+  // Fetch data from your API here.
+  return useEntityApis().menu.getMenuList();
+}
 
-onMounted(() => {
-    search();
-});
+onMounted(async () => {
+  data.value = await getData()
+})
 
 </script>
 
+<template>
+  <div class="container py-10 mx-auto">
+    <data-table :columns="columns" :data="data" />
+<!--    <DataTable :columns="columns" :data="data" />-->
+  </div>
+</template>
