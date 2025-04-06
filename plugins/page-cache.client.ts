@@ -15,10 +15,36 @@ export default defineNuxtPlugin(() => {
   })
   
   // 监听路由变化，管理页面缓存
-  router.afterEach((to) => {
-    // 获取页面的keepalive配置
-    const meta = to.meta || {}
+  router.beforeEach((to, from) => {
+    // 确保to和from对象存在且有meta属性
+    if (to && to.meta && to.meta.pageCache === false) {
+      pageCache.clearAllPages()
+    }
+    return true
+  })
+  
+  router.afterEach((to, from) => {
+    // 确保to和from对象存在且有meta属性
+    if (to && to.name && from && from.name && to.name === from.name) {
+      // 刷新相同页面
+      pageCache.removePage(String(to.name))
+    }
+    
+    // 确保to对象存在且有必要的属性
+    if (to && to.meta && to.meta.pageCache === undefined && to.name) {
+      // 没有明确指定缓存策略的页面，默认缓存
+      pageCache.addPage(String(to.name))
+    }
+    
+    // 确保to对象和to.meta有效
+    if (!to || typeof to !== 'object') return
+    
+    // 安全地获取meta对象，如果不存在则使用空对象
+    const meta = (to.meta && typeof to.meta === 'object') ? to.meta : {}
     const keepalive = meta.keepalive
+    
+    // 如果没有to.name属性，则不能添加到缓存
+    if (!to.name) return
     
     // 如果明确设置为false，不添加到缓存
     if (keepalive === false) return

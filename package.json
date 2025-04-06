@@ -7,7 +7,8 @@
     "dev": "node scripts/copy-tinymce.js && nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && node scripts/copy-tinymce.js"
+    "postinstall": "nuxt prepare && node scripts/copy-tinymce.js",
+    "clean": "rm -rf .nuxt node_modules/.vite"
   },
   "dependencies": {
     "@nuxtjs/color-mode": "^3.5.2",

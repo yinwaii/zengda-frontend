@@ -9,7 +9,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // 在路由切换时保存页面状态
     router.beforeEach((to, from) => {
-      if (from.meta.name) {
+      if (from.meta && from.meta.name) {
         // 只缓存必要的状态，避免缓存函数对象
         const state: Record<string, any> = {}
         const provides = nuxtApp.vueApp._context.provides
@@ -28,7 +28,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // 在路由切换后恢复页面状态
     router.afterEach((to) => {
-      if (to.meta.name) {
+      if (to.meta && to.meta.name) {
         const cached = cache.get(to.meta.name)
         if (cached) {
           window.scrollTo(0, cached.scrollPosition)

@@ -8,7 +8,7 @@
 						<p class="text-sm text-muted-foreground mt-1">{{ component.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
-						<shadcn-button @click="$emit('edit')">
+						<shadcn-button @click="isEditing = true">
 							<LucidePencil class="mr-2 h-4 w-4" />
 							编辑
 						</shadcn-button>
@@ -43,7 +43,7 @@
 							<shadcn-input id="value" v-model="editForm.value" />
 						</div>
 						<div class="flex justify-end gap-2">
-							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
+							<shadcn-button type="button" variant="outline" @click="isEditing = false">
 								取消
 							</shadcn-button>
 							<shadcn-button type="submit">
@@ -84,7 +84,7 @@
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">BOM ID</dt>
-							<dd class="mt-1">{{ component.bomId || '未关联BOM' }}</dd>
+							<dd class="mt-1">{{ hasBom ? (bomData ? bomData.id : '未关联BOM') : '未关联BOM' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
@@ -110,29 +110,64 @@ import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdComponent } from '~/models/entity/component'
 import type { ZdParameter } from '~/models/entity/parameter'
+import type { ZdBom } from '~/models/entity/bom'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const props = defineProps<{
-	component: ZdComponent
-	isEditing: boolean
-	parameters?: ZdParameter[]
+	data: TreeNodeData, // 明确定义为TreeNodeData类型
+	component: ZdComponent,
+	parameters?: ZdParameter[],
+	bom?: ZdBom // 添加可选的BOM属性
 }>()
+
+// 计算组件数据，优先使用component，如果不存在则从data中提取
+const component = computed(() => {
+  // 如果直接提供了component属性，则使用它
+  if (props.component) return props.component
+  
+  // 否则从data.originalData中获取组件数据，添加空值检查
+  return props.data && props.data.originalData ? props.data.originalData : props.data || {}
+})
+
+// 获取关联的BOM数据
+const bomData = computed(() => {
+  // 如果直接提供了bom属性，则使用它
+  if (props.bom) return props.bom
+  
+  // 否则从data中查找bomData属性
+  return props.data && props.data.bomData ? props.data.bomData : null
+})
+
+// 检查是否有BOM数据
+const hasBom = computed(() => {
+  return !!component.value.bomId || !!bomData.value
+})
 
 const emit = defineEmits<{
-	edit: []
-	cancel: []
-	submit: [form: Partial<ZdComponent>]
+	save: [form: Partial<ZdComponent>]
 }>()
 
+const isEditing = ref(false)
+
 const editForm = ref<Partial<ZdComponent>>({
-	name: props.component.name,
-	description: props.component.description,
-	isShow: props.component.isShow,
-	isRequired: props.component.isRequired,
-	price: props.component.price,
-	value: props.component.value
+	name: component.value.name,
+	description: component.value.description,
+	isShow: component.value.isShow,
+	isRequired: component.value.isRequired,
+	price: component.value.price,
+	value: component.value.value
 })
 
 const handleSubmit = () => {
-	emit('submit', editForm.value)
+  isEditing.value = false
+  
+  // 合并原始数据和编辑表单数据
+  const updatedData = {
+    ...component.value,
+    ...editForm.value,
+    originalId: component.value.id, // 保持原始ID
+  }
+  
+	emit('save', updatedData)
 }
 </script> 

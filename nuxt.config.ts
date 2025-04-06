@@ -103,19 +103,27 @@ export default defineNuxtConfig({
       comments: false
     }
   },
-  // 懒加载路由
+  // 路由配置
   router: {
     options: {
       scrollBehaviorType: 'auto'
     }
   },
-  // 添加全局滚动行为到app.vue中
-  // app: {
-  //   mounted() {
-  //     // 页面切换时滚动到顶部
-  //     window.scrollTo(0, 0);
-  //   }
-  // },
+  
+  // 确保路由相关插件优先加载
+  plugins: [
+    // 路由修复插件应该首先加载
+    { src: '~/plugins/router-fix.ts', mode: 'client' }
+  ],
+  
+  // 添加路由相关的构建优化
+  build: {
+    transpile: [
+      'vue-router',
+      // 其他需要转译的依赖...
+    ],
+  },
+  
   // 添加hooks配置来复制TinyMCE静态资源
   hooks: {
     'build:before': async () => {

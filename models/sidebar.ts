@@ -16,6 +16,14 @@ export const sidebarData = [
 				url: '/design',
 			},
 			{
+				title: '组件 / Component',
+				url: '/design/component',
+			},
+			{
+				title: '模块 / PSystem',
+				url: '/design/psystem',
+			},
+			{
 				title: '模板 / Template',
 				url: '/design/projectTemplate',
 			},

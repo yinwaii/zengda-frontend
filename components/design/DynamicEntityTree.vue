@@ -186,8 +186,32 @@ const getDialogComponent = (type: string = 'default') => {
 
 // 获取详情组件的props
 const getDetailProps = (node: TreeNodeData) => {
+  if (!node) return {}
+  
   const propName = getPropNameByType(node.type)
+  
+  // 递归遍历节点树，检查是否有component类型的节点，如果有则加载其BOM信息
+  const traverseAndEnrichNodes = (treeNode: TreeNodeData) => {
+    // 如果是组件节点且有bomId，但没有关联的BOM数据，则标记需要加载
+    if (treeNode.type === NODE_TYPES.COMPONENT && 
+        treeNode.originalData && 
+        treeNode.originalData.bomId && 
+        !treeNode.bomData) {
+      // 在这里我们只能标记节点，实际加载需要在父组件中进行
+      console.log('发现组件节点需要加载BOM数据:', treeNode.originalData.id, treeNode.originalData.bomId)
+    }
+    
+    // 递归处理子节点
+    if (treeNode.children && treeNode.children.length > 0) {
+      treeNode.children.forEach(child => traverseAndEnrichNodes(child))
+    }
+  }
+  
+  // 开始遍历
+  traverseAndEnrichNodes(node)
+  
   return {
+    data: node, // 始终传递data属性
     [propName]: node.originalData || node,
     parameters: node.parameters || []
   }
