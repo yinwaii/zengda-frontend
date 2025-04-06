@@ -4,7 +4,6 @@ import { h, ref } from 'vue'
 import { type ZdTemplate, ZdTemplateColumns } from '~/models/entity/template'
 import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
-// import { Dialog as ProjectTemplateDialog } from '~/components/design/projectTemplate'
 import type { ZdTemplate as ZdTemplateType } from '~/models/entity/template'
 
 definePageMeta({
@@ -215,7 +214,7 @@ onDeactivated(() => {
 
 const onClick = (row: ZdTemplateType) => {
 	console.log('Clicking row:', row.id)
-	navigateTo(`/design/projectTemplate/${row.id}`, { replace: true })
+	navigateTo(`/design/template/${row.id}`, { replace: true })
 }
 </script>
 <template>

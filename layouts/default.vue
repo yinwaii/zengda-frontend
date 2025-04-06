@@ -29,7 +29,7 @@ const sidebarData: any = [
 			},
 			{
 				title: '模板 / Template',
-				url: '/design/projectTemplate',
+				url: '/design/template',
 			},
 			{
 				title: '项目 / Project',

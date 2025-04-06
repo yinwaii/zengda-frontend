@@ -72,6 +72,13 @@ export default defineNuxtConfig({
         driver: 'memory',
         ttl: 60 * 60 // 1小时缓存
       }
+    },
+    // 添加序列化配置，处理函数不可序列化的问题
+    devStorage: {
+      db: {
+        driver: 'fs',
+        base: './.nuxt/db' // 添加base选项指定存储路径
+      }
     }
   },
   vite: {
@@ -124,7 +131,7 @@ export default defineNuxtConfig({
     ],
   },
   
-  // 添加hooks配置来复制TinyMCE静态资源
+  // 添加全局钩子来处理函数序列化问题
   hooks: {
     'build:before': async () => {
       // 创建静态资源目录

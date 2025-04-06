@@ -17,7 +17,7 @@ export default defineNuxtPlugin({
         
         // 可以添加项目中存在的路由
         '/design/project',
-        '/design/projectTemplate',
+        '/design/template',
         '/system/dept',
         '/system/menu',
         '/system/role',

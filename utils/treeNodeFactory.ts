@@ -135,7 +135,7 @@ export const getProjectTreeNodeStruct: TreeNodeFactory<any> = (project) => {
 /**
  * 将项目模板数据转换为树节点结构
  */
-export const getProjectTemplateTreeNodeStruct: TreeNodeFactory<any> = (template) => {
+export const getTemplateTreeNodeStruct: TreeNodeFactory<any> = (template) => {
   // 生成复合ID
   const compositeId = generateCompositeId(NODE_TYPES.TEMPLATE, template.id)
 
@@ -144,7 +144,7 @@ export const getProjectTemplateTreeNodeStruct: TreeNodeFactory<any> = (template)
     originalId: template.id, // 保留原始ID
     label: template.name,
     type: NODE_TYPES.TEMPLATE,
-    children: template.children?.map(getProjectTemplateTreeNodeStruct) || [],
+    children: template.children?.map(getTemplateTreeNodeStruct) || [],
     originalData: template,
   }
 }
@@ -323,7 +323,7 @@ export const createTreeNodeFactory = (types: NodeType[]) => {
         factories[type] = getProjectTreeNodeStruct
         break
       case NODE_TYPES.TEMPLATE:
-        factories[type] = getProjectTemplateTreeNodeStruct
+        factories[type] = getTemplateTreeNodeStruct
         break
       case NODE_TYPES.PSYSTEM:
         factories[type] = getPsystemTreeNodeStruct
@@ -345,7 +345,7 @@ export const createTreeNodeFactory = (types: NodeType[]) => {
 //   getBomTreeNodeStruct,
 //   getComponentTreeNodeStruct,
 //   getProjectTreeNodeStruct,
-//   getProjectTemplateTreeNodeStruct,
+//   getTemplateTreeNodeStruct,
 //   getPsystemTreeNodeStruct,
 //   getSpecificationTreeNodeStruct,
 //   combineTreeNodeFactories,

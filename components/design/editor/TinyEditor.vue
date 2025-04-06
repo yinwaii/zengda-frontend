@@ -4,6 +4,7 @@
     <lazy-editor 
       v-model="localValue" 
       :init="props.init"
+      :readonly="props.readonly"
       @onChange="handleChange"
     />
     <template #fallback>
@@ -28,6 +29,10 @@ const props = defineProps({
   init: {
     type: Object,
     default: () => ({})
+  },
+  readonly: {
+    type: Boolean,
+    default: false
   }
 })
 

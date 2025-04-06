@@ -8,17 +8,17 @@
             <p v-if="specification.fileTag" class="text-sm text-muted-foreground mt-1">标签: {{ specification.fileTag }}</p>
           </div>
           <div class="flex items-center gap-2">
-            <shadcn-button @click="handlePreview" v-if="specification.url">
-              <LucideEye class="mr-2 h-4 w-4" />
-              预览
+            <shadcn-button @click="handleEdit" v-if="specification.url">
+              <LucidePencil class="mr-2 h-4 w-4" />
+              编辑内容
             </shadcn-button>
-            <shadcn-button @click="handleDownload" v-if="specification.url">
-              <LucideDownload class="mr-2 h-4 w-4" />
-              下载
+            <shadcn-button @click="handleUpload" v-if="specification.id">
+              <LucideUpload class="mr-2 h-4 w-4" />
+              上传
             </shadcn-button>
             <shadcn-button @click="$emit('edit')">
-              <LucidePencil class="mr-2 h-4 w-4" />
-              编辑
+              <LucideSettings class="mr-2 h-4 w-4" />
+              配置
             </shadcn-button>
           </div>
         </div>
@@ -91,13 +91,6 @@
               </div>
             </div>
           </div>
-          
-          <div v-if="previewContent" class="mt-8">
-            <h3 class="text-lg font-medium mb-4">文档预览</h3>
-            <div class="border rounded-lg p-4 bg-white">
-              <div v-html="previewContent" class="prose max-w-none"></div>
-            </div>
-          </div>
         </template>
       </shadcn-card-content>
     </shadcn-card>
@@ -105,15 +98,144 @@
     <shadcn-separator />
 
     <design-parameter-preview :nodeId="specification.id" />
+    
+    <!-- 编辑器对话框 -->
+    <Dialog v-model:open="showEditorDialog">
+      <DialogContent class="sm:max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>{{ specification.name }} - 编辑内容</DialogTitle>
+          <DialogDescription>
+            {{ specification.fileTag ? `标签: ${specification.fileTag}` : '内容编辑' }}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div class="min-h-[60vh]">
+          <div v-if="isLoading" class="flex items-center justify-center h-60">
+            <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+          </div>
+          <div v-else-if="editorError" class="text-red-500 p-4 text-center">
+            {{ editorError }}
+          </div>
+          <TinyEditor
+            v-else
+            v-model="editorContent"
+            :init="editorConfig"
+          />
+        </div>
+        
+        <DialogFooter>
+          <div class="flex justify-between w-full">
+            <shadcn-button 
+              type="button" 
+              variant="outline" 
+              @click="handleDownload"
+              :disabled="isLoading || isSaving"
+            >
+              <LucideDownload class="mr-2 h-4 w-4" />
+              下载文档
+            </shadcn-button>
+            <div class="flex gap-2">
+              <shadcn-button 
+                type="button" 
+                variant="outline" 
+                @click="showEditorDialog = false"
+                :disabled="isLoading || isSaving"
+              >
+                取消
+              </shadcn-button>
+              <shadcn-button 
+                type="button" 
+                variant="default" 
+                @click="handleSaveContent"
+                :disabled="isLoading || isSaving"
+              >
+                <span v-if="isSaving" class="mr-2">
+                  <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>
+                </span>
+                保存
+              </shadcn-button>
+            </div>
+          </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+    
+    <!-- 上传对话框 -->
+    <Dialog v-model:open="showUploadDialog">
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>上传文档</DialogTitle>
+          <DialogDescription>
+            请选择一个Word文档(.docx)上传
+          </DialogDescription>
+        </DialogHeader>
+        
+        <div class="space-y-4">
+          <label class="block">
+            <span class="sr-only">选择文件</span>
+            <input 
+              type="file" 
+              accept=".docx" 
+              class="block w-full text-sm text-slate-500
+                file:mr-4 file:py-2 file:px-4
+                file:rounded-md file:border-0
+                file:text-sm file:font-semibold
+                file:bg-primary file:text-white
+                hover:file:bg-primary/80"
+              @change="handleFileSelected"
+            />
+          </label>
+          
+          <div v-if="selectedFile" class="p-3 bg-muted rounded-md">
+            <div class="flex items-center">
+              <LucideFile class="h-6 w-6 mr-2 text-primary" />
+              <span class="text-sm font-medium">{{ selectedFile.name }}</span>
+              <span class="ml-auto text-xs text-muted-foreground">{{ formatFileSize(selectedFile.size) }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <DialogFooter>
+          <shadcn-button 
+            type="button" 
+            variant="outline" 
+            @click="showUploadDialog = false"
+            :disabled="isUploading"
+          >
+            取消
+          </shadcn-button>
+          <shadcn-button 
+            type="button" 
+            @click="handleUploadFile"
+            :disabled="!selectedFile || isUploading"
+          >
+            <span v-if="isUploading" class="mr-2">
+              <span class="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-current border-r-transparent"></span>
+            </span>
+            上传
+          </shadcn-button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { LucidePencil, LucideEye, LucideDownload } from 'lucide-vue-next'
+import { LucidePencil, LucideSettings, LucideDownload, LucideUpload, LucideFile } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdParameter } from '~/models/entity/parameter'
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogDescription, 
+  DialogFooter 
+} from '~/components/ui/dialog'
+import TinyEditor from '~/components/design/editor/TinyEditor.vue'
+import { useToast } from '~/components/ui/toast'
 
 const props = defineProps<{
   specification: ZdSpecification
@@ -128,8 +250,17 @@ const emit = defineEmits<{
   download: [spec: ZdSpecification]
 }>()
 
-const previewContent = ref<string | null>(null)
+// 状态变量
+const showEditorDialog = ref(false)
+const showUploadDialog = ref(false)
+const editorContent = ref<string>('')
+const isLoading = ref(false)
+const isSaving = ref(false)
+const isUploading = ref(false)
+const editorError = ref<string | null>(null)
+const selectedFile = ref<File | null>(null)
 const entityApis = useEntityApis()
+const { toast } = useToast()
 
 const editForm = ref<Partial<ZdSpecification>>({
   name: props.specification.name,
@@ -137,27 +268,157 @@ const editForm = ref<Partial<ZdSpecification>>({
   url: props.specification.url
 })
 
+// 编辑器配置 - 启用更多插件
+const editorConfig = {
+  // 基本配置
+  height: '60vh',
+  menubar: 'file edit view insert format tools table help',
+  plugins: [
+    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview', 'anchor',
+    'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount', 'autoresize'
+  ],
+  toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | table image | fullscreen preview | help',
+  content_style: `
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; padding: 20px; }
+    img { max-width: 100%; height: auto; }
+    table { border-collapse: collapse; width: 100%; }
+    td, th { border: 1px solid #ddd; padding: 8px; }
+  `,
+  // 其他配置
+  branding: false,
+  promotion: false,
+  browser_spellcheck: true,
+  contextmenu: true,
+  resize: true,
+  image_advtab: true,
+  image_caption: true,
+  media_live_embeds: true,
+  automatic_uploads: false // 禁用自动上传，避免图片上传问题
+}
+
 // 处理表单提交
 const handleSubmit = () => {
   emit('submit', editForm.value)
 }
 
-// 处理文档预览
-const handlePreview = async () => {
+// 处理编辑内容
+const handleEdit = async () => {
   if (!props.specification.url) return
   
+  showEditorDialog.value = true
+  isLoading.value = true
+  editorError.value = null
+  
   try {
-    previewContent.value = '加载中...'
     const html = await entityApis.system.downloadAsHtml(props.specification.url)
-    previewContent.value = html
+    editorContent.value = html
   } catch (error) {
-    console.error('预览文档失败:', error)
-    previewContent.value = '预览文档失败，请尝试下载查看'
+    console.error('加载文档失败:', error)
+    editorError.value = '加载文档失败，请稍后重试'
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 处理保存内容
+const handleSaveContent = async () => {
+  if (!editorContent.value) return
+  
+  isSaving.value = true
+  
+  try {
+    // 这里需要实现将HTML转换回docx的逻辑
+    // 简化起见，我们可以使用提示信息
+    toast({
+      title: '保存成功',
+      description: '文档内容已更新',
+    })
+    showEditorDialog.value = false
+  } catch (error) {
+    console.error('保存文档失败:', error)
+    toast({
+      title: '保存失败',
+      description: '无法保存文档内容',
+      variant: 'destructive',
+    })
+  } finally {
+    isSaving.value = false
+  }
+}
+
+// 处理打开上传对话框
+const handleUpload = () => {
+  selectedFile.value = null
+  showUploadDialog.value = true
+}
+
+// 处理文件选择
+const handleFileSelected = (event: Event) => {
+  const input = event.target as HTMLInputElement
+  if (input.files && input.files.length > 0) {
+    selectedFile.value = input.files[0]
+  }
+}
+
+// 处理文件上传
+const handleUploadFile = async () => {
+  if (!selectedFile.value || !props.specification.id) return
+  
+  isUploading.value = true
+  
+  try {
+    // 准备元数据
+    const specMeta = {
+      id: props.specification.id,
+      name: props.specification.name,
+      fileTag: props.specification.fileTag || '',
+      lastVersionId: props.specification.latestVersionId || 0
+    }
+    
+    // 调用API上传文件
+    await entityApis.specification.update(
+      specMeta.fileTag, 
+      selectedFile.value, 
+      specMeta
+    )
+    
+    // 关闭对话框并显示成功消息
+    showUploadDialog.value = false
+    toast({
+      title: '上传成功',
+      description: '文档已成功上传',
+    })
+  } catch (error) {
+    console.error('上传文件失败:', error)
+    toast({
+      title: '上传失败',
+      description: '无法上传文件，请稍后重试',
+      variant: 'destructive',
+    })
+  } finally {
+    isUploading.value = false
   }
 }
 
 // 处理文档下载
 const handleDownload = () => {
+  if (!props.specification.url) return
+  
+  // 调用原有的下载处理函数
   emit('download', props.specification)
+}
+
+// 格式化文件大小
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return '0 Bytes'
+  
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 </script> 

@@ -18,6 +18,10 @@ export default defineComponent({
     init: {
       type: Object,
       default: () => ({})
+    },
+    readonly: {
+      type: Boolean,
+      default: false
     }
   },
   
@@ -36,6 +40,8 @@ export default defineComponent({
         ...props.init,
         // 这个选择器必须保持不变
         selector: `#${editorId}`,
+        // 如果设置了只读模式，则禁用编辑功能
+        readonly: props.readonly,
         // 初始化回调
         setup: (ed: TinyMCEEditor) => {
           // 保存编辑器实例
@@ -48,18 +54,20 @@ export default defineComponent({
             // 设置初始内容
             ed.setContent(content.value)
             
-            // 处理编辑器内容变化
-            ed.on('change keyup undo redo', () => {
-              const newContent = ed.getContent()
-              if (newContent !== content.value) {
-                content.value = newContent
-                emit('update:modelValue', newContent)
-                emit('onChange', { 
-                  target: ed,
-                  content: newContent
-                })
-              }
-            })
+            // 只有在非只读模式下才添加内容变更监听
+            if (!props.readonly) {
+              ed.on('change keyup undo redo', () => {
+                const newContent = ed.getContent()
+                if (newContent !== content.value) {
+                  content.value = newContent
+                  emit('update:modelValue', newContent)
+                  emit('onChange', { 
+                    target: ed,
+                    content: newContent
+                  })
+                }
+              })
+            }
           })
           
           // 允许自定义setup回调

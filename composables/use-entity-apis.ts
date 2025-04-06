@@ -191,12 +191,25 @@ export const useEntityApis = () => {
       downloadAsHtml: async (filename: string) => {
         try {
           // filename可能是编码后的完整URL或单纯的文件名
+          // 确保文件名是正确编码的
+          const encodedFilename = encodeURIComponent(filename);
+          
           // 直接使用缓存API进行转换
-          const response = await fetch(`/api/cached-docx-to-html/${filename}`)
+          const response = await fetch(`/api/cached-docx-to-html/${encodedFilename}`)
           
           if (!response.ok) {
-            console.error(`文档转换请求失败: ${response.status} ${response.statusText}`)
-            throw new Error(`下载并转换文件失败: ${response.statusText}`)
+            let errorDetail = '';
+            try {
+              // 尝试读取错误详情
+              const errorText = await response.text();
+              const errorJson = JSON.parse(errorText);
+              errorDetail = errorJson.message || response.statusText;
+            } catch (e) {
+              errorDetail = response.statusText;
+            }
+            
+            console.error(`文档转换请求失败: ${response.status} ${errorDetail}`)
+            throw new Error(`下载并转换文件失败: ${errorDetail}`)
           }
           
           // 获取HTML内容

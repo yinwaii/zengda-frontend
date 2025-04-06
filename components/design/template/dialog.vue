@@ -8,31 +8,31 @@
         </shadcn-dialog-description>
       </shadcn-dialog-header>
       <form @submit.prevent="handleSubmit">
-        <div class="grid gap-4 py-4">
-          <div class="grid grid-cols-4 items-center gap-4">
-            <shadcn-label for="name" class="text-right">名称</shadcn-label>
+      <div class="grid gap-4 py-4">
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="name" class="text-right">名称</shadcn-label>
             <shadcn-input id="name" v-model="form.name" class="col-span-3" required />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <shadcn-label for="description" class="text-right">描述</shadcn-label>
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="description" class="text-right">描述</shadcn-label>
             <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
-            <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <shadcn-label for="isCustomized" class="text-right">是否定制</shadcn-label>
-            <shadcn-checkbox id="isCustomized" v-model="form.isCustomized" class="col-span-3" />
-          </div>
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
+          <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
+        </div>
+        <div class="grid grid-cols-4 items-center gap-4">
+          <shadcn-label for="isCustomized" class="text-right">是否定制</shadcn-label>
+          <shadcn-checkbox id="isCustomized" v-model="form.isCustomized" class="col-span-3" />
+        </div>
           <div class="grid grid-cols-4 items-center gap-4">
             <shadcn-label for="productTypeId" class="text-right">产品类型ID</shadcn-label>
             <shadcn-input id="productTypeId" v-model="form.productTypeId" type="number" class="col-span-3" required />
           </div>
-        </div>
-        <shadcn-dialog-footer>
+      </div>
+      <shadcn-dialog-footer>
           <shadcn-button type="submit">保存</shadcn-button>
-        </shadcn-dialog-footer>
+      </shadcn-dialog-footer>
       </form>
     </shadcn-dialog-content>
   </shadcn-dialog>

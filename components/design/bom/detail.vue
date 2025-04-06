@@ -246,7 +246,7 @@ const handleDeleteItem = async (item: ZdBomChild, index: number) => {
 		}
 		
 		if (updatedBom.items && updatedBom.items.length > index) {
-			updatedBom.items.splice(index, 1)
+		updatedBom.items.splice(index, 1)
 		}
 		
 		// 调用API更新BOM
