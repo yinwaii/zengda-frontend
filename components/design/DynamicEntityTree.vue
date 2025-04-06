@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import { ref, computed, h, toRaw } from 'vue'
-import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus } from 'lucide-vue-next'
+import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus, LucideTag } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import { NODE_TYPES } from '~/utils/treeNodeFactory'
@@ -80,6 +80,8 @@ import PsystemDetail from '~/components/design/psystem/detail.vue'
 import PsystemDialog from '~/components/design/psystem/dialog.vue'
 import SpecificationDetail from '~/components/design/specification/detail.vue'
 import SpecificationDialog from '~/components/design/specification/dialog.vue'
+import PtypeDetail from '~/components/design/ptype/detail.vue'
+import PtypeDialog from '~/components/design/ptype/dialog.vue'
 
 const props = defineProps<{
   treeData: TreeNodeData[]
@@ -119,6 +121,7 @@ const iconMap: Record<string, any> = {
   [NODE_TYPES.TEMPLATE]: LucideFile,
   [NODE_TYPES.PSYSTEM]: LucideSettings,
   [NODE_TYPES.SPECIFICATION]: LucideCode,
+  [NODE_TYPES.PTYPE]: LucideTag,
   'default': LucideFile
 }
 
@@ -130,6 +133,7 @@ const iconColorMap: Record<string, string> = {
   [NODE_TYPES.TEMPLATE]: 'text-purple-500',
   [NODE_TYPES.PSYSTEM]: 'text-red-500',
   [NODE_TYPES.SPECIFICATION]: 'text-indigo-500',
+  [NODE_TYPES.PTYPE]: 'text-orange-500',
   'default': 'text-gray-500'
 }
 
@@ -141,6 +145,7 @@ const nodeComponents: Record<string, any> = {
   [NODE_TYPES.TEMPLATE]: TreeNode,
   [NODE_TYPES.PSYSTEM]: TreeNode,
   [NODE_TYPES.SPECIFICATION]: TreeNode,
+  [NODE_TYPES.PTYPE]: TreeNode,
   'default': TreeNode
 }
 
@@ -151,7 +156,9 @@ const detailComponents: Record<string, any> = {
   [NODE_TYPES.PROJECT]: ProjectDetail,
   [NODE_TYPES.TEMPLATE]: TemplateDetail,
   [NODE_TYPES.PSYSTEM]: PsystemDetail,
-  [NODE_TYPES.SPECIFICATION]: SpecificationDetail
+  [NODE_TYPES.SPECIFICATION]: SpecificationDetail,
+  [NODE_TYPES.PTYPE]: PtypeDetail,
+  'default': null
 }
 
 // 对话框组件映射
@@ -161,7 +168,8 @@ const dialogComponents: Record<string, any> = {
   [NODE_TYPES.PROJECT]: ProjectDialog,
   [NODE_TYPES.TEMPLATE]: TemplateDialog,
   [NODE_TYPES.PSYSTEM]: PsystemDialog,
-  [NODE_TYPES.SPECIFICATION]: SpecificationDialog
+  [NODE_TYPES.SPECIFICATION]: SpecificationDialog,
+  [NODE_TYPES.PTYPE]: PtypeDialog
 }
 
 // 获取节点图标
@@ -250,6 +258,8 @@ const getPropNameByType = (type?: string) => {
       return 'system'
     case NODE_TYPES.SPECIFICATION:
       return 'specification'
+    case NODE_TYPES.PTYPE:
+      return 'ptype'
     default:
       return 'item'
   }

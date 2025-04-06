@@ -1,4 +1,6 @@
 import { z } from 'zod';
+import { getColumns, packHeader } from '../column';
+import type { BasicProperty, TimeStamp } from '../entity';
 
 export interface ZdPType extends BasicProperty, TimeStamp {
 	isShow: boolean;

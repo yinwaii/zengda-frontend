@@ -8,6 +8,7 @@ export const NODE_TYPES = {
   TEMPLATE: 'project-template',
   PSYSTEM: 'psystem',
   SPECIFICATION: 'specification',
+  PTYPE: 'ptype',
 } as const
 
 export type NodeType = typeof NODE_TYPES[keyof typeof NODE_TYPES]
@@ -184,6 +185,23 @@ export const getSpecificationTreeNodeStruct: TreeNodeFactory<any> = (spec) => {
 }
 
 /**
+ * 将产品类型数据转换为树节点结构
+ */
+export const getPtypeTreeNodeStruct: TreeNodeFactory<any> = (ptype) => {
+  // 生成复合ID
+  const compositeId = generateCompositeId(NODE_TYPES.PTYPE, ptype.id)
+
+  return {
+    id: compositeId, // 使用复合ID
+    originalId: ptype.id, // 保留原始ID
+    label: ptype.name,
+    type: NODE_TYPES.PTYPE,
+    children: ptype.children?.map(getPtypeTreeNodeStruct) || [],
+    originalData: ptype,
+  }
+}
+
+/**
  * 组合多个树节点结构获取函数
  * @param factories 树节点结构获取函数列表
  * @returns 组合后的树节点结构获取函数
@@ -330,6 +348,9 @@ export const createTreeNodeFactory = (types: NodeType[]) => {
         break
       case NODE_TYPES.SPECIFICATION:
         factories[type] = getSpecificationTreeNodeStruct
+        break
+      case NODE_TYPES.PTYPE:
+        factories[type] = getPtypeTreeNodeStruct
         break
     }
   })

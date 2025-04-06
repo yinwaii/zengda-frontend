@@ -8,6 +8,7 @@ import type { ZdComponent } from '~/models/entity/component'
 import type { ZdBom } from '~/models/entity/bom'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdSpecificationMeta } from '~/models/entity/specification'
+import type { ZdPType } from '~/models/entity/ptype'
 
 /**
  * 实体处理函数的复用composable
@@ -359,6 +360,82 @@ export const useEntityHandlers = () => {
   }
 
   /**
+   * 处理产品类型保存
+   * @param data 产品类型数据
+   * @param reloadFunction 保存后刷新数据的函数
+   */
+  const handlePtypeSave = async (data: Partial<ZdPType>, reloadFunction: () => Promise<void>) => {
+    try {
+      // 准备数据，移除不需要的属性
+      const ptypeData = prepareEntityData(data)
+      
+      // 移除空的时间字段，避免数据库错误
+      if ('createdTime' in ptypeData && !ptypeData.createdTime) {
+        delete ptypeData.createdTime;
+      }
+      if ('updatedTime' in ptypeData && !ptypeData.updatedTime) {
+        delete ptypeData.updatedTime;
+      }
+      
+      console.log('提交产品类型数据:', ptypeData)
+      
+      // 调用API保存产品类型数据
+      await entityApis.ptype.update(ptypeData as ZdPType)
+      
+      toast.toast({
+        title: "成功",
+        description: "产品类型更新成功",
+      })
+      await reloadFunction()
+    } catch (error) {
+      console.error('更新产品类型失败:', error)
+      toast.toast({
+        title: "错误",
+        description: "更新产品类型失败",
+        variant: "destructive",
+      })
+    }
+  }
+  
+  /**
+   * 处理产品类型创建
+   * @param data 产品类型数据
+   * @param reloadFunction 创建后刷新数据的函数
+   */
+  const handlePtypeCreate = async (data: Partial<ZdPType>, reloadFunction: () => Promise<void>) => {
+    try {
+      // 准备数据，移除不需要的属性
+      const ptypeData = prepareEntityData(data)
+      
+      // 移除空的时间字段，避免数据库错误
+      if ('createdTime' in ptypeData && !ptypeData.createdTime) {
+        delete ptypeData.createdTime;
+      }
+      if ('updatedTime' in ptypeData && !ptypeData.updatedTime) {
+        delete ptypeData.updatedTime;
+      }
+      
+      console.log('提交产品类型数据:', ptypeData)
+      
+      // 调用API创建产品类型数据
+      await entityApis.ptype.create(ptypeData as ZdPType)
+      
+      toast.toast({
+        title: "成功",
+        description: "产品类型创建成功",
+      })
+      await reloadFunction()
+    } catch (error) {
+      console.error('创建产品类型失败:', error)
+      toast.toast({
+        title: "错误",
+        description: "创建产品类型失败",
+        variant: "destructive",
+      })
+    }
+  }
+
+  /**
    * 处理数据保存的通用函数
    * @param data 要保存的数据
    * @param nodeType 节点类型
@@ -380,6 +457,8 @@ export const useEntityHandlers = () => {
         return handleBomSave(data, reloadFunction)
       case NODE_TYPES.SPECIFICATION:
         return handleSpecificationSave(data, reloadFunction)
+      case NODE_TYPES.PTYPE:
+        return handlePtypeSave(data, reloadFunction)
       default:
         console.warn('未处理的节点类型:', nodeType)
     }
@@ -407,6 +486,8 @@ export const useEntityHandlers = () => {
         return handleBomCreate(data, reloadFunction)
       case NODE_TYPES.SPECIFICATION:
         return handleSpecificationCreate(data, reloadFunction)
+      case NODE_TYPES.PTYPE:
+        return handlePtypeCreate(data, reloadFunction)
       default:
         console.warn('未处理的节点类型:', nodeType)
     }
@@ -421,12 +502,14 @@ export const useEntityHandlers = () => {
     handleComponentSave,
     handleBomSave,
     handleSpecificationSave,
+    handlePtypeSave,
     handleProjectCreate,
     handleTemplateCreate,
     handleSystemCreate,
     handleComponentCreate,
     handleBomCreate,
     handleSpecificationCreate,
+    handlePtypeCreate,
     prepareEntityData
   }
-} 
+}
