@@ -38,7 +38,7 @@
           :is-editing="isEditing"
           @edit="startEditing"
           @cancel="cancelEditing"
-          @submit="handleSubmit"
+          @save="(data: any) => currentItem && emit('save', data, currentItem.type || 'default')"
         />
       </template>
       <template v-else>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h } from 'vue'
+import { ref, computed, h, toRaw } from 'vue'
 import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
@@ -274,13 +274,6 @@ const startEditing = () => {
 // 处理取消编辑
 const cancelEditing = () => {
   isEditing.value = false
-}
-
-// 处理提交
-const handleSubmit = (formData: any) => {
-  if (!currentItem.value) return
-  emit('save', formData, currentItem.value.type || 'default')
-  isEditing.value = false // 提交后退出编辑模式
 }
 
 // 处理添加新项

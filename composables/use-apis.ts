@@ -137,10 +137,17 @@ export const useApis = (baseUrl?: string) => {
 		},
 
 		post: <T>(url: string, body?: any, option?: any) => {
+			// 确保添加Content-Type头
+			const headers = {
+				'Content-Type': 'application/json',
+				...(option?.headers || {})
+			}
+			
 			return fetchWithResponse<T>(url, { 
 				method: 'post', 
 				body, 
-				...option 
+				...option,
+				headers
 			}, apiBase);
 		},
 
@@ -154,26 +161,47 @@ export const useApis = (baseUrl?: string) => {
 		},
 
 		put: <T>(url: string, body?: any, option?: any) => {
+			// 确保添加Content-Type头
+			const headers = {
+				'Content-Type': 'application/json',
+				...(option?.headers || {})
+			}
+			
 			return fetchWithResponse<T>(url, { 
 				method: 'put', 
 				body, 
-				...option 
+				...option,
+				headers
 			}, apiBase);
 		},
 
 		patch: <T>(url: string, body?: any, option?: any) => {
+			// 确保添加Content-Type头
+			const headers = {
+				'Content-Type': 'application/json',
+				...(option?.headers || {})
+			}
+			
 			return fetchWithResponse<T>(url, { 
 				method: 'patch', 
 				body, 
-				...option 
+				...option,
+				headers
 			}, apiBase);
 		},
 
 		delete: <T>(url: string, body?: any, option?: any) => {
+			// 确保添加Content-Type头
+			const headers = {
+				'Content-Type': 'application/json',
+				...(option?.headers || {})
+			}
+			
 			return fetchWithResponse<T>(url, { 
 				method: 'delete', 
 				body, 
-				...option 
+				...option,
+				headers
 			}, apiBase);
 		}
 	};

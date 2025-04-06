@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { MoreHorizontal } from 'lucide-vue-next'
-import { ZdParameter } from '~/models/entity/parameter'
+import type { ZdParameter } from '~/models/entity/parameter'
 
 defineProps<{
 	parameter: ZdParameter

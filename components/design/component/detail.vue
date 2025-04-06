@@ -107,6 +107,7 @@
 
 <script setup lang="ts">
 import { LucidePencil } from 'lucide-vue-next'
+import { toRaw } from 'vue'
 import { formatDate } from '~/utils/date'
 import type { ZdComponent } from '~/models/entity/component'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -158,16 +159,29 @@ const editForm = ref<Partial<ZdComponent>>({
 	value: component.value.value
 })
 
-const handleSubmit = () => {
+const handleSubmit = (event: Event) => {
+  // 阻止表单默认提交行为
+  if (event) event.preventDefault()
+  
   isEditing.value = false
   
-  // 合并原始数据和编辑表单数据
+  // 确保我们有原始id
+  const originalId = component.value.originalId || component.value.id
+  
+  // 获取编辑表单中的数据，确保这些是最新修改的值
+  const formData = toRaw(editForm.value)
+  
+  // 创建新对象，仅保留原始数据中我们需要的字段
   const updatedData = {
     ...component.value,
     ...editForm.value,
-    originalId: component.value.id, // 保持原始ID
+    id: component.value.originalId, // 保持原始ID
   }
   
-	emit('save', updatedData)
+  // 使用 JSON 序列化再解析来创建普通对象的深拷贝，移除 Proxy
+  const plainData = JSON.parse(JSON.stringify(updatedData))
+  
+  console.log('发送修改后的组件数据:', plainData)
+  emit('save', plainData)
 }
 </script> 

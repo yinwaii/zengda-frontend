@@ -55,7 +55,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { ZdPSystem } from '~/models/entity/psystem'
+import type { ZdPSystem } from '~/models/entity/psystem'
 
 const props = defineProps<{
   open: boolean
@@ -67,7 +67,7 @@ const emit = defineEmits<{
   (e: 'save', system: ZdPSystem): void
 }>()
 
-const form = ref<ZdPSystem>(new ZdPSystem())
+const form = ref<ZdPSystem>({} as ZdPSystem)
 const parentSystems = ref<ZdPSystem[]>([])
 const entityApis = useEntityApis()
 
@@ -87,14 +87,14 @@ watch(() => props.system, (newSystem) => {
   if (newSystem) {
     form.value = { ...newSystem }
   } else {
-    form.value = new ZdPSystem()
+    form.value = {} as ZdPSystem
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = new ZdPSystem()
+    form.value = {} as ZdPSystem
   }
 })
 
@@ -104,7 +104,10 @@ const setIsOpen = (value: boolean) => {
 }
 
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = (event: Event) => {
+  // 防止表单默认提交行为
+  if (event) event.preventDefault()
+  
   // 表单验证
   if (!form.value.name) {
     console.error('系统名称不能为空')

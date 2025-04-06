@@ -62,14 +62,14 @@ export const ZdTemplateFormConfig = {
 	specId: { label: '规格书ID' },
 }
 
-export class ZdTemplate implements ZdTemplate {
-	constructor() {
-		this.id = -1;
-		this.name = '';
-		this.productTypeId = -1;
-		this.productTypeName = '';
-		this.isCustomized = false;
-		this.isShow = false;
-		this.specId = undefined;
-	}
-} 
+// export class ZdTemplate implements ZdTemplate {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.name = '';
+// 		this.productTypeId = -1;
+// 		this.productTypeName = '';
+// 		this.isCustomized = false;
+// 		this.isShow = false;
+// 		this.specId = undefined;
+// 	}
+// } 

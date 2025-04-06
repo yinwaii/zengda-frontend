@@ -29,13 +29,13 @@ export const ZdComponentFormConfig = {
 	value: { label: '数量' },
 }
 
-export class ZdComponent implements ZdComponent {
-	constructor() {
-		this.id = 0;
-		this.name = '';
-		this.description = '';
-		this.isRequired = false;
-		this.isShow = false;
-	}
-}
+// export class ZdComponent implements ZdComponent {
+// 	constructor() {
+// 		this.id = 0;
+// 		this.name = '';
+// 		this.description = '';
+// 		this.isRequired = false;
+// 		this.isShow = false;
+// 	}
+// }
 

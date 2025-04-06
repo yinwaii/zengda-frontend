@@ -44,14 +44,14 @@ export const ZdParameterFormConfig = {
 	isDeleted: { label: '是否删除' },
 }
 
-export class ZdParameter implements ZdParameter {
-	constructor() {
-		this.id = -1;
-		this.name = '';
-		this.description = '';
-		this.objectId = -1;
-		this.objectType = '';
-		this.value = '';
-		this.isDeleted = false;
-	}
-}
+// export class ZdParameter implements ZdParameter {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.name = '';
+// 		this.description = '';
+// 		this.objectId = -1;
+// 		this.objectType = '';
+// 		this.value = '';
+// 		this.isDeleted = false;
+// 	}
+// }

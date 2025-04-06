@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="tsx">
-import { ZdParameter } from '~/models/entity/parameter'
+import type { ZdParameter } from '~/models/entity/parameter'
 import type { ColumnDef } from '@tanstack/vue-table'
 import { ref, h } from 'vue'
 import { useToast } from '@/components/ui/toast'

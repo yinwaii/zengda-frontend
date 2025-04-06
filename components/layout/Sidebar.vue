@@ -19,7 +19,7 @@ const props = defineProps<{
 					<shadcn-sidebar-menu>
 						<shadcn-sidebar-menu-item v-for="childItem in item.items" :key="childItem.title">
 							<shadcn-sidebar-menu-button as-child :is-active="childItem.isActive">
-								<a :href="childItem.url">{{ childItem.title }}</a>
+								<NuxtLink :to="childItem.url">{{ childItem.title }}</NuxtLink>
 							</shadcn-sidebar-menu-button>
 						</shadcn-sidebar-menu-item>
 					</shadcn-sidebar-menu>

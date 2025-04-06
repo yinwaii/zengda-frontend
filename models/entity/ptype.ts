@@ -24,12 +24,12 @@ export const ZdPTypeFormConfig = {
 	model: { label: '型号' },
 }
 
-export class ZdPType implements ZdPType {
-	constructor() {
-		this.id = -1;
-		this.name = '';
-		this.code = '';
-		this.model = '';
-		this.isShow = true;
-	}
-}
+// export class ZdPType implements ZdPType {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.name = '';
+// 		this.code = '';
+// 		this.model = '';
+// 		this.isShow = true;
+// 	}
+// }

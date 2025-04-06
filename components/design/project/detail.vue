@@ -71,26 +71,55 @@
 
 <script setup lang="ts">
 import { LucidePencil } from 'lucide-vue-next'
+import { toRaw, computed, ref } from 'vue'
 import { formatDate } from '~/utils/date'
+import type { ZdProject } from '~/models/entity/project'
+import type { ZdParameter } from '~/models/entity/parameter'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const props = defineProps<{
 	project: ZdProject
 	isEditing: boolean
 	parameters: ZdParameter[]
+	data?: TreeNodeData // 可选的树节点数据
 }>()
 
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ZdProject>]
+	save: [form: Partial<ZdProject>]
 }>()
 
-const editForm = ref<Partial<ZdProject>>({
-	name: props.project.name,
-	description: props.project.description
+// 计算属性，处理项目数据
+const project = computed(() => {
+	// 优先使用直接传入的project
+	return props.project || {}
 })
 
-const handleSubmit = () => {
-	emit('submit', editForm.value)
+const editForm = ref<Partial<ZdProject>>({
+	name: project.value.name,
+	description: project.value.description
+})
+
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+	
+	// 确保有原始ID
+	const originalId = project.value.id
+	
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(project.value),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ZdProject> & { originalId: number })
+	
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+	
+	console.log('发送修改后的项目数据:', plainData)
+	emit('save', plainData)
 }
 </script> 

@@ -176,7 +176,7 @@
 
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
-import { resolveComponent } from 'vue'
+import { resolveComponent, toRaw } from 'vue'
 import { LucidePencil, LucidePlus } from 'lucide-vue-next'
 import type { ZdBom, ZdBomChild } from '~/models/entity/bom'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -197,7 +197,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ZdBom>]
+	save: [form: Partial<ZdBom>]
 }>()
 
 const entityApis = useEntityApis()
@@ -241,16 +241,19 @@ const handleDeleteItem = async (item: ZdBomChild, index: number) => {
 	try {
 		// 创建一个新的BOM对象，移除指定索引的物料项
 		const updatedBom: ZdBom = {
-			...props.bom,
-			items: [...props.bom.items]
+			...toRaw(props.bom),
+			items: [...(props.bom.items || [])]
 		}
-		updatedBom.items.splice(index, 1)
+		
+		if (updatedBom.items && updatedBom.items.length > index) {
+			updatedBom.items.splice(index, 1)
+		}
 		
 		// 调用API更新BOM
 		await entityApis.bom.update(updatedBom)
 		
 		// 发出事件通知更新
-		emit('submit', updatedBom)
+		emit('save', updatedBom)
 	} catch (error) {
 		console.error('删除物料项失败:', error)
 		alert('删除物料项失败，请重试')
@@ -281,8 +284,12 @@ const handleItemSubmit = async (updatedItem: ZdBomChild) => {
 	try {
 		// 创建一个新的BOM对象，更新或添加物料项
 		const updatedBom: ZdBom = {
-			...props.bom,
-			items: [...props.bom.items]
+			...toRaw(props.bom),
+			items: [...(props.bom.items || [])]
+		}
+		
+		if (!updatedBom.items) {
+			updatedBom.items = []
 		}
 		
 		if (selectedItemIndex.value >= 0) {
@@ -297,7 +304,7 @@ const handleItemSubmit = async (updatedItem: ZdBomChild) => {
 		await entityApis.bom.update(updatedBom)
 		
 		// 发出事件通知更新
-		emit('submit', updatedBom)
+		emit('save', updatedBom)
 	} catch (error) {
 		console.error('更新物料项失败:', error)
 		alert('更新物料项失败，请重试')
@@ -326,9 +333,9 @@ const bomItemColumns = computed(() => [
 		enableHiding: false,
 		cell: ({ row }: { row: any }) => {
 			const item = row.original as ZdBomChild
-			const index = props.bom.items.findIndex(i => 
+			const index = props.bom.items ? props.bom.items.findIndex(i => 
 				i.itemId === item.itemId && i.bomId === item.bomId
-			)
+			) : -1
 			return h('div', { class: 'flex justify-end' }, [
 				h(resolveComponent('design-bom-item-actions'), {
 					onView: () => handleViewItem(item, index),
@@ -342,7 +349,25 @@ const bomItemColumns = computed(() => [
 	}
 ])
 
-const handleSubmit = () => {
-	emit('submit', editForm.value)
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+	
+	// 确保有原始ID
+	const originalId = props.bom.id
+	
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(props.bom),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ZdBom> & { originalId: number })
+	
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+	
+	console.log('发送修改后的BOM数据:', plainData)
+	emit('save', plainData)
 }
 </script> 

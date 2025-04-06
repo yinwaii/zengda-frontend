@@ -32,11 +32,11 @@ export const ZdTComponentFormConfig = {
 	description: { label: '描述' },
 }
 
-export class ZdTComponent implements ZdTComponent {
-	constructor() {
-		this.id = -1;
-		this.psystemId = -1;
-		this.templateId = -1;
-		this.componentId = -1;
-	}
-}
+// export class ZdTComponent implements ZdTComponent {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.psystemId = -1;
+// 		this.templateId = -1;
+// 		this.componentId = -1;
+// 	}
+// }

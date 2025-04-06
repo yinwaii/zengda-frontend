@@ -170,7 +170,10 @@ function toggleRole(roleId: number) {
 }
 
 // 提交分配
-async function handleSubmit() {
+async function handleSubmit(event: Event) {
+  // 防止表单默认提交行为
+  if (event) event.preventDefault()
+  
   if (!props.user?.userId) return
 
   // 没有分配任何权限, 直接关闭

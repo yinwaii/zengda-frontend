@@ -190,7 +190,10 @@ const loadPermissionData = async () => {
     }
 };
 
-const handleSubmit = async () => {
+const handleSubmit = async (event: Event) => {
+    // 防止表单默认提交行为
+    if (event) event.preventDefault()
+    
     if (!props.role?.roleId) return;
 
     if (checkedList.value.length === 0) {

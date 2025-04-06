@@ -36,16 +36,16 @@ export const ZdConfigurationFormConfig = {
 	componentConfig: { label: '组件配置' },
 }
 
-export class ZdConfiguration implements ZdConfiguration {
-	constructor() {
-		this.id = -1;
-		this.name = '';
-		this.template_id = -1;
-		// th
-		this.project_id = -1;
-		this.lastVersionId = -1;
-		this.valueConfig = '';
-		this.componentConfig = '';
-		this.isShow = false;
-	}
-}
+// export class ZdConfiguration implements ZdConfiguration {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.name = '';
+// 		this.template_id = -1;
+// 		// th
+// 		this.project_id = -1;
+// 		this.lastVersionId = -1;
+// 		this.valueConfig = '';
+// 		this.componentConfig = '';
+// 		this.isShow = false;
+// 	}
+// }

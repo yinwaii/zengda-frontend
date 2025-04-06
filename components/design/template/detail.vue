@@ -137,27 +137,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { toRaw } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdTemplate } from '~/models/entity/template'
 import type { ZdParameter } from '~/models/entity/parameter'
 import type { ZdPType } from '~/models/entity/ptype'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const props = defineProps<{
 	template: ZdTemplate
 	isEditing: boolean
 	parameters?: ZdParameter[]
+	data?: TreeNodeData // 可选的树节点数据
 }>()
 
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ZdTemplate>]
+	save: [form: Partial<ZdTemplate>]
 }>()
 
 const productTypes = ref<ZdPType[]>([])
 const entityApis = useEntityApis()
+
+// 计算属性，处理模板数据
+const template = computed(() => {
+	// 优先使用直接传入的template
+	return props.template || {}
+})
 
 // 获取产品类型列表
 onMounted(async () => {
@@ -176,14 +185,32 @@ const getProductTypeName = (typeId: number) => {
 }
 
 const editForm = ref<Partial<ZdTemplate>>({
-	name: props.template.name,
-	description: props.template.description,
-	productTypeId: props.template.productTypeId,
-	isShow: props.template.isShow,
-	isCustomized: props.template.isCustomized
+	name: template.value.name,
+	description: template.value.description,
+	productTypeId: template.value.productTypeId,
+	isShow: template.value.isShow,
+	isCustomized: template.value.isCustomized
 })
 
-const handleSubmit = () => {
-	emit('submit', editForm.value)
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+	
+	// 确保有原始ID
+	const originalId = template.value.id
+	
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(template.value),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ZdTemplate> & { originalId: number })
+	
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+	
+	console.log('发送修改后的模板数据:', plainData)
+	emit('save', plainData)
 }
 </script> 

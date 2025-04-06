@@ -1,4 +1,6 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useEntityApis } from '~/composables/use-entity-apis'
 
 export const useUserStore = defineStore('userStore', () => {
 	const token = ref('')

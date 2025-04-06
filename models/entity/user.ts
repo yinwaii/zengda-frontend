@@ -14,16 +14,16 @@ export interface ZdSession {
 	token: string
 }
 
-export class ZdUser implements ZdUser {
-	constructor() {
-		this.id = -1;
-		this.username = '';
-		this.password = '';
-		this.email = '';
-		this.phone = '';
-		this.role = '';
-	}
-}
+// export class ZdUser implements ZdUser {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.username = '';
+// 		this.password = '';
+// 		this.email = '';
+// 		this.phone = '';
+// 		this.role = '';
+// 	}
+// }
 
 export interface User {
 	userId: number

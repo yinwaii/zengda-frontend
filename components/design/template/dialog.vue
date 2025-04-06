@@ -48,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { ZdTemplate } from '~/models/entity/template'
+import type { ZdTemplate } from '~/models/entity/template'
 import type { ZdPType } from '~/models/entity/ptype'
 import { ref, watch, onMounted } from 'vue'
 
@@ -62,7 +62,7 @@ const emit = defineEmits<{
   (e: 'save', template: ZdTemplate): void
 }>()
 
-const form = ref<ZdTemplate>(new ZdTemplate())
+const form = ref<ZdTemplate>({} as ZdTemplate)
 const productTypes = ref<ZdPType[]>([])
 const entityApis = useEntityApis()
 
@@ -82,14 +82,14 @@ watch(() => props.template, (newTemplate) => {
   if (newTemplate) {
     form.value = { ...newTemplate }
   } else {
-    form.value = new ZdTemplate()
+    form.value = {} as ZdTemplate
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = new ZdTemplate()
+    form.value = {} as ZdTemplate
   }
 })
 
@@ -99,7 +99,10 @@ const setIsOpen = (value: boolean) => {
 }
 
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = (event: Event) => {
+  // 防止表单默认提交行为
+  if (event) event.preventDefault()
+  
   // 表单验证
   if (!form.value.name) {
     console.error('模板名称不能为空')

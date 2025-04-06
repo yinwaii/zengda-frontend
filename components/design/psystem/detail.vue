@@ -53,7 +53,11 @@
 						</div>
 						<div class="space-y-2">
 							<shadcn-label for="isDeleted">已删除</shadcn-label>
-							<shadcn-checkbox id="isDeleted" v-model="editForm.isDeleted" />
+							<shadcn-checkbox 
+								id="isDeleted" 
+								:model-value="Boolean(editForm.isDeleted)" 
+								@update:model-value="editForm.isDeleted = $event === 'indeterminate' ? false : $event" 
+							/>
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
@@ -138,25 +142,34 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { toRaw } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdPSystem } from '~/models/entity/psystem'
 import type { ZdParameter } from '~/models/entity/parameter'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const props = defineProps<{
 	system: ZdPSystem
 	isEditing: boolean
 	parameters?: ZdParameter[]
+	data?: TreeNodeData // 可选的树节点数据
 }>()
 
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ZdPSystem>]
+	save: [form: Partial<ZdPSystem>]
 }>()
 
 const parentSystems = ref<ZdPSystem[]>([])
 const entityApis = useEntityApis()
+
+// 计算属性，处理系统数据
+const system = computed(() => {
+	// 优先使用直接传入的system
+	return props.system || {}
+})
 
 // 获取可选父系统列表
 onMounted(async () => {
@@ -177,14 +190,32 @@ const getParentSystemName = (parentId: number) => {
 }
 
 const editForm = ref<Partial<ZdPSystem>>({
-	name: props.system.name,
-	description: props.system.description,
-	parentId: props.system.parentId,
-	docsUrl: props.system.docsUrl,
-	isDeleted: props.system.isDeleted
+	name: system.value.name,
+	description: system.value.description,
+	parentId: system.value.parentId,
+	docsUrl: system.value.docsUrl,
+	isDeleted: system.value.isDeleted
 })
 
-const handleSubmit = () => {
-	emit('submit', editForm.value)
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+	
+	// 确保有原始ID
+	const originalId = system.value.id
+	
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(system.value),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ZdPSystem> & { originalId: number })
+	
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+	
+	console.log('发送修改后的系统数据:', plainData)
+	emit('save', plainData)
 }
 </script> 

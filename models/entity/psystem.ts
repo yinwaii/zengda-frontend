@@ -35,15 +35,15 @@ export const ZdPSystemFormConfig = {
 	// parameters: { label: '参数' },
 }
 
-export class ZdPSystem implements ZdPSystem {
-	constructor() {
-		this.id = -1;
-		this.name = '';
-		this.isDeleted = true;
-		this.docsUrl = null;
-		this.parentId = -1;
-		this.description = '';
-		this.children = null;
-		this.parameters = null;
-	}
-}
+// export class ZdPSystem implements ZdPSystem {
+// 	constructor() {
+// 		this.id = -1;
+// 		this.name = '';
+// 		this.isDeleted = true;
+// 		this.docsUrl = null;
+// 		this.parentId = -1;
+// 		this.description = '';
+// 		this.children = null;
+// 		this.parameters = null;
+// 	}
+// }

@@ -10,26 +10,43 @@ import { parseOriginalId, generateCompositeId } from './treeNodeFactory'
  * @param id 任意格式的ID
  * @returns 原始数字ID
  */
-export const toApiId = (id: string | number | undefined | null): number | null => {
-	if (id === undefined || id === null) return null
+export function toApiId(id: string | number | null | undefined): number | null {
+	if (id === null || id === undefined) return null;
 
-	// 如果已经是数字，直接返回
-	if (typeof id === 'number') return id
+	try {
+		// 如果输入已经是数字，直接返回
+		if (typeof id === 'number') return id;
 
-	// 如果是字符串，检查是否为复合ID
-	if (typeof id === 'string') {
-		const originalId = parseOriginalId(id)
-		// 确保结果是数字
-		if (typeof originalId === 'number') return originalId
-
-		// 尝试将字符串转换为数字
-		const numId = Number(originalId)
-		if (!isNaN(numId) && isFinite(numId)) return numId
+		// 字符串处理
+		if (typeof id === 'string') {
+			// 检查是否为包含冒号的复合ID
+			if (id.includes(':')) {
+				// 从最后一个冒号分隔符后取出数字部分
+				const parts = id.split(':');
+				const numericPart = parts[parts.length - 1];
+				const parsed = parseInt(numericPart, 10);
+				
+				if (!isNaN(parsed)) {
+					console.log(`toApiId: 从复合ID "${id}" 提取纯数字ID: ${parsed}`);
+					return parsed;
+				}
+			} else {
+				// 尝试直接转换为数字
+				const parsed = parseInt(id, 10);
+				if (!isNaN(parsed)) {
+					console.log(`toApiId: 将字符串ID "${id}" 转换为数字: ${parsed}`);
+					return parsed;
+				}
+			}
+		}
+		
+		// 转换失败
+		console.warn(`toApiId: 无法将 ${typeof id} 类型的值 "${id}" 转换为有效的API ID`);
+		return null;
+	} catch (err) {
+		console.error(`toApiId: 转换ID "${id}" 时发生错误`, err);
+		return null;
 	}
-
-	// 尝试直接转换为数字
-	const numId = Number(id)
-	return !isNaN(numId) && isFinite(numId) ? numId : null
 }
 
 /**

@@ -1,7 +1,8 @@
 <script setup lang="tsx">
 import { navigateTo } from '#app'
 import { h, ref } from 'vue'
-import { ZdProject, ZdProjectColumns, ZdProjectColumnsVisibility } from '~/models/entity/project'
+import { ZdProjectColumns, ZdProjectColumnsVisibility } from '~/models/entity/project'
+import type { ZdProject } from '~/models/entity/project'
 import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
 

@@ -1,17 +1,17 @@
 <template>
 	<div class="p-4 h-full">
 		<div v-if="pageLoading" class="flex items-center justify-center h-full">
-					<div class="animate-pulse flex space-x-4">
-						<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
-						<div class="flex-1 space-y-3 py-1">
-							<div class="h-2 bg-accent-foreground/10 rounded"></div>
-							<div class="space-y-1">
-								<div class="h-2 bg-accent-foreground/10 rounded"></div>
-							</div>
-						</div>
-						</div>
+			<div class="animate-pulse flex space-x-4">
+				<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
+				<div class="flex-1 space-y-3 py-1">
+					<div class="h-2 bg-accent-foreground/10 rounded"></div>
+					<div class="space-y-1">
+						<div class="h-2 bg-accent-foreground/10 rounded"></div>
 					</div>
-					
+				</div>
+			</div>
+		</div>
+		
 		<design-dynamic-entity-tree
 			v-else
 			:tree-data="projectTreeData"
@@ -21,24 +21,27 @@
 			@node-toggle="handleNodeToggle"
 			@save="handleSave"
 			@create="handleCreate"
+			class="h-full"
 		/>
 	</div>
 	
 	<!-- 配置生成对话框 -->
-		<design-configuration-dialog 
-			:open="isConfigDialogOpen" 
+	<design-configuration-dialog 
+		:open="isConfigDialogOpen" 
 		:project-id="projectId"
-			@update:open="isConfigDialogOpen = $event"
-			@save="handleConfigSubmit"
+		@update:open="isConfigDialogOpen = $event"
+		@save="handleConfigSubmit"
 	/>
 </template>
 
 <script setup lang="ts">
-import { LucideSettings } from 'lucide-vue-next'
+import { ref, onMounted, computed } from 'vue'
 import { useToast } from '@/components/ui/toast'
+import { useRoute } from 'vue-router'
 import { useEntityTree } from '@/composables/useEntityTree'
 import { useEntityHandlers } from '@/composables/useEntityHandlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdConfiguration } from '~/models/entity/configuration'
 import { NODE_TYPES } from '~/utils/treeNodeFactory'
 
 // 添加 keepalive 配置
@@ -47,11 +50,14 @@ definePageMeta({
 	// 禁用缓存，减少内存占用
 	keepalive: false,
 	// 禁用页面过渡动画
-	pageTransition: false
+	pageTransition: false,
+	layout: 'default'
 })
 
-const { id } = useRoute().params
-const projectId = Number(id)
+// 通过路由获取项目ID
+const route = useRoute()
+const projectId = computed(() => Number(route.params.id))
+
 const toast = useToast()
 const entityApis = useEntityApis()
 const entityTree = useEntityTree()
@@ -82,6 +88,7 @@ const openConfigDialog = () => {
  */
 const handleSave = (data: any, nodeType: string) => {
 	console.log('保存数据:', data, '节点类型:', nodeType)
+	// 直接传递接收到的数据，不进行任何处理
 	return entityHandlers.handleSave(data, nodeType, loadSpecificProject)
 }
 
@@ -100,8 +107,9 @@ const loadSpecificProject = async () => {
 	pageLoading.value = true
 	try {
 		console.log('开始加载项目数据...')
+		
 		// 步骤1: 使用loadProjectById获取项目基本数据
-		const { treeData: projectData } = await entityTree.loadProjectById(projectId)
+		const { treeData: projectData } = await entityTree.loadProjectById(projectId.value)
 		
 		if (projectData.length === 0) {
 			toast.toast({
@@ -114,7 +122,7 @@ const loadSpecificProject = async () => {
 		}
 		
 		// 获取项目详情
-		const project = await entityApis.project.get(projectId)
+		const project = await entityApis.project.get(projectId.value)
 		if (!project) {
 			toast.toast({
 				title: "警告", 
@@ -125,18 +133,86 @@ const loadSpecificProject = async () => {
 			return
 		}
 		
+		console.log('项目数据加载成功:', project)
+		
+		// 确保项目有关联的模板
+		if (!project.templateId) {
+			console.warn('项目没有关联模板ID')
+			toast.toast({
+				title: "警告",
+				description: "项目未关联模板",
+				variant: "destructive", 
+			})
+			pageLoading.value = false
+			return
+		}
+		
+		console.log(`项目关联的模板ID: ${project.templateId}，开始加载模板数据`)
+		
+		// 步骤1.5: 显式加载模板数据
+		const projectWithTemplate = await entityTree.loadTemplateByProject(projectData)
+		console.log('加载模板数据完成', projectWithTemplate)
+		
 		// 步骤2: 使用loadEntityChildren一次性加载所有子元素
 		// 这样避免多次修改反应式数据，减少递归更新的可能性
 		console.log('加载项目所有子元素...')
-		const { treeData: completeData } = await entityTree.loadEntityChildren(projectData, {
+		const { treeData: completeData } = await entityTree.loadEntityChildren(projectWithTemplate, {
 			loadSystems: true,
 			loadComponents: true,
 			loadFullComponents: true,
 			loadBoms: true,
-			loadSpecifications: true
+			loadSpecifications: true  // 确保规格书加载选项为true
 		})
 		
+		// 步骤3: 显式为项目中的每个模板节点加载规格书数据
 		if (completeData.length > 0) {
+			console.log('显式为每个模板节点加载规格书数据...')
+			// 再次调用loadSpecificationByTemplate，确保规格书数据被正确加载
+			const enhancedData = await entityTree.loadSpecificationByTemplate(completeData)
+			console.log('规格书加载完成，更新数据')
+			
+			// 使用enhancedData替换completeData
+			completeData.splice(0, completeData.length, ...enhancedData)
+		}
+		
+		if (completeData.length > 0) {
+			console.log('完整项目数据加载成功:', completeData)
+			
+			// 检查规格书节点是否已加载
+			const checkSpecNodes = (node: TreeNodeData) => {
+				let specFound = false;
+				if (node.type === NODE_TYPES.SPECIFICATION) {
+					console.log('找到规格书节点:', node);
+					specFound = true;
+				}
+				
+				if (node.children?.length) {
+					for (const child of node.children) {
+						if (checkSpecNodes(child)) {
+							specFound = true;
+						}
+					}
+				}
+				return specFound;
+			};
+			
+			for (const rootNode of completeData) {
+				const hasSpecNode = checkSpecNodes(rootNode);
+				console.log(`根节点[${rootNode.id}]下${hasSpecNode ? '包含' : '不包含'}规格书节点`);
+				
+				// 检查模板节点
+				if (rootNode.children?.length) {
+					for (const templateNode of rootNode.children) {
+						if (templateNode.type === NODE_TYPES.TEMPLATE) {
+							console.log(`模板节点[${templateNode.id}]具有规格书ID:`, 
+								templateNode.originalData?.specId);
+							console.log(`模板节点[${templateNode.id}]下子节点:`, 
+								templateNode.children?.map(n => ({id: n.id, type: n.type})));
+						}
+					}
+				}
+			}
+			
 			// 一次性更新树数据
 			projectTreeData.value = completeData
 			
@@ -145,6 +221,7 @@ const loadSpecificProject = async () => {
 			// 如果有子节点，将第一层子节点也设为展开
 			if (completeData[0].children && completeData[0].children.length > 0) {
 				expandKeys.push(completeData[0].children[0].id)
+				console.log('设置展开节点:', expandKeys)
 			}
 			expandedKeys.value = expandKeys
 
@@ -194,15 +271,15 @@ const handleNodeToggle = (node: TreeNodeData, expanded: boolean) => {
  * 加载项目配置
  */
 const loadProjectConfiguration = async () => {
-	if (!projectId) return
+	if (!projectId.value) return
 	
 	try {
-		const project = await entityApis.project.get(projectId)
+		const project = await entityApis.project.get(projectId.value)
 		if (!project || !project.templateId) return
 		
 		const config = await entityApis.configuration.getByTemplateId(
 			project.templateId,
-			projectId
+			projectId.value
 		)
 		
 		if (config && config.id > 0) {

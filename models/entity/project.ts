@@ -149,12 +149,12 @@ export const ZdProjectColumnsVisibility = {
 	price: false,
 }
 
-export class ZdProject implements ZdProject {
-	constructor() {
-		this.id = 0
-		this.name = ''
-		this.description = ''
-		this.productTypeId = 0
-		this.templateId = 0
-	}
-} 
+// export class ZdProject implements ZdProject {
+// 	constructor() {
+// 		this.id = 0
+// 		this.name = ''
+// 		this.description = ''
+// 		this.productTypeId = 0
+// 		this.templateId = 0
+// 	}
+// } 

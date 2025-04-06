@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { ZdParameter } from '~/models/entity/parameter'
+import type { ZdParameter } from '~/models/entity/parameter'
 import { ref, computed, watch } from 'vue'
 
 const props = defineProps<{
@@ -83,7 +83,7 @@ const emit = defineEmits<{
 }>()
 
 // 表单状态
-const formState = ref<ZdParameter>(props.parameter ? { ...props.parameter } : new ZdParameter())
+const formState = ref<ZdParameter>(props.parameter ? { ...props.parameter } : {} as ZdParameter)
 const isSubmitting = ref(false)
 const isEdit = computed(() => !!props.parameter)
 
@@ -92,7 +92,7 @@ watch(() => props.parameter, (newVal) => {
   if (newVal) {
     formState.value = { ...newVal }
   } else {
-    formState.value = new ZdParameter()
+    formState.value = {} as ZdParameter
   }
 }, { immediate: true })
 

@@ -1,4 +1,5 @@
 import type { User } from "~/models/entity/user"
+import { useApis } from '~/composables/use-apis'
 
 export const useEntityApis = () => {
   const api = useApis(), systemApi = useApis('http://localhost:6990')

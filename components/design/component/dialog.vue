@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { ZdComponent } from '~/models/entity/component'
+import type { ZdComponent } from '~/models/entity/component'
 
 const props = defineProps<{
   open: boolean
@@ -54,21 +54,21 @@ const emit = defineEmits<{
   (e: 'save', component: ZdComponent): void
 }>()
 
-const form = ref<ZdComponent>(new ZdComponent())
+const form = ref<ZdComponent>({} as ZdComponent)
 
 // 监听组件变化，初始化表单
 watch(() => props.component, (newComponent) => {
   if (newComponent) {
     form.value = { ...newComponent }
   } else {
-    form.value = new ZdComponent()
+    form.value = {} as ZdComponent
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = new ZdComponent()
+    form.value = {} as ZdComponent
   }
 })
 
@@ -78,7 +78,10 @@ const setIsOpen = (value: boolean) => {
 }
 
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = (event: Event) => {
+  // 防止表单默认提交行为
+  if (event) event.preventDefault()
+  
   // 表单验证
   if (!form.value.name) {
     console.error('组件名称不能为空')

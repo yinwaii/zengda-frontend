@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { ZdProject } from '~/models/entity/project'
+import type { ZdProject } from '~/models/entity/project'
 import type { ZdTemplate } from '~/models/entity/template'
 import { ref, watch, onMounted } from 'vue'
 
@@ -69,7 +69,7 @@ const emit = defineEmits<{
   (e: 'save', project: ZdProject): void
 }>()
 
-const form = ref<ZdProject>(new ZdProject())
+const form = ref<ZdProject>({} as ZdProject)
 const templates = ref<ZdTemplate[]>([])
 const productTypes = ref<any[]>([])
 const entityApis = useEntityApis()
@@ -100,14 +100,14 @@ watch(() => props.project, (newProject) => {
   if (newProject) {
     form.value = { ...newProject }
   } else {
-    form.value = new ZdProject()
+    form.value = {} as ZdProject
   }
 }, { immediate: true })
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
   if (!isOpen) {
-    form.value = new ZdProject()
+    form.value = {} as ZdProject
   }
 })
 
@@ -117,7 +117,10 @@ const setIsOpen = (value: boolean) => {
 }
 
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = (event: Event) => {
+  // 防止表单默认提交行为
+  if (event) event.preventDefault()
+  
   // 表单验证
   if (!form.value.name) {
     // 可以使用toast组件显示错误

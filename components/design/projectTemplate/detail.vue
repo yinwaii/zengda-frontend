@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, toRaw } from 'vue'
 import { LucidePencil } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -109,7 +109,7 @@ const props = defineProps<{
 const emit = defineEmits<{
 	edit: []
 	cancel: []
-	submit: [form: Partial<ProjectTemplate>]
+	save: [form: Partial<ProjectTemplate>]
 }>()
 
 const editForm = ref<Partial<ProjectTemplate>>({
@@ -119,7 +119,25 @@ const editForm = ref<Partial<ProjectTemplate>>({
 	version: props.projectTemplate.version
 })
 
-const handleSubmit = () => {
-	emit('submit', editForm.value)
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+	
+	// 确保有原始ID
+	const originalId = props.projectTemplate.id
+	
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(props.projectTemplate),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ProjectTemplate> & { originalId: number })
+	
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+	
+	console.log('发送修改后的模板数据:', plainData)
+	emit('save', plainData)
 }
 </script> 
