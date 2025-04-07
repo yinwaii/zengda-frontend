@@ -61,10 +61,10 @@
 
 <script setup lang="ts">
 import { ref, computed, h, toRaw } from 'vue'
-import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus, LucideTag } from 'lucide-vue-next'
+import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus, LucideTag, LucideSettings2, LucideLayoutTemplate, LucidePackage, LucideComponent, LucideFileSpreadsheet, LucideBoxes } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 // 导入各模块的组件
@@ -82,6 +82,8 @@ import SpecificationDetail from '~/components/design/specification/detail.vue'
 import SpecificationDialog from '~/components/design/specification/dialog.vue'
 import PtypeDetail from '~/components/design/ptype/detail.vue'
 import PtypeDialog from '~/components/design/ptype/dialog.vue'
+import ConfigurationDetail from '~/components/design/configuration/detail.vue'
+import ConfigurationDialog from '~/components/design/configuration/dialog.vue'
 
 const props = defineProps<{
   treeData: TreeNodeData[]
@@ -113,28 +115,30 @@ const dialogType = ref('')
 const dialogProps = ref<Record<string, any>>({})
 const expandedKeys = ref<(string | number)[]>(props.defaultExpandedKeys || [])
 
-// 图标映射
+// 节点类型对应的图标
 const iconMap: Record<string, any> = {
-  [NODE_TYPES.BOM]: LucideBox,
-  [NODE_TYPES.COMPONENT]: LucideCpu,
-  [NODE_TYPES.PROJECT]: LucideFolder,
-  [NODE_TYPES.TEMPLATE]: LucideFile,
-  [NODE_TYPES.PSYSTEM]: LucideSettings,
-  [NODE_TYPES.SPECIFICATION]: LucideCode,
-  [NODE_TYPES.PTYPE]: LucideTag,
-  'default': LucideFile
+  PROJECT: LucideFolder,
+  COMPONENT: LucideComponent,
+  BOM: LucidePackage,
+  PSYSTEM: LucideCode,
+  TEMPLATE: LucideLayoutTemplate,
+  SPECIFICATION: LucideFileSpreadsheet,
+  CONFIGURATION: LucideSettings2,
+  PTYPE: LucideBoxes,
+  default: LucideFile
 }
 
-// 图标颜色映射
+// 节点类型对应的图标颜色
 const iconColorMap: Record<string, string> = {
-  [NODE_TYPES.BOM]: 'text-blue-500',
-  [NODE_TYPES.COMPONENT]: 'text-green-500',
-  [NODE_TYPES.PROJECT]: 'text-yellow-500',
-  [NODE_TYPES.TEMPLATE]: 'text-purple-500',
-  [NODE_TYPES.PSYSTEM]: 'text-red-500',
-  [NODE_TYPES.SPECIFICATION]: 'text-indigo-500',
-  [NODE_TYPES.PTYPE]: 'text-orange-500',
-  'default': 'text-gray-500'
+  PROJECT: 'text-yellow-500',
+  COMPONENT: 'text-violet-500',
+  BOM: 'text-green-500',
+  PSYSTEM: 'text-blue-500',
+  TEMPLATE: 'text-orange-500',
+  SPECIFICATION: 'text-indigo-500',
+  CONFIGURATION: 'text-cyan-500',
+  PTYPE: 'text-pink-500',
+  default: 'text-gray-500'
 }
 
 // 组件映射
@@ -158,6 +162,7 @@ const detailComponents: Record<string, any> = {
   [NODE_TYPES.PSYSTEM]: PsystemDetail,
   [NODE_TYPES.SPECIFICATION]: SpecificationDetail,
   [NODE_TYPES.PTYPE]: PtypeDetail,
+  [NODE_TYPES.CONFIGURATION]: ConfigurationDetail,
   'default': null
 }
 
@@ -169,7 +174,8 @@ const dialogComponents: Record<string, any> = {
   [NODE_TYPES.TEMPLATE]: TemplateDialog,
   [NODE_TYPES.PSYSTEM]: PsystemDialog,
   [NODE_TYPES.SPECIFICATION]: SpecificationDialog,
-  [NODE_TYPES.PTYPE]: PtypeDialog
+  [NODE_TYPES.PTYPE]: PtypeDialog,
+  [NODE_TYPES.CONFIGURATION]: ConfigurationDialog
 }
 
 // 获取节点图标
@@ -260,6 +266,8 @@ const getPropNameByType = (type?: string) => {
       return 'specification'
     case NODE_TYPES.PTYPE:
       return 'ptype'
+    case NODE_TYPES.CONFIGURATION:
+      return 'configuration'
     default:
       return 'item'
   }

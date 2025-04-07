@@ -27,22 +27,24 @@
 	
 	<!-- 配置生成对话框 -->
 		<design-configuration-dialog 
-			:open="isConfigDialogOpen" 
-		:project-id="projectId"
-			@update:open="isConfigDialogOpen = $event"
-			@save="handleConfigSubmit"
+			:modelValue="isConfigDialogOpen"
+			@update:modelValue="isConfigDialogOpen = $event"
+			:project-id="projectId"
+			:editing-item="editingConfigItem"
+			@submit="handleConfigSubmit"
 	/>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useRoute } from 'vue-router'
 import { useEntityTree } from '@/composables/useEntityTree'
 import { useEntityHandlers } from '@/composables/useEntityHandlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdConfiguration } from '~/models/entity/configuration'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { toApiId } from '~/utils/idConverter'
+// import { NODE_TYPES } from 'models/entity/node-types'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -71,6 +73,7 @@ const pageLoading = ref(true)
 
 // 配置对话框状态
 const isConfigDialogOpen = ref(false)
+const editingConfigItem = ref<ZdConfiguration | undefined>(undefined)
 const projectConfiguration = ref<ZdConfiguration | null>(null)
 
 // 默认展开的节点
@@ -79,7 +82,8 @@ const expandedKeys = ref<(string | number)[]>([])
 /**
  * 打开配置对话框
  */
-const openConfigDialog = () => {
+const openConfigDialog = (config?: ZdConfiguration) => {
+	editingConfigItem.value = config
 	isConfigDialogOpen.value = true
 }
 
@@ -173,6 +177,14 @@ const loadSpecificProject = async () => {
 			
 			// 使用enhancedData替换completeData
 			completeData.splice(0, completeData.length, ...enhancedData)
+			
+			// 步骤4: 显式加载配置节点数据
+			console.log('显式加载配置节点数据...')
+			const dataWithConfig = await entityTree.loadConfigurationByProject(completeData)
+			console.log('配置节点加载完成，更新数据')
+			
+			// 使用dataWithConfig替换completeData
+			completeData.splice(0, completeData.length, ...dataWithConfig)
 		}
 		
 		if (completeData.length > 0) {
@@ -277,13 +289,21 @@ const loadProjectConfiguration = async () => {
 		const project = await entityApis.project.get(projectId.value)
 		if (!project || !project.templateId) return
 		
-		const config = await entityApis.configuration.getByTemplateId(
+		// 使用toApiId转换项目ID为纯数字
+		const projectNumericId = toApiId(projectId.value)
+		if (projectNumericId === null) {
+			console.error('无法将项目ID转换为有效的数字ID')
+			return
+		}
+		
+		const configList = await entityApis.configuration.getByTemplateId(
 			project.templateId,
-			projectId.value
+			projectNumericId
 		)
 		
-		if (config && config.id > 0) {
-			projectConfiguration.value = config
+		if (configList && configList.list && configList.list.length > 0) {
+			// 获取第一个配置作为当前项目配置
+			projectConfiguration.value = configList.list[0]
 		} else {
 			projectConfiguration.value = null
 		}
@@ -306,15 +326,26 @@ const handleConfigSubmit = async (configuration: ZdConfiguration) => {
 				description: "更新配置成功",
 			})
 		} else {
-			await entityApis.configuration.create(configuration)
+			// 创建时使用纯数字ID
+			const projectNumericId = toApiId(projectId.value)
+			// 确保项目ID是有效的数字
+			if (projectNumericId === null) {
+				throw new Error('无法将项目ID转换为有效的数字ID')
+			}
+			
+			const configWithCorrectId = {
+				...configuration,
+				project_id: projectNumericId
+			}
+			await entityApis.configuration.create(configWithCorrectId)
 			toast.toast({
 				title: "成功",
 				description: "创建配置成功",
 			})
 		}
 		
-		// 重新加载配置
-		await loadProjectConfiguration()
+		// 重新加载项目树数据
+		await loadSpecificProject()
 		
 		// 关闭对话框
 		isConfigDialogOpen.value = false

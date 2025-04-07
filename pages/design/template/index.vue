@@ -228,7 +228,7 @@ const onClick = (row: ZdTemplateType) => {
 			:on-row-click="onClick"></abstract-data-table>
 
 		<!-- 编辑对话框 -->
-		<design-project-template-dialog v-model:open="dialogVisible" :template="editingTemplate"
+		<design-template-dialog v-model:open="dialogVisible" :template="editingTemplate"
 			@save="handleTemplateSubmit" />
 	</div>
 </template>

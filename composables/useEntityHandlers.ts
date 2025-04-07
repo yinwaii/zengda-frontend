@@ -1,5 +1,5 @@
 import { useToast } from '@/components/ui/toast'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 import { toApiId } from '~/utils/idConverter'
 import type { ZdProject } from '~/models/entity/project'
 import type { ZdTemplate } from '~/models/entity/template'
@@ -512,4 +512,4 @@ export const useEntityHandlers = () => {
     handlePtypeCreate,
     prepareEntityData
   }
-}
+} 

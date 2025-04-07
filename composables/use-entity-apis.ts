@@ -76,9 +76,13 @@ export const useEntityApis = () => {
       delete: (id: number) => api.delete<ZdParameter>(`/parameter/${id}`)
     },
 
+    argument: {
+      
+    },
+
     configuration: {
       get: (id: number) => api.get<ZdConfiguration>(`/configuration/${id}`),
-      getByTemplateId: (templateId: number, projectId: number) => api.get<ZdConfiguration>('/configuration/', { tid: templateId, pid: projectId }),
+      getByTemplateId: (templateId: number, projectId: number) => api.get<VOList<ZdConfiguration>>('/configuration/', { tid: templateId, pid: projectId }),
       create: (data: ZdConfiguration) => api.post<ZdConfiguration>('/configuration/', data),
       update: (data: ZdConfiguration) => api.put<ZdConfiguration>('/configuration', data),
       delete: (id: number) => api.delete<ZdConfiguration>(`/configuration/${id}`)

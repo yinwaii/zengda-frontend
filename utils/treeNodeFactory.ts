@@ -1,15 +1,10 @@
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdConfiguration } from '~/models/entity/configuration'
+import type { ZdTemplate } from '~/models/entity/template'
+import type { TreeNode } from '~/models/tree-node'
+import { NODE_TYPES } from '~/models/entity/node-types'
 
-// 定义节点类型常量
-export const NODE_TYPES = {
-  BOM: 'bom',
-  COMPONENT: 'component',
-  PROJECT: 'project',
-  TEMPLATE: 'project-template',
-  PSYSTEM: 'psystem',
-  SPECIFICATION: 'specification',
-  PTYPE: 'ptype',
-} as const
+// 定义节点类型常量已迁移到models/entity/node-types.ts
 
 export type NodeType = typeof NODE_TYPES[keyof typeof NODE_TYPES]
 
@@ -202,6 +197,23 @@ export const getPtypeTreeNodeStruct: TreeNodeFactory<any> = (ptype) => {
 }
 
 /**
+ * 将配置数据转换为树节点结构
+ */
+export const getConfigurationTreeNodeStruct: TreeNodeFactory<any> = (config) => {
+  // 生成复合ID
+  const compositeId = generateCompositeId(NODE_TYPES.CONFIGURATION, config.id)
+
+  return {
+    id: compositeId, // 使用复合ID
+    originalId: config.id, // 保留原始ID
+    label: config.name || `配置 ${config.id}`, // 使用名称作为显示标签，如果没有名称则使用ID
+    type: NODE_TYPES.CONFIGURATION,
+    children: config.children?.map(getConfigurationTreeNodeStruct) || [],
+    originalData: config,
+  }
+}
+
+/**
  * 组合多个树节点结构获取函数
  * @param factories 树节点结构获取函数列表
  * @returns 组合后的树节点结构获取函数
@@ -352,23 +364,67 @@ export const createTreeNodeFactory = (types: NodeType[]) => {
       case NODE_TYPES.PTYPE:
         factories[type] = getPtypeTreeNodeStruct
         break
+      case NODE_TYPES.CONFIGURATION:
+        factories[type] = getConfigurationTreeNodeStruct
+        break
     }
   })
 
   return combineTreeNodeFactories(factories)
 }
 
+// 创建配置节点
+export const createConfigurationNode = (
+  configuration: ZdConfiguration,
+  template: ZdTemplate
+): TreeNode => {
+  return {
+    id: `configuration-${configuration.id}`,
+    name: `${template.name}配置`,
+    type: NODE_TYPES.CONFIGURATION,
+    expanded: false,
+    children: [],
+    data: {
+      id: configuration.id,
+      type: NODE_TYPES.CONFIGURATION,
+      template_id: configuration.template_id,
+      project_id: configuration.project_id,
+      entity: configuration
+    }
+  }
+}
+
+// 创建模板节点
+export const createTemplateNode = (
+  template: ZdTemplate
+): TreeNode => {
+  return {
+    id: `template-${template.id}`,
+    name: template.name,
+    type: NODE_TYPES.TEMPLATE,
+    expanded: false,
+    children: [],
+    data: {
+      id: template.id,
+      type: NODE_TYPES.TEMPLATE,
+      entity: template
+    }
+  }
+}
+
 // 导出所有函数
-// export {
-//   generateCompositeId,
-//   parseOriginalId,
-//   parseNodeType,
-//   getBomTreeNodeStruct,
-//   getComponentTreeNodeStruct,
-//   getProjectTreeNodeStruct,
-//   getTemplateTreeNodeStruct,
-//   getPsystemTreeNodeStruct,
-//   getSpecificationTreeNodeStruct,
-//   combineTreeNodeFactories,
-//   createTreeNodeFactory
-// } 
+export const treeNodeFactory = {
+  generateCompositeId,
+  parseOriginalId,
+  parseNodeType,
+  getBomTreeNodeStruct,
+  getComponentTreeNodeStruct,
+  getProjectTreeNodeStruct,
+  getTemplateTreeNodeStruct,
+  getPsystemTreeNodeStruct,
+  getSpecificationTreeNodeStruct,
+  combineTreeNodeFactories,
+  createTreeNodeFactory,
+  createConfigurationNode,
+  createTemplateNode
+} 

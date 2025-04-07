@@ -1,5 +1,6 @@
 import { ref } from 'vue'
-import { createTreeNodeFactory, NODE_TYPES, generateCompositeId } from '~/utils/treeNodeFactory'
+import { createTreeNodeFactory, generateCompositeId, getConfigurationTreeNodeStruct } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 import { convertApiResponseIds, toApiId } from '~/utils/idConverter'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdProject } from '~/models/entity/project'
@@ -9,6 +10,7 @@ import type { ZdComponent } from '~/models/entity/component'
 import type { ZdTComponent } from '~/models/entity/tcompoment'
 import type { ZdBom } from '~/models/entity/bom'
 import type { ZdSpecification } from '~/models/entity/specification'
+import type { ZdConfiguration } from '~/models/entity/configuration'
 import type { VOPaged, VOList } from '~/models/entity'
 import type { ExtendedZdTComponent } from '~/types/extended'
 
@@ -30,6 +32,7 @@ export const useEntityTree = () => {
   const componentTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.COMPONENT])
   const bomTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.BOM])
   const specificationTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.SPECIFICATION])
+  const configurationTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.CONFIGURATION])
 
   /**
    * 加载项目数据并创建项目节点
@@ -680,6 +683,76 @@ export const useEntityTree = () => {
   }
 
   /**
+   * 根据项目ID加载配置数据并挂载到项目节点下
+   * @param projectNodes 项目节点数组
+   * @returns 更新后的项目节点数组
+   */
+  const loadConfigurationByProject = async (projectNodes: TreeNodeData[]): Promise<TreeNodeData[]> => {
+    // 处理空数组入参
+    if (!projectNodes || projectNodes.length === 0) {
+      return projectNodes || []
+    }
+
+    try {
+      // 对每个项目节点处理
+      for (const projectNode of projectNodes) {
+        // 增强检查，确保originalData存在且有效
+        if (!projectNode || !projectNode.originalData) {
+          console.warn('发现无效项目节点', projectNode)
+          continue
+        }
+
+        const project = projectNode.originalData as ZdProject
+        // 增强ID检查
+        if (!project || typeof project.id === 'undefined' || project.id === null) {
+          console.warn('发现无效项目数据', project)
+          continue
+        }
+
+        // 确保项目有关联的模板ID
+        if (!project.templateId) {
+          console.warn(`项目 ${project.id} 没有关联模板`)
+          continue
+        }
+
+        try {
+          // 获取项目关联的配置
+          const configId = toApiId(project.id)
+          const configResponse = await entityApis.configuration.getByTemplateId(project.templateId, configId ?? 0)
+          
+          if (configResponse && configResponse.list && configResponse.list.length > 0) {
+            // 遍历配置列表，为每个配置创建树节点
+            for (const config of configResponse.list) {
+              // 转换API响应中的ID为前端使用的复合ID
+              const configWithCompositeId = {
+                ...config,
+                id: generateCompositeId(NODE_TYPES.CONFIGURATION, config.id)
+              }
+
+              // 将配置转换为树节点
+              const configNode = configurationTreeNodeFactory(configWithCompositeId)
+
+              // 将配置节点插入到项目子节点的最前面
+              projectNode.children = [configNode].concat(projectNode.children || [])
+              console.log(`为项目 ${project.id} 添加了配置节点 ${config.id}`)
+            }
+          } else {
+            console.warn(`未找到项目 ${project.id} 关联的配置`)
+          }
+        } catch (err) {
+          console.error(`加载项目 ${project.id} 的配置失败:`, err)
+        }
+      }
+
+      return projectNodes
+    } catch (err) {
+      console.error('加载配置数据失败:', err)
+      error('加载配置数据失败')
+      return projectNodes
+    }
+  }
+
+  /**
    * 完整加载实体树数据，包括项目、模板、系统、组件、BOM和规格等
    * @param options 可选的加载选项
    * @returns 树节点数据
@@ -1155,6 +1228,7 @@ export const useEntityTree = () => {
     loadBomByComponent,
     loadSpecificationByTemplate,
     loadSpecificationByPSystem,
+    loadConfigurationByProject,
     
     // 工具函数
     findPSystemNode,
@@ -1167,6 +1241,7 @@ export const useEntityTree = () => {
     psystemTreeNodeFactory,
     componentTreeNodeFactory,
     bomTreeNodeFactory,
-    specificationTreeNodeFactory
+    specificationTreeNodeFactory,
+    configurationTreeNodeFactory
   }
 } 

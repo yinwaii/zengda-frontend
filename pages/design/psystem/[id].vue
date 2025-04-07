@@ -30,7 +30,7 @@ import { useToast } from '@/components/ui/toast'
 import { useEntityTree } from '@/composables/useEntityTree'
 import { useEntityHandlers } from '@/composables/useEntityHandlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 
 // 添加 keepalive 配置
 definePageMeta({

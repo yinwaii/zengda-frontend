@@ -26,11 +26,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useEntityTree } from '@/composables/useEntityTree'
 import { useEntityHandlers } from '@/composables/useEntityHandlers'
-import { NODE_TYPES, generateCompositeId, getPtypeTreeNodeStruct } from '~/utils/treeNodeFactory'
+import { useEntityApis } from '@/composables/use-entity-apis'
+import { NODE_TYPES } from '~/models/entity/node-types'
+import { generateCompositeId, getPtypeTreeNodeStruct } from '~/utils/treeNodeFactory'
 import { toApiId } from '~/utils/idConverter'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdPType } from '~/models/entity/ptype'
@@ -58,6 +60,7 @@ const entityHandlers = useEntityHandlers()
 const pageLoading = ref(true)
 const ptypeTreeData = ref<TreeNodeData[]>([])
 const expandedKeys = ref<(string | number)[]>([])
+const editingPType = ref<ZdPType | undefined>(undefined)
 
 /**
  * 根据产品类型ID加载模板数据
@@ -79,7 +82,7 @@ const loadTemplateByPType = async (ptypeData: TreeNodeData[]): Promise<TreeNodeD
     
     // 筛选出productTypeId匹配当前产品类型的模板
     const currentPType = ptypeData[0].originalData as ZdPType
-    const matchingTemplates = templates.filter(template => 
+    const matchingTemplates = templates.filter((template: ZdTemplate) => 
       template.productTypeId === toApiId(currentPType.id)
     )
     
@@ -88,7 +91,7 @@ const loadTemplateByPType = async (ptypeData: TreeNodeData[]): Promise<TreeNodeD
     if (matchingTemplates.length === 0) return ptypeData
     
     // 将匹配的模板转换为节点并添加到产品类型节点下
-    const templateNodes = matchingTemplates.map(template => {
+    const templateNodes = matchingTemplates.map((template: ZdTemplate) => {
       // 转换模板为节点
       const templateWithCompositeId = {
         ...template,
@@ -176,6 +179,9 @@ const loadPTypeData = async () => {
       pageLoading.value = false
       return
     }
+    
+    // 保存产品类型数据用于编辑
+    editingPType.value = ptype
     
     // 使用产品类型节点工厂创建节点
     const ptypeNode = {

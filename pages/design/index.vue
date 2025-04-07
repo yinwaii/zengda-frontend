@@ -13,7 +13,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useToast } from '@/components/ui/toast'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const toast = useToast()

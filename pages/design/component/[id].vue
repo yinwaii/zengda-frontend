@@ -32,7 +32,7 @@ import { useToast } from '@/components/ui/toast'
 import { useRouter, useRoute } from 'vue-router'
 import { useEntityTree } from '@/composables/useEntityTree'
 import { useEntityHandlers } from '@/composables/useEntityHandlers'
-import { NODE_TYPES } from '~/utils/treeNodeFactory'
+import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 // 路由和API
