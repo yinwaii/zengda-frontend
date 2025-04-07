@@ -2,9 +2,11 @@ import type { User } from "~/models/entity/user"
 import { useApis } from '~/composables/use-apis'
 
 export const useEntityApis = () => {
-  const api = useApis(), systemApi = useApis('http://localhost:6990')
+  const api = useApis()
   const config = useRuntimeConfig()
   const apiBase = config.public.apiBase as string || ''
+  const dufsServer = config.dufsServer || process.env.DUFS_SERVER || 'http://localhost:6990'
+  const systemApi = useApis(dufsServer)
 
   return {
     // User APIs
