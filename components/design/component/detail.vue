@@ -35,12 +35,12 @@
 							<shadcn-checkbox id="isRequired" v-model="editForm.isRequired" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="price">价格</shadcn-label>
+							<shadcn-label for="price">价格计算公式/默认价格</shadcn-label>
 							<shadcn-input id="price" v-model="editForm.price" />
 						</div>
 						<div class="space-y-2">
-							<shadcn-label for="value">数量</shadcn-label>
-							<shadcn-input id="value" v-model="editForm.value" />
+							<shadcn-label for="compValue">价格</shadcn-label>
+							<shadcn-input id="compValue" v-model="editForm.compValue" />
 						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="isEditing = false">
@@ -75,12 +75,12 @@
 							</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
+							<dt class="text-sm font-medium text-muted-foreground">价格计算公式/默认价格</dt>
 							<dd class="mt-1">{{ component.price || '未设置' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">数量</dt>
-							<dd class="mt-1">{{ component.value || '未设置' }}</dd>
+							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
+							<dd class="mt-1">{{ component.compValue || '未设置' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">BOM ID</dt>
@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { LucidePencil } from 'lucide-vue-next'
-import { toRaw } from 'vue'
+import { toRaw, ref, computed, watch } from 'vue'
 import { formatDate } from '~/utils/date'
 import type { ZdComponent } from '~/models/entity/component'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -115,27 +115,21 @@ import type { ZdBom } from '~/models/entity/bom'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 
 const props = defineProps<{
-	data: TreeNodeData, // 明确定义为TreeNodeData类型
+	data: TreeNodeData,
 	component: ZdComponent,
 	parameters?: ZdParameter[],
-	bom?: ZdBom // 添加可选的BOM属性
+	bom?: ZdBom
 }>()
 
 // 计算组件数据，优先使用component，如果不存在则从data中提取
 const component = computed(() => {
-  // 如果直接提供了component属性，则使用它
   if (props.component) return props.component
-  
-  // 否则从data.originalData中获取组件数据，添加空值检查
   return props.data && props.data.originalData ? props.data.originalData : props.data || {}
 })
 
 // 获取关联的BOM数据
 const bomData = computed(() => {
-  // 如果直接提供了bom属性，则使用它
   if (props.bom) return props.bom
-  
-  // 否则从data中查找bomData属性
   return props.data && props.data.bomData ? props.data.bomData : null
 })
 
@@ -156,26 +150,38 @@ const editForm = ref<Partial<ZdComponent>>({
 	isShow: component.value.isShow,
 	isRequired: component.value.isRequired,
 	price: component.value.price,
-	value: component.value.value
+	compValue: component.value.compValue,
+	bomId: component.value.bomId
 })
 
+// 监听组件数据变化，更新表单
+watch(() => component.value, (newComponent) => {
+  if (newComponent) {
+    editForm.value = {
+      id: newComponent.id,
+      name: newComponent.name,
+      description: newComponent.description,
+      isShow: newComponent.isShow,
+      isRequired: newComponent.isRequired,
+      price: newComponent.price,
+      compValue: newComponent.compValue,
+      bomId: newComponent.bomId
+    }
+  }
+}, { immediate: true })
+
 const handleSubmit = (event: Event) => {
-  // 阻止表单默认提交行为
   if (event) event.preventDefault()
   
   isEditing.value = false
   
-  // 确保我们有原始id
-  const originalId = component.value.originalId || component.value.id
-  
-  // 获取编辑表单中的数据，确保这些是最新修改的值
+  // 获取编辑表单中的数据
   const formData = toRaw(editForm.value)
   
-  // 创建新对象，仅保留原始数据中我们需要的字段
-  const updatedData = {
-    ...component.value,
-    ...editForm.value,
-    id: component.value.originalId, // 保持原始ID
+  // 创建新对象，确保包含id
+  const updatedData: Partial<ZdComponent> = {
+    id: component.value.id,
+    ...formData
   }
   
   // 使用 JSON 序列化再解析来创建普通对象的深拷贝，移除 Proxy

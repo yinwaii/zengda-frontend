@@ -1,11 +1,11 @@
 import type { User } from "~/models/entity/user"
 import { useApis } from '~/composables/use-apis'
 
-export const useEntityApis = () => {
+export const useEntityApis = (): any => {
   const api = useApis()
   const config = useRuntimeConfig()
   const apiBase = config.public.apiBase as string || ''
-  const dufsServer = config.dufsServer || process.env.DUFS_SERVER || 'http://localhost:6990'
+  const dufsServer = config.dufsServer || process.env.DUFS_SERVER || 'http://localhost:5000'
   const systemApi = useApis(dufsServer)
 
   return {
@@ -53,8 +53,8 @@ export const useEntityApis = () => {
     project: {
       get: (id: number) => api.get<ZdProject>(`/project/${id}`),
       getByPage: (page: number, size: number) => api.get<VOPaged<ZdProject>>('/project/', { page, size }),
-      create: (data: ZdProject) => api.post<ZdProject>('/project/', data),
-      update: (data: ZdProject) => api.put<ZdProject>('/project', data),
+      create: (data: Partial<ZdProject>) => api.post<ZdProject>('/project/', data),
+      update: (data: Partial<ZdProject>) => api.put<ZdProject>('/project', data),
       delete: (id: number) => api.delete<ZdProject>(`/project/${id}`)
     },
 
@@ -63,8 +63,8 @@ export const useEntityApis = () => {
       getAll: () => api.get<VOList<ZdComponent>>('/component/all'),
       get: (id: number) => api.get<ZdComponent>(`/component/${id}`),
       getByPage: (page: number, size: number) => api.get<VOPaged<ZdComponent>>('/component/', { page, size }),
-      create: (data: ZdComponent) => api.post<ZdComponent>('/component/', data),
-      update: (data: ZdComponent) => api.put<ZdComponent>('/component', data),
+      create: (data: Partial<ZdComponent>) => api.post<ZdComponent>('/component/', data),
+      update: (data: Partial<ZdComponent>) => api.put<ZdComponent>('/component', data),
       delete: (id: number) => api.delete<ZdComponent>(`/component/${id}`)
     },
 
@@ -77,9 +77,35 @@ export const useEntityApis = () => {
       updateBatch: (data: Array<ZdParameter>) => api.put<boolean>('/parameter/batch', data),
       delete: (id: number) => api.delete<ZdParameter>(`/parameter/${id}`)
     },
+    bom_configuration: {
+      create: (param: ZdBomConfiguration) => api.post<ZdBomConfiguration>('/configuration/bom', param),
+      update: (param: ZdBomConfiguration) => api.put<ZdBomConfiguration>('/configuration/bom', param),
+      delete: (param: ZdBomConfiguration) => api.delete<ZdBomConfiguration>('/configuration/bom', {}, {
+        body: param
+      }),
+    },
+    psystem_component: {
+      getAll: (psystemId: number) => api.get<Array<number>>(`/pSystem/${psystemId}/components`),
+      update: (psystemId: number, componentIds: number[]) => api.put<Array<number>>(`/pSystem/${psystemId}/components`, { componentIds }),
+      delete: (psystemId: number) => api.delete<null>(`/pSystem/${psystemId}/components`)
+    },
+
+    price: {
+      get: (configId: number) => api.get<ZdPrice>(`/price`, { configId })
+    },
 
     argument: {
-      
+      get: (configId: number, objectType: string, objectId: string) => api.get<ZdObjectArgument>(`/argument`, { configId, objectType, objectId }),
+      create: (configId: number, argument: ZdObjectArgument) => api.post<ZdObjectArgument>(`/argument`, argument, {
+        query: { configId }
+      }),
+      update: (configId: number, argument: ZdObjectArgument) => api.put<ZdObjectArgument>(`/argument`, argument, {
+        query: { configId }
+      }),
+      updateBatch: (configId: number, used_arguments: Array<ZdObjectArgument>) => api.post<boolean>('/argument/batch', used_arguments, {
+        query: { configId }
+      }),
+      delete: (configId: number) => api.delete<ZdObjectArgument>(`/argument`, { configId })
     },
 
     configuration: {
@@ -94,8 +120,8 @@ export const useEntityApis = () => {
     template: {
       get: (id: number) => api.get<ZdTemplate>(`/template/${id}`),
       getByPage: (page: number, size: number) => api.get<VOPaged<ZdTemplate>>('/template/', { page, size }),
-      create: (data: ZdTemplate) => api.post<ZdTemplate>('/template/', data),
-      update: (data: ZdTemplate) => api.put<ZdTemplate>('/template', data),
+      create: (data: Partial<ZdTemplate>) => api.post<ZdTemplate>('/template/', data),
+      update: (data: Partial<ZdTemplate>) => api.put<ZdTemplate>('/template', data),
       delete: (id: number) => api.delete<ZdTemplate>(`/template/${id}`),
     },
 
@@ -122,8 +148,8 @@ export const useEntityApis = () => {
       getAll: (require_tree: boolean = false) => api.get<Array<ZdPSystem>>('/pSystem/tree', { require_tree }),
       get: (id: number) => api.get<ZdPSystem>(`/pSystem/${id}`),
       getByPage: (page: number, size: number) => api.get<VOPaged<ZdPSystem>>('/pSystem/', { page, size }),
-      create: (data: ZdPSystem) => api.post<ZdPSystem>('/pSystem/', data),
-      update: (data: ZdPSystem) => api.put<ZdPSystem>('/pSystem', data),
+      create: (data: Partial<ZdPSystem>) => api.post<ZdPSystem>('/pSystem/', data),
+      update: (data: Partial<ZdPSystem>) => api.put<ZdPSystem>('/pSystem', data),
       delete: (id: number) => api.delete<ZdPSystem>(`/pSystem/${id}`),
     },
 
@@ -149,8 +175,8 @@ export const useEntityApis = () => {
 
     bom: {
       get: (id: number) => api.get<ZdBom>(`/bom/${id}`),
-      create: (data: ZdBom) => api.post<ZdBom>('/bom', data),
-      update: (data: ZdBom) => api.put<ZdBom>('/bom', data),
+      create: (data: Partial<ZdBom>) => api.post<ZdBom>('/bom', data),
+      update: (data: Partial<ZdBom>) => api.put<ZdBom>('/bom', data),
       data: (id: number) => api.delete<ZdBom>(`/bom/${id}`)
     },
 

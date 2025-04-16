@@ -4,10 +4,37 @@
     <div class="w-[320px] min-w-[320px] h-full border-r pr-2 overflow-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">{{ treeTitle }}</h2>
-        <shadcn-button size="sm" variant="outline" @click="handleAddNew">
-          <LucidePlus class="h-4 w-4 mr-1" />
-          新建
-        </shadcn-button>
+        <!-- 模板下拉菜单 -->
+        <TemplateDropdownMenu
+          v-if="currentItem && currentItem.type === 'TEMPLATE'"
+          :template="(currentItem as ZdTemplate)"
+          @clone="handleClone"
+        />
+        <!-- 项目下拉菜单 -->
+        <ProjectDropdownMenu
+          v-else-if="currentItem && currentItem.type === 'PROJECT'"
+          :project="currentItem"
+        />
+        <!-- 产品系统下拉菜单 -->
+        <PsystemDropdownMenu
+          v-else-if="currentItem && currentItem.type === 'PSYSTEM'"
+          :psystem="currentItem"
+        />
+        <!-- 组件下拉菜单 -->
+        <ComponentDropdownMenu
+          v-else-if="currentItem && currentItem.type === 'COMPONENT'"
+          :component="currentItem"
+        />
+        <!-- BOM下拉菜单 -->
+        <BomDropdownMenu
+          v-else-if="currentItem && currentItem.type === 'BOM'"
+          :bom="currentItem"
+        />
+        <!-- 规格下拉菜单 -->
+        <SpecificationDropdownMenu
+          v-else-if="currentItem && currentItem.type === 'SPECIFICATION'"
+          :specification="currentItem"
+        />
       </div>
       
       <abstract-tree
@@ -60,12 +87,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, toRaw } from 'vue'
+import { ref, computed, h, toRaw, watch } from 'vue'
 import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus, LucideTag, LucideSettings2, LucideLayoutTemplate, LucidePackage, LucideComponent, LucideFileSpreadsheet, LucideBoxes } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdTemplate } from '~/models/entity/template'
 
 // 导入各模块的组件
 import BomDetail from '~/components/design/bom/detail.vue'
@@ -76,7 +104,7 @@ import ProjectDetail from '~/components/design/project/detail.vue'
 import ProjectDialog from '~/components/design/project/dialog.vue'
 import TemplateDetail from '~/components/design/template/detail.vue'
 import TemplateDialog from '~/components/design/template/dialog.vue'
-import PsystemDetail from '~/components/design/psystem/detail.vue'
+import PsystemDetail from '~/components/design/psystem/details.vue'
 import PsystemDialog from '~/components/design/psystem/dialog.vue'
 import SpecificationDetail from '~/components/design/specification/detail.vue'
 import SpecificationDialog from '~/components/design/specification/dialog.vue'
@@ -84,6 +112,12 @@ import PtypeDetail from '~/components/design/ptype/detail.vue'
 import PtypeDialog from '~/components/design/ptype/dialog.vue'
 import ConfigurationDetail from '~/components/design/configuration/detail.vue'
 import ConfigurationDialog from '~/components/design/configuration/dialog.vue'
+import ProjectDropdownMenu from '~/components/design/project/dropdown-menu.vue'
+import TemplateDropdownMenu from '~/components/design/template/dropdown-menu.vue'
+import PsystemDropdownMenu from '~/components/design/psystem/dropdown-menu.vue'
+import ComponentDropdownMenu from '~/components/design/component/dropdown-menu.vue'
+import BomDropdownMenu from '~/components/design/bom/dropdown-menu.vue'
+import SpecificationDropdownMenu from '~/components/design/specification/dropdown-menu.vue'
 
 const props = defineProps<{
   treeData: TreeNodeData[]
@@ -104,6 +138,8 @@ const emit = defineEmits<{
   (e: 'save', data: any, nodeType: string): void
   // 新数据创建事件
   (e: 'create', data: any, nodeType: string): void
+  // 克隆事件
+  (e: 'clone', template: ZdTemplate): void
 }>()
 
 // 当前状态管理
@@ -307,7 +343,25 @@ const handleAddNew = () => {
 
 // 处理对话框保存
 const handleDialogSave = (data: any) => {
-  emit('create', data, dialogType.value)
+  if (dialogType.value === NODE_TYPES.TEMPLATE && dialogProps.value.isClone) {
+    emit('clone', data)
+  } else {
+    emit('create', data, dialogType.value)
+  }
   showDialog.value = false
+}
+
+// 处理克隆事件
+const handleClone = (template: ZdTemplate) => {
+  console.log('DynamicEntityTree 收到克隆事件，template:', template)
+  
+  // 打开模板对话框进行克隆
+  dialogType.value = NODE_TYPES.TEMPLATE
+  dialogProps.value = {
+    open: true,
+    template,
+    isClone: true
+  }
+  showDialog.value = true
 }
 </script> 

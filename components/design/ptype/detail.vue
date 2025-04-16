@@ -157,7 +157,7 @@ const loadRelatedTemplates = async () => {
     const templates = response.content
     
     // 筛选出productTypeId匹配当前产品类型的模板
-    relatedTemplates.value = templates.filter(template => 
+    relatedTemplates.value = templates.filter((template: any) => 
       template.productTypeId === toApiId(props.ptype.id)
     )
   } catch (error) {

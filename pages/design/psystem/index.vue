@@ -21,12 +21,12 @@ const ZdPSystemColumns = [
     { accessorKey: 'parentId', header: '父系统ID', meta: { width: '120px' } },
     { accessorKey: 'docsUrl', header: '文档链接', meta: { width: '200px' } },
     { accessorKey: 'specId', header: '规格ID', meta: { width: '120px' } },
-    { accessorKey: 'isDeleted', header: '已删除', 
+    { accessorKey: 'isShow', header: '是否可见', 
         cell: ({ row }: { row: any }) => {
-            const isDeleted = row.getValue('isDeleted')
+            const isShow = row.getValue('isShow')
             return <div>
-                <shadcn-badge variant={isDeleted ? 'destructive' : 'default'}>
-                    {isDeleted ? '已删除' : '正常'}
+                <shadcn-badge variant={isShow ? 'default' : 'secondary'}>
+                    {isShow ? '可见' : '隐藏'}
                 </shadcn-badge>
             </div>
         },
@@ -129,7 +129,7 @@ const handleDelete = async (psystem: ZdPSystem) => {
 }
 
 // 处理表单提交
-const handlePSystemSubmit = async (psystem: ZdPSystem) => {
+const handlePSystemSubmit = async (psystem: Partial<ZdPSystem>) => {
 	try {
 		let result
 		if (psystem.id) {

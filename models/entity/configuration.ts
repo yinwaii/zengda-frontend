@@ -7,6 +7,9 @@ export interface ZdConfiguration extends BasicProperty, TimeStamp {
 	lastVersionId: number
 	valueConfig: string
 	componentConfig: string
+	docs: string
+	isDeleted: boolean
+	// bomConfig: 
 }
 
 export const ZdConfigurationColumns = getColumns<ZdConfiguration>([

@@ -25,7 +25,7 @@
         </button>
         <button 
           class="p-1 hover:bg-accent rounded-sm opacity-70 hover:opacity-100"
-          @click.stop="handleCopy(node)"
+          @click.stop="handleClone(node)"
         >
           <LucideCopy class="h-3.5 w-3.5" />
         </button>
@@ -38,6 +38,7 @@
 import { LucideBookTemplate, LucideLayoutTemplate, LucidePencil, LucideCopy } from 'lucide-vue-next'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdTemplate } from '~/models/entity/template'
 
 defineOptions({
   name: 'TemplateTreeNode'
@@ -57,7 +58,7 @@ const emit = defineEmits<{
   'toggle': [node: TreeNodeData, expanded: boolean]
   'update:expanded': [expanded: boolean]
   'edit': [node: TreeNodeData]
-  'copy': [node: TreeNodeData]
+  'clone': [node: TreeNodeData]
 }>()
 
 const handleClick = (node: TreeNodeData) => {
@@ -72,7 +73,7 @@ const handleEdit = (node: TreeNodeData) => {
   emit('edit', node)
 }
 
-const handleCopy = (node: TreeNodeData) => {
-  emit('copy', node)
+const handleClone = (node: TreeNodeData) => {
+  emit('clone', node)
 }
 </script> 

@@ -2,18 +2,22 @@ export interface ZdBomChild {
 	bomId: number
 	itemId: number
 	itemName: string
-	note?: any
+	note?: string
 }
 
 export interface ZdBom extends TimeStamp {
 	params: any
 	searchValue: string
 	id: number
-	componentId: number
-	interId: number
-	note: string
-	number: string
-	parentId: number
-	version: string
+	componentId: number // 组件id
+	tcomponentId: number // 模板组件id
+	interId: number // bom内码
+	note: string // 备注
+	number: string // bom单号
+	parentId: number // 上级bomId
+	lastVersionId: string // 历史版本id
+	version: string // 版本
+	price: number // 价格
+	isDeleted: boolean // 是否已删除
 	items: Array<ZdBomChild>
 }

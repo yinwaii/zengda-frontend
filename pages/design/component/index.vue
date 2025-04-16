@@ -140,7 +140,7 @@ const handleDelete = async (component: ZdComponent) => {
 }
 
 // 处理表单提交
-const handleComponentSubmit = async (component: ZdComponent) => {
+const handleComponentSubmit = async (component: Partial<ZdComponent>) => {
 	try {
 		if (component.id) {
 			// 编辑现有组件

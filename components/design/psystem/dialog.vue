@@ -1,49 +1,51 @@
 <template>
   <shadcn-dialog :open="open" @update:open="setIsOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px]">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ (system && system.id > 0) ? '编辑产品系统' : '新建产品系统' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
           {{ (system && system.id > 0) ? '修改产品系统信息' : '创建新的产品系统' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="name" class="text-right">名称</shadcn-label>
-          <shadcn-input id="name" v-model="form.name" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="description" class="text-right">描述</shadcn-label>
-          <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="parentId" class="text-right">父系统</shadcn-label>
-          <shadcn-select v-model="form.parentId" class="col-span-3">
-            <shadcn-select-trigger>
-              <shadcn-select-value :placeholder="parentSystems.length ? '选择父系统' : '无父系统'" />
-            </shadcn-select-trigger>
-            <shadcn-select-content>
-              <shadcn-select-group>
-                <shadcn-select-item :value="-1">无父系统</shadcn-select-item>
-                <shadcn-select-item 
-                  v-for="parent in parentSystems" 
-                  :key="parent.id" 
-                  :value="parent.id"
-                  :disabled="parent.id === form.id"
-                >
-                  {{ parent.name }}
-                </shadcn-select-item>
-              </shadcn-select-group>
-            </shadcn-select-content>
-          </shadcn-select>
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="docsUrl" class="text-right">文档链接</shadcn-label>
-          <shadcn-input id="docsUrl" :value="form.docsUrl || ''" @update:model-value="form.docsUrl = typeof $event === 'number' ? String($event) : $event" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isDeleted" class="text-right">已删除</shadcn-label>
-          <shadcn-checkbox id="isDeleted" v-model="form.isDeleted" class="col-span-3" />
+      <div class="overflow-y-auto max-h-[calc(80vh-8rem)]">
+        <div class="grid gap-4 py-4">
+          <div class="grid grid-cols-4 items-center gap-4">
+            <shadcn-label for="name" class="text-right">名称</shadcn-label>
+            <shadcn-input id="name" v-model="form.name" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <shadcn-label for="description" class="text-right">描述</shadcn-label>
+            <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <shadcn-label for="parentId" class="text-right">父系统</shadcn-label>
+            <shadcn-select v-model="form.parentId" class="col-span-3">
+              <shadcn-select-trigger>
+                <shadcn-select-value :placeholder="parentSystems.length ? '选择父系统' : '无父系统'" />
+              </shadcn-select-trigger>
+              <shadcn-select-content>
+                <shadcn-select-group>
+                  <shadcn-select-item :value="-1">无父系统</shadcn-select-item>
+                  <shadcn-select-item 
+                    v-for="parent in parentSystems" 
+                    :key="parent.id" 
+                    :value="parent.id"
+                    :disabled="parent.id === form.id"
+                  >
+                    {{ parent.name }}
+                  </shadcn-select-item>
+                </shadcn-select-group>
+              </shadcn-select-content>
+            </shadcn-select>
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <shadcn-label for="docsUrl" class="text-right">文档链接</shadcn-label>
+            <shadcn-input id="docsUrl" :value="form.docsUrl || ''" @update:model-value="form.docsUrl = typeof $event === 'number' ? String($event) : $event" class="col-span-3" />
+          </div>
+          <div class="grid grid-cols-4 items-center gap-4">
+            <shadcn-label for="isShow" class="text-right">是否可见</shadcn-label>
+            <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
+          </div>
         </div>
       </div>
       <shadcn-dialog-footer>
@@ -57,6 +59,10 @@
 import { ref, watch, onMounted } from 'vue'
 import type { ZdPSystem } from '~/models/entity/psystem'
 
+// 定义创建和更新时的数据类型
+type CreatePSystemData = Omit<ZdPSystem, 'id' | 'isDeleted'>
+type UpdatePSystemData = Omit<ZdPSystem, 'isDeleted'>
+
 const props = defineProps<{
   open: boolean
   system?: ZdPSystem | null
@@ -64,10 +70,21 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void
-  (e: 'save', system: ZdPSystem): void
+  (e: 'save', system: CreatePSystemData | UpdatePSystemData): void
 }>()
 
-const form = ref<ZdPSystem>({} as ZdPSystem)
+const form = ref<ZdPSystem>({
+  id: -1,
+  name: '',
+  description: '',
+  parentId: -1,
+  docsUrl: null,
+  specId: null,
+  isShow: true,
+  isDeleted: false,
+  children: null,
+  parameters: null
+} as ZdPSystem)
 const parentSystems = ref<ZdPSystem[]>([])
 const entityApis = useEntityApis()
 
@@ -114,7 +131,19 @@ const handleSubmit = (event: Event) => {
     return
   }
   
-  emit('save', form.value)
+  // 准备提交的数据
+  const submitData = { ...form.value }
+  
+  // 如果是创建，不传入 id 和 isDeleted
+  if (!props.system?.id) {
+    const { id, isDeleted, ...createData } = submitData
+    emit('save', createData as CreatePSystemData)
+  } else {
+    // 如果是编辑，不传入 isDeleted
+    const { isDeleted, ...updateData } = submitData
+    emit('save', updateData as UpdatePSystemData)
+  }
+  
   setIsOpen(false)
 }
 </script> 

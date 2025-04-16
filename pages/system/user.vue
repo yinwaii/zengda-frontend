@@ -166,7 +166,7 @@ const hasMore = computed(() => {
 })
 
 const reload = () => {
-  userinfo.getUserPage(userQueryParams.value).then((res) => {
+  userinfo.getUserPage(userQueryParams.value).then((res: any) => {
     const pageData = res as SysPage<User>
     userList.value = pageData.records
     total.value = pageData.total

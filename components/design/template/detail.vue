@@ -127,13 +127,15 @@ const handleSubmit = (event: Event) => {
 	// 确保有原始ID
 	const originalId = props.template.id
 	
-	// 创建更新对象，确保包含必要字段
+	// 创建更新对象，确保包含必要字段，但不包含 isDeleted
 	const updatedData = {
-		...toRaw(props.template),
-		...toRaw(editForm.value),
 		id: originalId,
-		originalId: originalId
-	} as (Partial<ZdTemplate> & { originalId: number })
+		name: editForm.value.name,
+		description: editForm.value.description,
+		isShow: editForm.value.isShow,
+		isCustomized: editForm.value.isCustomized,
+		productTypeId: editForm.value.productTypeId
+	} as Partial<ZdTemplate>
 	
 	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
 	const plainData = JSON.parse(JSON.stringify(updatedData))

@@ -1,12 +1,13 @@
 import { z } from 'zod';
 
 export interface ZdPSystem extends BasicProperty, TimeStamp {
-	isDeleted: boolean;
-	docsUrl: null | string;
-	parentId: number;
-	specId: number | null;
-	children: Array<ZdPSystem> | null;
-	parameters: Array<ZdParameter> | null;
+	isShow: boolean; // 是否可见
+	isDeleted: boolean; // 是否已删除
+	docsUrl: null | string; // 文档链接
+	parentId: number; // 父ID
+	specId: number | null; // 规格ID
+	children: Array<ZdPSystem> | null; // 子系统
+	parameters: Array<ZdParameter> | null; // 参数
 }
 
 export const ZdPSystemColumns = getColumns<ZdPSystem>([

@@ -1,37 +1,39 @@
 <template>
-  <shadcn-dialog :open="open" @update:open="setIsOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px]">
+  <shadcn-dialog :open="open" @update:open="handleUpdateOpen">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
       <shadcn-dialog-header>
-        <shadcn-dialog-title>{{ component?.id ? '编辑组件' : '新建组件' }}</shadcn-dialog-title>
+        <shadcn-dialog-title>{{ isEdit ? '编辑组件' : '新建组件' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
-          {{ component?.id ? '修改组件信息' : '创建新的组件' }}
+          {{ isEdit ? '修改组件信息' : '创建一个新的组件' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="name" class="text-right">名称</shadcn-label>
-          <shadcn-input id="name" v-model="form.name" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="description" class="text-right">描述</shadcn-label>
-          <shadcn-input id="description" v-model="form.description" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
-          <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isRequired" class="text-right">是否必须</shadcn-label>
-          <shadcn-checkbox id="isRequired" v-model="form.isRequired" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="price" class="text-right">价格</shadcn-label>
-          <shadcn-input id="price" v-model="form.price" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="value" class="text-right">数量</shadcn-label>
-          <shadcn-input id="value" v-model="form.value" class="col-span-3" />
-        </div>
+      <div class="overflow-y-auto max-h-[calc(80vh-8rem)]">
+        <form @submit.prevent="handleSubmit" class="space-y-4">
+          <div class="space-y-2">
+            <shadcn-label for="name">名称</shadcn-label>
+            <shadcn-input id="name" v-model="form.name" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="description">描述</shadcn-label>
+            <shadcn-textarea id="description" v-model="form.description" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="isShow">是否显示</shadcn-label>
+            <shadcn-checkbox id="isShow" v-model="form.isShow" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="isRequired">是否必须</shadcn-label>
+            <shadcn-checkbox id="isRequired" v-model="form.isRequired" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="price">价格计算公式/默认价格</shadcn-label>
+            <shadcn-input id="price" v-model="form.price" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="compValue">价格</shadcn-label>
+            <shadcn-input id="compValue" v-model="form.compValue" />
+          </div>
+        </form>
       </div>
       <shadcn-dialog-footer>
         <shadcn-button type="submit" @click="handleSubmit">保存</shadcn-button>
@@ -41,54 +43,77 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, toRaw } from 'vue'
 import type { ZdComponent } from '~/models/entity/component'
+// import type { BasicProperty, TimeStamp } from '~/models/entity/types'
 
 const props = defineProps<{
   open: boolean
-  component?: ZdComponent | null
+  isEdit?: boolean
+  data?: ZdComponent
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:open', value: boolean): void
-  (e: 'save', component: ZdComponent): void
+  'update:open': [value: boolean]
+  save: [form: Partial<ZdComponent>]
 }>()
 
-const form = ref<ZdComponent>({} as ZdComponent)
+const form = ref<Partial<ZdComponent>>({
+  name: '',
+  description: '',
+  isShow: true,
+  isRequired: false,
+  price: '',
+  compValue: '',
+  bomId: undefined
+})
 
-// 监听组件变化，初始化表单
-watch(() => props.component, (newComponent) => {
-  if (newComponent) {
-    form.value = { ...newComponent }
+watch(() => props.data, (newData) => {
+  if (newData) {
+    form.value = {
+      id: newData.id,
+      name: newData.name,
+      description: newData.description,
+      isShow: newData.isShow,
+      isRequired: newData.isRequired,
+      price: newData.price || '',
+      compValue: newData.compValue || '',
+      bomId: newData.bomId
+    }
   } else {
-    form.value = {} as ZdComponent
+    form.value = {
+      name: '',
+      description: '',
+      isShow: true,
+      isRequired: false,
+      price: '',
+      compValue: '',
+      bomId: undefined
+    }
   }
 }, { immediate: true })
 
-// 监听对话框开关状态
-watch(() => props.open, (isOpen) => {
-  if (!isOpen) {
-    form.value = {} as ZdComponent
-  }
-})
-
-// 设置对话框开关状态
-const setIsOpen = (value: boolean) => {
+const handleUpdateOpen = (value: boolean) => {
   emit('update:open', value)
 }
 
-// 处理表单提交
 const handleSubmit = (event: Event) => {
-  // 防止表单默认提交行为
   if (event) event.preventDefault()
   
-  // 表单验证
-  if (!form.value.name) {
-    console.error('组件名称不能为空')
-    return
+  // 获取表单数据
+  const formData = toRaw(form.value)
+  
+  // 创建新对象，根据是否是编辑模式决定是否包含id
+  const updatedData = {
+    ...formData,
+    ...(props.isEdit ? { id: formData.id } : {})
   }
   
-  emit('save', form.value)
-  setIsOpen(false)
+  // 使用 JSON 序列化再解析来创建普通对象的深拷贝，移除 Proxy
+  const plainData = JSON.parse(JSON.stringify(updatedData))
+  
+  console.log('发送组件数据:', plainData)
+  emit('save', plainData)
+  emit('update:open', false)
 }
 </script> 

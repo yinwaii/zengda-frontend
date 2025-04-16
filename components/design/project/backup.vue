@@ -1,6 +1,7 @@
 <template>
 	<div class="space-y-6">
 		<!-- 配置选择器区域 -->
+		<!--
 		<shadcn-card v-if="configurations && configurations.length > 0">
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
@@ -20,24 +21,25 @@
 							<template #default>
 								{{ getSelectedConfigName() }}
 							</template>
-						</shadcn-select-trigger>
-						<shadcn-select-content>
-							<shadcn-select-item v-for="config in configurations" :key="config.id" :value="config.id">
-								{{ config.id }} - 最后更新: {{ formatDate(config.updatedTime) || formatDate(config.createdTime) || '未知' }}
-							</shadcn-select-item>
-						</shadcn-select-content>
-					</shadcn-select>
-					<shadcn-button size="sm" variant="outline" @click="handleEditConfig" :disabled="!selectedConfig">
-						<LucidePencil class="h-4 w-4 mr-1" />
-						编辑
-					</shadcn-button>
-					<shadcn-button size="sm" variant="destructive" @click="handleDeleteConfig" :disabled="!selectedConfig">
-						<LucideTrash class="h-4 w-4 mr-1" />
-						删除
-					</shadcn-button>
-				</div>
-			</shadcn-card-content>
-		</shadcn-card>
+</shadcn-select-trigger>
+<shadcn-select-content>
+	<shadcn-select-item v-for="config in configurations" :key="config.id" :value="config.id">
+		{{ config.id }} - 最后更新: {{ formatDate(config.updatedTime) || formatDate(config.createdTime) || '未知' }}
+	</shadcn-select-item>
+</shadcn-select-content>
+</shadcn-select>
+<shadcn-button size="sm" variant="outline" @click="handleEditConfig" :disabled="!selectedConfig">
+	<LucidePencil class="h-4 w-4 mr-1" />
+	编辑
+</shadcn-button>
+<shadcn-button size="sm" variant="destructive" @click="handleDeleteConfig" :disabled="!selectedConfig">
+	<LucideTrash class="h-4 w-4 mr-1" />
+	删除
+</shadcn-button>
+</div>
+</shadcn-card-content>
+</shadcn-card>
+-->
 
 		<shadcn-card>
 			<shadcn-card-header>
@@ -65,80 +67,6 @@
 							<shadcn-label for="description">描述</shadcn-label>
 							<shadcn-textarea id="description" v-model="editForm.description" />
 						</div>
-						<div class="space-y-2">
-							<shadcn-label for="productTypeId">产品类型</shadcn-label>
-							<shadcn-select v-model="editForm.productTypeId">
-								<shadcn-select-trigger>
-									<shadcn-select-value :placeholder="'选择产品类型'" />
-								</shadcn-select-trigger>
-								<shadcn-select-content>
-									<shadcn-select-item v-for="type in productTypes" :key="type.id" :value="type.id">
-										{{ type.name }}
-									</shadcn-select-item>
-								</shadcn-select-content>
-							</shadcn-select>
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="templateId">模板</shadcn-label>
-							<shadcn-select v-model="editForm.templateId">
-								<shadcn-select-trigger>
-									<shadcn-select-value :placeholder="'选择模板'" />
-								</shadcn-select-trigger>
-								<shadcn-select-content>
-									<shadcn-select-item v-for="template in templates" :key="template.id" :value="template.id">
-										{{ template.name }}
-									</shadcn-select-item>
-								</shadcn-select-content>
-							</shadcn-select>
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="quantity">数量</shadcn-label>
-							<shadcn-input id="quantity" v-model="editForm.quantity" type="number" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="model">模型</shadcn-label>
-							<shadcn-input id="model" v-model="editForm.model" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="attention">注意力</shadcn-label>
-							<shadcn-input id="attention" v-model="editForm.attention" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="company">公司</shadcn-label>
-							<shadcn-input id="company" v-model="editForm.company" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="tel">电话</shadcn-label>
-							<shadcn-input id="tel" v-model="editForm.tel" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="mob">手机</shadcn-label>
-							<shadcn-input id="mob" v-model="editForm.mob" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="fax">传真</shadcn-label>
-							<shadcn-input id="fax" v-model="editForm.fax" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="email">邮件</shadcn-label>
-							<shadcn-input id="email" v-model="editForm.email" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="number">号码</shadcn-label>
-							<shadcn-input id="number" v-model="editForm.number" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="date">日期</shadcn-label>
-							<shadcn-input id="date" v-model="editForm.date" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="valid">是否合法</shadcn-label>
-							<shadcn-input id="valid" v-model="editForm.valid" />
-						</div>
-						<div class="space-y-2">
-							<shadcn-label for="price">价格</shadcn-label>
-							<shadcn-input id="price" v-model="editForm.price" />
-						</div>
 						<div class="flex justify-end gap-2">
 							<shadcn-button type="button" variant="outline" @click="$emit('cancel')">
 								取消
@@ -154,70 +82,6 @@
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">ID</dt>
 							<dd class="mt-1">{{ project.id }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">名称</dt>
-							<dd class="mt-1">{{ project.name }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">描述</dt>
-							<dd class="mt-1">{{ project.description || '暂无描述' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">产品类型</dt>
-							<dd class="mt-1">{{ getProductTypeName(project.productTypeId) }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">模板</dt>
-							<dd class="mt-1">{{ getTemplateName(project.templateId) }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">数量</dt>
-							<dd class="mt-1">{{ project.quantity || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">模型</dt>
-							<dd class="mt-1">{{ project.model || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">注意力</dt>
-							<dd class="mt-1">{{ project.attention || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">公司</dt>
-							<dd class="mt-1">{{ project.company || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">电话</dt>
-							<dd class="mt-1">{{ project.tel || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">手机</dt>
-							<dd class="mt-1">{{ project.mob || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">传真</dt>
-							<dd class="mt-1">{{ project.fax || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">邮件</dt>
-							<dd class="mt-1">{{ project.email || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">号码</dt>
-							<dd class="mt-1">{{ project.number || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">日期</dt>
-							<dd class="mt-1">{{ project.date || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">是否合法</dt>
-							<dd class="mt-1">{{ project.valid || '暂无' }}</dd>
-						</div>
-						<div class="space-y-2 p-4 border rounded-lg">
-							<dt class="text-sm font-medium text-muted-foreground">价格</dt>
-							<dd class="mt-1">{{ project.price || '暂无' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建人</dt>
@@ -251,21 +115,16 @@
 							</dd>
 						</div>
 					</div>
-					<div class="flex justify-end mt-4">
-						<shadcn-button @click="$emit('edit')">
-							<LucidePencil class="mr-2 h-4 w-4" />
-							编辑
-						</shadcn-button>
-					</div>
 				</template>
 			</shadcn-card-content>
 		</shadcn-card>
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="project.id" />
+		<design-parameter-preview :nodeId="project.id"></design-parameter-preview>
 
-		<!-- 配置数据表格区域 -->
+		<!-- 配置信息区域 - 移至底部并合并，支持所有节点的配置 -->
+		<!--
 		<shadcn-card v-if="selectedConfig">
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
@@ -342,9 +201,6 @@
 								<div class="space-y-2">
 									<shadcn-label for="arg-value">参数值</shadcn-label>
 									<shadcn-textarea id="arg-value" v-model="editingArgument.value" placeholder="输入参数值" />
-									<p class="text-xs text-muted-foreground">
-										根据选择的类型输入相应格式的值。数字类型直接输入数字，布尔类型输入true/false，对象和数组请输入有效的JSON格式。
-									</p>
 								</div>
 								<div class="flex justify-end space-x-2">
 									<shadcn-button variant="outline" @click="cancelEditArgument">取消</shadcn-button>
@@ -411,15 +267,12 @@
 				</shadcn-tabs>
 			</shadcn-card-content>
 		</shadcn-card>
+		-->
 	</div>
 
 	<!-- 配置对话框 -->
-	<configuration-dialog 
-		:modelValue="showConfigDialog"
-		@update:modelValue="showConfigDialog = $event"
-		:editing-item="editingConfig"
-		@submit="onConfigSubmit" 
-	/>
+	<configuration-dialog :modelValue="showConfigDialog" @update:modelValue="showConfigDialog = $event"
+		:editing-item="editingConfig" @submit="onConfigSubmit" />
 
 	<!-- 确认删除对话框 -->
 	<shadcn-alert-dialog v-model:open="showDeleteConfirm">
@@ -433,6 +286,22 @@
 			<shadcn-alert-dialog-footer>
 				<shadcn-alert-dialog-cancel>取消</shadcn-alert-dialog-cancel>
 				<shadcn-alert-dialog-action @click="confirmDelete">删除</shadcn-alert-dialog-action>
+			</shadcn-alert-dialog-footer>
+		</shadcn-alert-dialog-content>
+	</shadcn-alert-dialog>
+
+	<!-- 确认删除参数对话框 -->
+	<shadcn-alert-dialog v-model:open="showDeleteArgConfirm">
+		<shadcn-alert-dialog-content>
+			<shadcn-alert-dialog-header>
+				<shadcn-alert-dialog-title>确认删除参数</shadcn-alert-dialog-title>
+				<shadcn-alert-dialog-description>
+					您确定要删除此参数吗？此操作不可撤销。
+				</shadcn-alert-dialog-description>
+			</shadcn-alert-dialog-header>
+			<shadcn-alert-dialog-footer>
+				<shadcn-alert-dialog-cancel>取消</shadcn-alert-dialog-cancel>
+				<shadcn-alert-dialog-action @click="confirmDeleteArgument">删除</shadcn-alert-dialog-action>
 			</shadcn-alert-dialog-footer>
 		</shadcn-alert-dialog-content>
 	</shadcn-alert-dialog>
@@ -500,22 +369,6 @@
 			</shadcn-dialog-footer>
 		</shadcn-dialog-content>
 	</shadcn-dialog>
-
-	<!-- 确认删除参数对话框 -->
-	<shadcn-alert-dialog v-model:open="showDeleteArgConfirm">
-		<shadcn-alert-dialog-content>
-			<shadcn-alert-dialog-header>
-				<shadcn-alert-dialog-title>确认删除参数</shadcn-alert-dialog-title>
-				<shadcn-alert-dialog-description>
-					您确定要删除此参数吗？此操作不可撤销。
-				</shadcn-alert-dialog-description>
-			</shadcn-alert-dialog-header>
-			<shadcn-alert-dialog-footer>
-				<shadcn-alert-dialog-cancel>取消</shadcn-alert-dialog-cancel>
-				<shadcn-alert-dialog-action @click="confirmDeleteArgument">删除</shadcn-alert-dialog-action>
-			</shadcn-alert-dialog-footer>
-		</shadcn-alert-dialog-content>
-	</shadcn-alert-dialog>
 </template>
 
 <script setup lang="ts">
@@ -525,12 +378,12 @@ import { formatDate } from '~/utils/date'
 import type { ZdProject } from '~/models/entity/project'
 import type { ZdParameter } from '~/models/entity/parameter'
 import type { ZdConfiguration } from '~/models/entity/configuration'
-import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdObjectArgument, ZdParameterArgument } from '~/models/entity/argument'
-// import type { ZdPrice, ZdPriceItem } from '~/models/entity/price'
+import type { TreeNodeData } from '~/components/abstract/tree/types'
 import ConfigurationDialog from '~/components/design/configuration/dialog.vue'
 import { useToast } from '~/components/ui/toast'
 import { toApiId } from '~/utils/idConverter'
+import type { ZdPrice, ZdPriceItem } from '~/models/entity/price'
 
 const props = defineProps<{
 	project: ZdProject
@@ -554,66 +407,15 @@ const project = computed(() => {
 	return props.project || {}
 })
 
-// 添加下拉框数据
-const templates = ref<ZdTemplate[]>([])
-const productTypes = ref<any[]>([])
-
-// 加载下拉框数据
-const loadDropdownData = async () => {
-	try {
-		// 获取模板列表
-		const templateResponse = await entityApis.template.getByPage(0, 1000)
-		templates.value = templateResponse.content || []
-		
-		// 尝试获取产品类型
-		try {
-			const typeResponse = await entityApis.ptype.getAll()
-			productTypes.value = typeResponse || []
-		} catch (error) {
-			console.warn('无法获取产品类型列表:', error)
-			productTypes.value = []
-		}
-	} catch (error) {
-		console.error('加载下拉框数据失败:', error)
-	}
-}
-
-// 获取产品类型名称
-const getProductTypeName = (id: number) => {
-	const type = productTypes.value.find(t => t.id === id)
-	return type ? type.name : `未知类型 (${id})`
-}
-
-// 获取模板名称
-const getTemplateName = (id: number) => {
-	const template = templates.value.find(t => t.id === id)
-	return template ? template.name : `未知模板 (${id})`
-}
-
 const editForm = ref<Partial<ZdProject>>({
-	id: project.value.id,
 	name: project.value.name,
-	description: project.value.description,
-	productTypeId: project.value.productTypeId,
-	templateId: project.value.templateId,
-	quantity: project.value.quantity,
-	model: project.value.model,
-	attention: project.value.attention,
-	company: project.value.company,
-	tel: project.value.tel,
-	mob: project.value.mob,
-	fax: project.value.fax,
-	email: project.value.email,
-	number: project.value.number,
-	date: project.value.date,
-	valid: project.value.valid,
-	price: project.value.price
+	description: project.value.description
 })
 
 // 配置相关状态
 const configurations = ref<ZdConfiguration[]>([])
 const selectedConfigId = ref<number | null>(null)
-const selectedConfig = computed(() => 
+const selectedConfig = computed(() =>
 	configurations.value.find(c => c.id === selectedConfigId.value) || null
 )
 
@@ -621,340 +423,6 @@ const selectedConfig = computed(() =>
 const showConfigDialog = ref(false)
 const editingConfig = ref<ZdConfiguration | undefined>(undefined)
 const showDeleteConfirm = ref(false)
-
-// 获取所有配置
-const loadConfigurations = async () => {
-	try {
-		if (!project.value || !project.value.id || !project.value.templateId) return
-
-		// 使用toApiId转换项目ID为纯数字
-		const projectNumericId = toApiId(project.value.id)
-		if (projectNumericId === null) {
-			console.error('无法将项目ID转换为有效的数字ID')
-			toast({
-				title: '错误',
-				description: '项目ID格式无效',
-				variant: 'destructive'
-			})
-			return
-		}
-		
-		const response = await entityApis.configuration.getByTemplateId(
-			project.value.templateId,
-			projectNumericId
-		)
-
-		if (response && response.list && response.list.length > 0) {
-			configurations.value = response.list
-			// 默认选择第一个配置
-			if (!selectedConfigId.value && response.list.length > 0) {
-				selectedConfigId.value = response.list[0].id
-			}
-			
-			// 加载当前节点的参数
-			if (selectedConfigId.value && currentNode.value) {
-				console.log('配置加载完成，开始加载参数:', selectedConfigId.value, currentNode.value)
-				await loadNodeArguments()
-			}
-		} else {
-			configurations.value = []
-			selectedConfigId.value = null
-			objectArgument.value = null
-		}
-	} catch (error) {
-		console.error('加载配置列表失败:', error)
-		toast({
-			title: '错误',
-			description: '加载配置列表失败',
-			variant: 'destructive'
-		})
-	}
-}
-
-// 处理新增配置
-const handleAddConfig = () => {
-	editingConfig.value = undefined // 确保不是编辑模式
-	showConfigDialog.value = true
-}
-
-// 处理编辑配置
-const handleEditConfig = () => {
-	if (!selectedConfig.value) return
-	editingConfig.value = selectedConfig.value
-	showConfigDialog.value = true
-}
-
-// 处理删除配置
-const handleDeleteConfig = () => {
-	if (!selectedConfig.value) return
-	showDeleteConfirm.value = true
-}
-
-// 确认删除
-const confirmDelete = async () => {
-	if (!selectedConfig.value) return
-
-	try {
-		await entityApis.configuration.delete(selectedConfig.value.id)
-		toast({
-			title: '成功',
-			description: '配置已删除'
-		})
-		
-		// 重新加载配置列表
-		await loadConfigurations()
-		showDeleteConfirm.value = false
-	} catch (error) {
-		console.error('删除配置失败:', error)
-		toast({
-			title: '错误',
-			description: '删除配置失败',
-			variant: 'destructive'
-		})
-	}
-}
-
-// 配置对话框提交处理
-const onConfigSubmit = async (config: ZdConfiguration) => {
-	try {
-		if (editingConfig.value) {
-			// 更新
-			await entityApis.configuration.update(config)
-			toast({
-				title: '成功',
-				description: '配置已更新'
-			})
-		} else {
-			// 创建
-			// 确保使用纯数字ID
-			const projectNumericId = toApiId(project.value.id)
-			if (projectNumericId === null) {
-				throw new Error('无法将项目ID转换为有效的数字ID')
-			}
-			
-			const newConfig = await entityApis.configuration.create({
-				...config,
-				project_id: projectNumericId,
-				template_id: project.value.templateId
-			})
-			toast({
-				title: '成功',
-				description: '配置已创建'
-			})
-		}
-		
-		// 重新加载配置列表
-		await loadConfigurations()
-		showConfigDialog.value = false
-	} catch (error) {
-		console.error('保存配置失败:', error)
-		toast({
-			title: '错误',
-			description: '保存配置失败',
-			variant: 'destructive'
-		})
-	}
-}
-
-// 获取选中配置名称
-const getSelectedConfigName = () => {
-	if (!selectedConfig.value) return '请选择配置'
-	return `配置 #${selectedConfig.value.id}`
-}
-
-// 格式化配置JSON
-const formatConfig = (config: string) => {
-	if (!config) return '{}' 
-	try {
-		return JSON.stringify(JSON.parse(config), null, 2)
-	} catch (e) {
-		return config
-	}
-}
-
-// 监听项目变化，更新表单
-watch(() => props.project, (newProject) => {
-	if (newProject) {
-		editForm.value = {
-			id: newProject.id,
-			name: newProject.name,
-			description: newProject.description,
-			productTypeId: newProject.productTypeId,
-			templateId: newProject.templateId,
-			quantity: newProject.quantity,
-			model: newProject.model,
-			attention: newProject.attention,
-			company: newProject.company,
-			tel: newProject.tel,
-			mob: newProject.mob,
-			fax: newProject.fax,
-			email: newProject.email,
-			number: newProject.number,
-			date: newProject.date,
-			valid: newProject.valid,
-			price: newProject.price
-		}
-		// 加载配置列表
-		loadConfigurations()
-	}
-}, { immediate: true })
-
-// 处理表单提交
-const handleSubmit = () => {
-	// 创建更新数据对象，包含 id 但不包含 isDeleted
-	const updatedData = {
-		id: editForm.value.id,
-		name: editForm.value.name,
-		description: editForm.value.description,
-		productTypeId: editForm.value.productTypeId,
-		templateId: editForm.value.templateId,
-		quantity: editForm.value.quantity,
-		model: editForm.value.model,
-		attention: editForm.value.attention,
-		company: editForm.value.company,
-		tel: editForm.value.tel,
-		mob: editForm.value.mob,
-		fax: editForm.value.fax,
-		email: editForm.value.email,
-		number: editForm.value.number,
-		date: editForm.value.date,
-		valid: editForm.value.valid,
-		price: editForm.value.price
-	}
-	
-	// 使用 JSON 序列化再解析创建普通对象深拷贝，移除 Proxy
-	const plainData = JSON.parse(JSON.stringify(updatedData))
-	
-	// 触发保存事件
-	emit('save', plainData)
-}
-
-// 组件挂载时加载数据
-onMounted(() => {
-	loadConfigurations()
-	loadDropdownData()
-})
-
-// 报价相关状态
-const isPriceDialogOpen = ref(false)
-const priceConfigId = ref<number | null>(null)
-const priceLoading = ref(false)
-const priceData = ref<ZdPrice | null>(null)
-const priceItems = ref<ZdPriceItem[]>([])
-
-// 价格项表格列定义
-const priceColumns = ref([
-	{
-		accessorKey: 'name',
-		header: '名称',
-	},
-	{
-		accessorKey: 'totalPrice',
-		header: '价格',
-		cell: ({ row }: { row: any }) => {
-			return formatPrice(row.original.totalPrice)
-		}
-	},
-	{
-		accessorKey: 'remark',
-		header: '备注',
-		cell: ({ row }: { row: any }) => {
-			return row.original.remark || '-'
-		}
-	}
-])
-
-// 加载价格数据
-const loadPriceData = async () => {
-	if (!priceConfigId.value) return
-
-	try {
-		priceLoading.value = true
-		const response = await entityApis.price.get(priceConfigId.value)
-
-		if (response) {
-			priceData.value = response
-			// 提取价格项数据
-			if (response.priceItems && Array.isArray(response.priceItems)) {
-				priceItems.value = flattenPriceItems(response.priceItems)
-			} else {
-				priceItems.value = []
-			}
-		} else {
-			toast({
-				title: '警告',
-				description: '未找到价格数据'
-			})
-			priceData.value = null
-			priceItems.value = []
-		}
-	} catch (error) {
-		console.error('加载价格数据失败:', error)
-		toast({
-			title: '错误',
-			description: '加载价格数据失败',
-			variant: 'destructive'
-		})
-		priceData.value = null
-		priceItems.value = []
-	} finally {
-		priceLoading.value = false
-	}
-}
-
-// 将嵌套的价格项列表扁平化
-const flattenPriceItems = (items: ZdPriceItem[], level = 0): ZdPriceItem[] => {
-	let result: ZdPriceItem[] = []
-
-	items.forEach(item => {
-		// 添加当前项
-		const flatItem = {
-			...item,
-			// 添加显示级别信息，用于前端缩进显示
-			level,
-			// 为每个项生成一个唯一ID，避免key重复
-			_id: `price_${Math.random().toString(36).substring(2, 9)}`
-		}
-
-		result.push(flatItem)
-
-		// 递归处理子项
-		if (item.children && item.children.length > 0) {
-			result = [...result, ...flattenPriceItems(item.children, level + 1)]
-		}
-	})
-
-	return result
-}
-
-// 打开报价结果对话框
-const openPriceDialog = () => {
-	isPriceDialogOpen.value = true
-
-	// 默认选择当前配置
-	if (selectedConfig.value && !priceConfigId.value) {
-		priceConfigId.value = selectedConfig.value.id
-		loadPriceData()
-	}
-}
-
-// 格式化价格
-const formatPrice = (price: number) => {
-	if (typeof price !== 'number') return '¥0.00'
-	return `¥${price.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-}
-
-// 参数相关状态
-const objectArgument = ref<ZdObjectArgument | null>(null)
-const isEditingArgument = ref(false)
-const editingArgument = ref<ZdParameterArgument>({
-	id: 0,
-	name: '',
-	type: 'string',
-	value: ''
-})
-const showDeleteArgConfirm = ref(false)
-const argumentToDelete = ref<ZdParameterArgument | null>(null)
 
 // 当前选中的节点
 const currentNode = computed(() => props.data || null)
@@ -987,26 +455,104 @@ const currentNodeTypeAndId = computed(() => {
 	};
 })
 
+// 参数相关状态
+const objectArgument = ref<ZdObjectArgument | null>(null)
+const isEditingArgument = ref(false)
+const editingArgument = ref<ZdParameterArgument>({
+	id: 0,
+	name: '',
+	type: 'string',
+	value: ''
+})
+const showDeleteArgConfirm = ref(false)
+const argumentToDelete = ref<ZdParameterArgument | null>(null)
+
+// 报价相关状态
+const isPriceDialogOpen = ref(false)
+const priceConfigId = ref<number | null>(null)
+const priceLoading = ref(false)
+const priceData = ref<ZdPrice | null>(null)
+const priceItems = ref<ZdPriceItem[]>([])
+
+// 价格项表格列定义
+const priceColumns = ref([
+	{
+		accessorKey: 'name',
+		header: '名称',
+	},
+	{
+		accessorKey: 'totalPrice',
+		header: '价格',
+		cell: ({ row }: { row: any }) => {
+			return formatPrice(row.original.totalPrice)
+		}
+	},
+	{
+		accessorKey: 'remark',
+		header: '备注',
+		cell: ({ row }: { row: any }) => {
+			return row.original.remark || '-'
+		}
+	}
+])
+
+// 获取所有配置
+const loadConfigurations = async () => {
+	try {
+		if (!project.value || !project.value.id || !project.value.templateId) return
+
+		// 使用toApiId转换项目ID为纯数字
+		const projectNumericId = toApiId(project.value.id)
+		if (projectNumericId === null) {
+			console.error('无法将项目ID转换为有效的数字ID')
+			toast({
+				title: '错误',
+				description: '项目ID格式无效',
+				variant: 'destructive'
+			})
+			return
+		}
+
+		const response = await entityApis.configuration.getByTemplateId(
+			project.value.templateId,
+			projectNumericId
+		)
+
+		if (response && response.list && response.list.length > 0) {
+			configurations.value = response.list
+			// 默认选择第一个配置
+			if (!selectedConfigId.value && response.list.length > 0) {
+				selectedConfigId.value = response.list[0].id
+			}
+
+			// 加载当前节点的参数
+			if (selectedConfigId.value && currentNode.value) {
+				await loadNodeArguments()
+			}
+		} else {
+			configurations.value = []
+			selectedConfigId.value = null
+			objectArgument.value = null
+		}
+	} catch (error) {
+		console.error('加载配置列表失败:', error)
+		toast({
+			title: '错误',
+			description: '加载配置列表失败',
+			variant: 'destructive'
+		})
+	}
+}
+
 // 加载节点参数
 const loadNodeArguments = async () => {
 	if (!selectedConfigId.value || !currentNodeTypeAndId.value.objectType || !currentNodeTypeAndId.value.objectId) {
-		console.log('缺少加载参数必要信息:', {
-			configId: selectedConfigId.value,
-			objectType: currentNodeTypeAndId.value.objectType,
-			objectId: currentNodeTypeAndId.value.objectId
-		})
 		objectArgument.value = null
 		return
 	}
 
 	try {
 		const { objectType, objectId } = currentNodeTypeAndId.value
-		
-		console.log('加载节点参数:', {
-			configId: selectedConfigId.value,
-			objectType,
-			objectId
-		})
 
 		const response = await entityApis.argument.get(
 			selectedConfigId.value,
@@ -1014,12 +560,9 @@ const loadNodeArguments = async () => {
 			objectId
 		)
 
-		console.log('参数加载结果:', response)
-
 		if (response) {
 			objectArgument.value = response
 		} else {
-			console.log('未找到现有参数，创建空参数对象')
 			// 如果没有现有参数，创建一个空的参数对象
 			objectArgument.value = {
 				objectType,
@@ -1048,26 +591,6 @@ const loadNodeArguments = async () => {
 
 // 处理新增参数
 const handleAddArgument = () => {
-	// 如果还没有初始化对象参数，先创建一个空的
-	if (!objectArgument.value && currentNodeTypeAndId.value.objectType && currentNodeTypeAndId.value.objectId) {
-		objectArgument.value = {
-			objectType: currentNodeTypeAndId.value.objectType,
-			objectId: currentNodeTypeAndId.value.objectId,
-			arguments: [],
-			children: []
-		}
-	}
-	
-	// 如果没有可用的对象参数，显示错误并返回
-	if (!objectArgument.value) {
-		toast({
-			title: '错误',
-			description: '请先选择一个节点',
-			variant: 'destructive'
-		})
-		return
-	}
-	
 	editingArgument.value = {
 		id: 0, // 新参数的ID为0
 		name: '',
@@ -1183,27 +706,22 @@ const saveArgument = async () => {
 			arguments: updatedArguments
 		}
 
-		console.log('保存参数:', selectedConfigId.value, updatedObjectArgument)
-
 		// 保存到服务器
-		if (objectArgument.value.arguments.length === 0 && editingArgument.value.id === 0) {
+		if (objectArgument.value.arguments.length === 0) {
 			// 如果是首次添加参数，使用create方法
 			await entityApis.argument.create(selectedConfigId.value, updatedObjectArgument)
-			toast({
-				title: '成功',
-				description: '参数已创建'
-			})
 		} else {
 			// 否则使用update方法
 			await entityApis.argument.update(selectedConfigId.value, updatedObjectArgument)
-			toast({
-				title: '成功',
-				description: '参数已更新'
-			})
 		}
 
 		// 更新本地状态
 		objectArgument.value = updatedObjectArgument
+
+		toast({
+			title: '成功',
+			description: '参数已保存'
+		})
 
 		// 关闭编辑表单
 		isEditingArgument.value = false
@@ -1223,6 +741,141 @@ const saveArgument = async () => {
 	}
 }
 
+// 处理新增配置
+const handleAddConfig = () => {
+	editingConfig.value = undefined // 确保不是编辑模式
+	showConfigDialog.value = true
+}
+
+// 处理编辑配置
+const handleEditConfig = () => {
+	if (!selectedConfig.value) return
+	editingConfig.value = selectedConfig.value
+	showConfigDialog.value = true
+}
+
+// 处理删除配置
+const handleDeleteConfig = () => {
+	if (!selectedConfig.value) return
+	showDeleteConfirm.value = true
+}
+
+// 确认删除
+const confirmDelete = async () => {
+	if (!selectedConfig.value) return
+
+	try {
+		await entityApis.configuration.delete(selectedConfig.value.id)
+		toast({
+			title: '成功',
+			description: '配置已删除'
+		})
+
+		// 重新加载配置列表
+		await loadConfigurations()
+		showDeleteConfirm.value = false
+	} catch (error) {
+		console.error('删除配置失败:', error)
+		toast({
+			title: '错误',
+			description: '删除配置失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 配置对话框提交处理
+const onConfigSubmit = async (config: ZdConfiguration) => {
+	try {
+		if (editingConfig.value) {
+			// 更新
+			await entityApis.configuration.update(config)
+			toast({
+				title: '成功',
+				description: '配置已更新'
+			})
+		} else {
+			// 创建
+			// 确保使用纯数字ID
+			const projectNumericId = toApiId(project.value.id)
+			if (projectNumericId === null) {
+				throw new Error('无法将项目ID转换为有效的数字ID')
+			}
+
+			const newConfig = await entityApis.configuration.create({
+				...config,
+				project_id: projectNumericId,
+				template_id: project.value.templateId
+			})
+			toast({
+				title: '成功',
+				description: '配置已创建'
+			})
+		}
+
+		// 重新加载配置列表
+		await loadConfigurations()
+		showConfigDialog.value = false
+	} catch (error) {
+		console.error('保存配置失败:', error)
+		toast({
+			title: '错误',
+			description: '保存配置失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 获取选中配置名称
+const getSelectedConfigName = () => {
+	if (!selectedConfig.value) return '请选择配置'
+	return `配置 #${selectedConfig.value.id}`
+}
+
+// 格式化配置JSON
+const formatConfig = (config: string) => {
+	if (!config) return '{}'
+	try {
+		return JSON.stringify(JSON.parse(config), null, 2)
+	} catch (e) {
+		return config
+	}
+}
+
+const handleSubmit = (event: Event) => {
+	// 阻止表单默认提交行为
+	if (event) event.preventDefault()
+
+	// 确保有原始ID
+	const originalId = project.value.id
+
+	// 创建更新对象，确保包含必要字段
+	const updatedData = {
+		...toRaw(project.value),
+		...toRaw(editForm.value),
+		id: originalId,
+		originalId: originalId
+	} as (Partial<ZdProject> & { originalId: number })
+
+	// 使用JSON序列化再解析创建普通对象深拷贝，移除Proxy
+	const plainData = JSON.parse(JSON.stringify(updatedData))
+
+	console.log('发送修改后的项目数据:', plainData)
+	emit('save', plainData)
+}
+
+// 监听props.project变化，更新editForm
+watch(() => props.project, (newProject) => {
+	if (newProject) {
+		editForm.value = {
+			name: newProject.name,
+			description: newProject.description
+		}
+		// 加载配置列表
+		loadConfigurations()
+	}
+}, { immediate: true })
+
 // 监听当前节点变化，重新加载参数
 watch([currentNode, selectedConfigId], () => {
 	if (currentNode.value && selectedConfigId.value) {
@@ -1231,4 +884,87 @@ watch([currentNode, selectedConfigId], () => {
 		objectArgument.value = null
 	}
 })
-</script> 
+
+// 组件挂载时加载配置
+onMounted(() => {
+	loadConfigurations()
+})
+
+// 报价相关逻辑
+const openPriceDialog = () => {
+	isPriceDialogOpen.value = true
+
+	// 默认选择当前配置
+	if (selectedConfig.value && !priceConfigId.value) {
+		priceConfigId.value = selectedConfig.value.id
+		loadPriceData()
+	}
+}
+
+const loadPriceData = async () => {
+	if (!priceConfigId.value) return
+
+	try {
+		priceLoading.value = true
+		const response = await entityApis.price.get(priceConfigId.value)
+
+		if (response) {
+			priceData.value = response
+			// 提取价格项数据
+			if (response.priceItems && Array.isArray(response.priceItems)) {
+				priceItems.value = flattenPriceItems(response.priceItems)
+			} else {
+				priceItems.value = []
+			}
+		} else {
+			toast({
+				title: '警告',
+				description: '未找到价格数据'
+			})
+			priceData.value = null
+			priceItems.value = []
+		}
+	} catch (error) {
+		console.error('加载价格数据失败:', error)
+		toast({
+			title: '错误',
+			description: '加载价格数据失败',
+			variant: 'destructive'
+		})
+		priceData.value = null
+		priceItems.value = []
+	} finally {
+		priceLoading.value = false
+	}
+}
+
+// 将嵌套的价格项列表扁平化
+const flattenPriceItems = (items: ZdPriceItem[], level = 0): ZdPriceItem[] => {
+	let result: ZdPriceItem[] = []
+
+	items.forEach(item => {
+		// 添加当前项
+		const flatItem = {
+			...item,
+			// 添加显示级别信息，用于前端缩进显示
+			level,
+			// 为每个项生成一个唯一ID，避免key重复
+			_id: `price_${Math.random().toString(36).substring(2, 9)}`
+		}
+
+		result.push(flatItem)
+
+		// 递归处理子项
+		if (item.children && item.children.length > 0) {
+			result = [...result, ...flattenPriceItems(item.children, level + 1)]
+		}
+	})
+
+	return result
+}
+
+const formatPrice = (price: number) => {
+	if (typeof price !== 'number') return '¥0.00'
+	return `¥${price.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+}
+</script>

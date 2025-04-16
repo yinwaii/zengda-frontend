@@ -1,58 +1,62 @@
 <template>
   <shadcn-dialog :open="open" @update:open="setIsOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px]">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ specification?.id ? '编辑规格' : '新建规格' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
           {{ specification?.id ? '修改规格信息' : '创建新的规格' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="name" class="text-right">名称</shadcn-label>
-          <shadcn-input id="name" v-model="form.name" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="fileTag" class="text-right">文件标签</shadcn-label>
-          <shadcn-input id="fileTag" v-model="form.fileTag" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="url" class="text-right">URL</shadcn-label>
-          <shadcn-input id="url" v-model="form.url" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4" v-if="isEditing && specification?.id">
-          <shadcn-label for="latestVersionId" class="text-right">最新版本ID</shadcn-label>
-          <shadcn-input id="latestVersionId" v-model="form.latestVersionId" type="number" class="col-span-3" disabled />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4" v-if="!isEditing">
-          <shadcn-label for="file" class="text-right">规格文件</shadcn-label>
-          <div class="col-span-3">
-            <input 
-              id="file" 
-              type="file" 
-              ref="fileInputRef"
-              class="hidden" 
-              @change="handleFileChange"
-            />
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center justify-between border rounded-md p-2">
-                <span class="truncate max-w-[260px]">
-                  {{ selectedFile ? selectedFile.name : '未选择文件' }}
-                </span>
-                <shadcn-button type="button" variant="outline" size="sm" @click="triggerFileInput">
-                  浏览...
-                </shadcn-button>
+      <div class="overflow-y-auto max-h-[calc(80vh-8rem)]">
+        <form @submit.prevent="handleSubmit">
+          <div class="grid gap-4 py-4">
+            <div class="grid grid-cols-4 items-center gap-4">
+              <shadcn-label for="name" class="text-right">名称</shadcn-label>
+              <shadcn-input id="name" v-model="form.name" class="col-span-3" />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <shadcn-label for="fileTag" class="text-right">文件标签</shadcn-label>
+              <shadcn-input id="fileTag" v-model="form.fileTag" class="col-span-3" />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4">
+              <shadcn-label for="url" class="text-right">URL</shadcn-label>
+              <shadcn-input id="url" v-model="form.url" class="col-span-3" />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4" v-if="isEditing && specification?.id">
+              <shadcn-label for="latestVersionId" class="text-right">最新版本ID</shadcn-label>
+              <shadcn-input id="latestVersionId" v-model="form.latestVersionId" type="number" class="col-span-3" disabled />
+            </div>
+            <div class="grid grid-cols-4 items-center gap-4" v-if="!isEditing">
+              <shadcn-label for="file" class="text-right">规格文件</shadcn-label>
+              <div class="col-span-3">
+                <input 
+                  id="file" 
+                  type="file" 
+                  ref="fileInputRef"
+                  class="hidden" 
+                  @change="handleFileChange"
+                />
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center justify-between border rounded-md p-2">
+                    <span class="truncate max-w-[260px]">
+                      {{ selectedFile ? selectedFile.name : '未选择文件' }}
+                    </span>
+                    <shadcn-button type="button" variant="outline" size="sm" @click="triggerFileInput">
+                      浏览...
+                    </shadcn-button>
+                  </div>
+                  <p class="text-xs text-muted-foreground">
+                    支持Word文档(docx)或PDF格式
+                  </p>
+                </div>
               </div>
-              <p class="text-xs text-muted-foreground">
-                支持Word文档(docx)或PDF格式
-              </p>
             </div>
           </div>
-        </div>
+          <shadcn-dialog-footer>
+            <shadcn-button type="submit">保存</shadcn-button>
+          </shadcn-dialog-footer>
+        </form>
       </div>
-      <shadcn-dialog-footer>
-        <shadcn-button type="submit" @click="handleSubmit">保存</shadcn-button>
-      </shadcn-dialog-footer>
     </shadcn-dialog-content>
   </shadcn-dialog>
 </template>

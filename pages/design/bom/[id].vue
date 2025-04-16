@@ -34,6 +34,7 @@ import { useEntityTree } from '~/composables/useEntityTree'
 import { useEntityHandlers } from '~/composables/useEntityHandlers'
 import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import type { ZdBomChild } from '~/models/entity/bom'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -78,6 +79,11 @@ const currentItem = ref<any>(null)
  */
 const handleSave = (data: any, nodeType: string) => {
   console.log('保存数据:', data, '节点类型:', nodeType)
+  // 如果是 BOM 节点，移除 isDeleted 字段
+  if (nodeType === NODE_TYPES.BOM) {
+    const { isDeleted, ...updateData } = data
+    return entityHandlers.handleSave(updateData, nodeType, loadBomDetail)
+  }
   return entityHandlers.handleSave(data, nodeType, loadBomDetail)
 }
 
@@ -86,6 +92,11 @@ const handleSave = (data: any, nodeType: string) => {
  */
 const handleCreate = (data: any, nodeType: string) => {
   console.log('创建数据:', data, '节点类型:', nodeType)
+  // 如果是 BOM 节点，移除 id 和 isDeleted 字段
+  if (nodeType === NODE_TYPES.BOM) {
+    const { id, isDeleted, ...createData } = data
+    return entityHandlers.handleCreate(createData, nodeType, loadBomDetail)
+  }
   return entityHandlers.handleCreate(data, nodeType, loadBomDetail)
 }
 
@@ -148,7 +159,7 @@ const loadBomDetail = async () => {
     
     // 如果BOM有子物料项，转换为子节点
     if (bom.items && bom.items.length > 0) {
-      bomNode.children = bom.items.map((item, index) => ({
+      bomNode.children = bom.items.map((item: ZdBomChild, index: number) => ({
         id: `${bomNode.id}:item-${index}`,
         originalId: item.itemId,
         label: item.itemName || `物料 ${item.itemId}`,

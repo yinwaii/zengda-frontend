@@ -65,7 +65,7 @@ function toggleOpen(deptId: number) {
 }
 
 function reload() {
-  dept.getDeptList(searchForm.value).then((res) => {
+  dept.getDeptList(searchForm.value).then((res: any) => {
     const initOpen = (items: ZdDept[]): ZdDept[] => {
       return items.map(item => ({
         ...item,

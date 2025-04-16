@@ -1,38 +1,35 @@
 <template>
-  <shadcn-dialog v-model:open="isOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px]">
+  <shadcn-dialog :open="open" @update:open="$emit('update:open', $event)">
+    <shadcn-dialog-content>
       <shadcn-dialog-header>
-        <shadcn-dialog-title>{{ template?.id ? '编辑模板' : '新建模板' }}</shadcn-dialog-title>
+        <shadcn-dialog-title>{{ isEdit ? '编辑模板' : isClone ? '克隆模板' : '创建模板' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
-          {{ template?.id ? '修改模板信息' : '创建新的模板' }}
+          {{ isEdit ? '修改模板信息' : isClone ? '基于现有模板创建新模板' : '创建新的模板' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
       <form @submit.prevent="handleSubmit">
-      <div class="grid gap-4 py-4">
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="name" class="text-right">名称</shadcn-label>
-            <shadcn-input id="name" v-model="form.name" class="col-span-3" required />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="description" class="text-right">描述</shadcn-label>
-            <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isShow" class="text-right">是否显示</shadcn-label>
-          <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
-        </div>
-        <div class="grid grid-cols-4 items-center gap-4">
-          <shadcn-label for="isCustomized" class="text-right">是否定制</shadcn-label>
-          <shadcn-checkbox id="isCustomized" v-model="form.isCustomized" class="col-span-3" />
-        </div>
-          <div class="grid grid-cols-4 items-center gap-4">
-            <shadcn-label for="productTypeId" class="text-right">产品类型ID</shadcn-label>
-            <shadcn-input id="productTypeId" v-model="form.productTypeId" type="number" class="col-span-3" required />
+        <div class="grid gap-4 py-4">
+          <div class="space-y-2">
+            <shadcn-label for="name">名称</shadcn-label>
+            <shadcn-input id="name" v-model="form.name" />
           </div>
-      </div>
-      <shadcn-dialog-footer>
-          <shadcn-button type="submit">保存</shadcn-button>
-      </shadcn-dialog-footer>
+          <div class="space-y-2">
+            <shadcn-label for="description">描述</shadcn-label>
+            <shadcn-textarea id="description" v-model="form.description" />
+          </div>
+          <product-type-select v-model="form.productTypeId" />
+          <div class="space-y-2">
+            <shadcn-label for="isShow">是否显示</shadcn-label>
+            <shadcn-switch id="isShow" v-model="form.isShow" />
+          </div>
+          <div class="space-y-2">
+            <shadcn-label for="isCustomized">是否定制</shadcn-label>
+            <shadcn-switch id="isCustomized" v-model="form.isCustomized" />
+          </div>
+        </div>
+        <shadcn-dialog-footer>
+          <shadcn-button type="submit">{{ isEdit ? '保存' : isClone ? '克隆' : '创建' }}</shadcn-button>
+        </shadcn-dialog-footer>
       </form>
     </shadcn-dialog-content>
   </shadcn-dialog>
@@ -41,89 +38,55 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import type { ZdTemplate } from '~/models/entity/template'
+import ProductTypeSelect from '~/components/design/product-type-select.vue'
 
 const props = defineProps<{
   open: boolean
-  template?: ZdTemplate | null
+  template?: ZdTemplate
+  isClone?: boolean
 }>()
 
 const emit = defineEmits<{
-  'update:open': [value: boolean]
-  'save': [template: ZdTemplate]
+  (e: 'update:open', value: boolean): void
+  (e: 'save', data: Omit<ZdTemplate, 'id' | 'isDeleted'>): void
 }>()
 
-const form = ref<Partial<ZdTemplate>>({
+const isEdit = computed(() => !!props.template && !props.isClone)
+const isClone = computed(() => !!props.isClone)
+
+const form = ref({
   name: '',
   description: '',
+  productTypeId: 0,
   isShow: true,
-  isCustomized: false,
-  productTypeId: 1
+  isCustomized: false
 })
 
-// 监听模板变化，初始化表单
 watch(() => props.template, (newTemplate) => {
   if (newTemplate) {
     form.value = {
-      name: newTemplate.name,
-      description: newTemplate.description,
+      name: props.isClone ? `${newTemplate.name} (克隆)` : newTemplate.name,
+      description: newTemplate.description ?? '',
+      productTypeId: newTemplate.productTypeId,
       isShow: newTemplate.isShow,
-      isCustomized: newTemplate.isCustomized,
-      productTypeId: newTemplate.productTypeId
+      isCustomized: newTemplate.isCustomized
     }
   } else {
     form.value = {
       name: '',
       description: '',
+      productTypeId: 0,
       isShow: true,
-      isCustomized: false,
-      productTypeId: 1
+      isCustomized: false
     }
   }
 }, { immediate: true })
 
-// 监听对话框开关状态
-watch(() => props.open, (isOpen) => {
-  if (!isOpen) {
-    // 关闭对话框时不重置表单，避免刷新已编辑的值
-    return
+const handleSubmit = () => {
+  const newTemplate = {
+    ...form.value
   }
-})
-
-// 内部状态，同步props.open
-const isOpen = ref(props.open)
-watch(() => props.open, (newVal) => {
-  isOpen.value = newVal
-})
-watch(() => isOpen.value, (newVal) => {
-  emit('update:open', newVal)
-})
-
-// 设置对话框开关状态
-const setIsOpen = (value: boolean) => {
-  isOpen.value = value
-}
-
-// 处理表单提交
-const handleSubmit = (event: Event) => {
-  // 阻止表单默认提交行为
-  if (event) event.preventDefault()
-  
-  // 表单验证
-  if (!form.value.name) {
-    console.error('模板名称不能为空')
-    return
-  }
-  
-  // 创建新的模板对象
-  const newTemplate: ZdTemplate = {
-    ...form.value,
-    id: props.template?.id || 0
-  } as ZdTemplate
-  
-  // 触发保存事件
-  emit('save', newTemplate)
-  
-  // 关闭对话框
-  setIsOpen(false)
+  const plainData = JSON.parse(JSON.stringify(newTemplate))
+  emit('save', plainData)
 }
 </script> 

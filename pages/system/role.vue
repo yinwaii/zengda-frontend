@@ -130,7 +130,7 @@ function search() {
     roleQueryParams.value.page.current = 1;
     roleQueryParams.value.page.size = 10;
     roleQueryParams.value.data = {};
-    roleApi.getRolePage(roleQueryParams.value).then((res) => {
+    roleApi.getRolePage(roleQueryParams.value).then((res: any) => {
         const rolePageResult = res as SysPage<Role>;
         roleList.value = rolePageResult.records;
     });

@@ -1,13 +1,13 @@
 <template>
   <shadcn-dialog v-model:open="open">
-    <shadcn-dialog-content class="sm:max-w-[525px]">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ ptype?.id ? '编辑产品类型' : '新建产品类型' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
           {{ ptype?.id ? '修改产品类型信息' : '添加产品类型' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
-      <div class="py-4">
+      <div class="overflow-y-auto max-h-[calc(80vh-8rem)]">
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">

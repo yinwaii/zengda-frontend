@@ -32,7 +32,7 @@ export default defineNuxtConfig({
     shim: false,
   },
   runtimeConfig: {
-    dufsServer: process.env.DUFS_SERVER || 'http://localhost:6990',
+    dufsServer: process.env.DUFS_SERVER || 'http://localhost:5000',
     public: {
       apiBase: process.env.API_BASE || '',
     }
