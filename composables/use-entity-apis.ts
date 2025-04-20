@@ -198,7 +198,7 @@ export const useEntityApis = (): any => {
       getByComponentId: (componentId: number) => api.get<Array<number>>(`/bom/`, { componentId }),
       create: (data: Partial<ZdBom>) => api.post<ZdBom>('/bom', data),
       update: (data: Partial<ZdBom>) => api.put<ZdBom>('/bom', data),
-      data: (id: number) => api.delete<ZdBom>(`/bom/${id}`)
+      delete: (id: number) => api.delete<ZdBom>(`/bom/${id}`)
     },
 
     specification: {

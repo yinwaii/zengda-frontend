@@ -2,8 +2,8 @@
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
       <Button variant="outline" size="sm">
-        <Plus class="mr-2 h-4 w-4" />
-        新建
+        <Settings class="mr-2 h-4 w-4" />
+        操作
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
@@ -19,5 +19,5 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Plus } from 'lucide-vue-next'
+import { Settings } from 'lucide-vue-next'
 </script> 

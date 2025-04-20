@@ -469,23 +469,24 @@ const handleMenuDialogSubmit = (data: any) => {
   showMenuDialog.value = false
 }
 const entityApis = useEntityApis()
+const refresh = inject('refresh') as () => Promise<void>
 // 处理删除事件
-const handleDelete = (item: any) => {
+const handleDelete = async(item: any) => {
   console.log('DynamicEntityTree 收到删除事件，item:', item)
   if (item.type === NODE_TYPES.TEMPLATE) {
-    entityApis.template.delete(item.id)
-    
+    entityApis.template.delete(toApiId(item.id) ?? 0)
   } else if (item.type === NODE_TYPES.PROJECT) {
-    entityApis.project.delete(item.id)
+    entityApis.project.delete(toApiId(item.id) ?? 0)
   } else if (item.type === NODE_TYPES.PSYSTEM) {
-    entityApis.psystem.delete(item.id)
+    entityApis.psystem.delete(toApiId(item.id) ?? 0)
   } else if (item.type === NODE_TYPES.COMPONENT) {
-    entityApis.component.delete(item.id)
+    entityApis.component.delete(toApiId(item.id) ?? 0)
   } else if (item.type === NODE_TYPES.BOM) {
-    entityApis.bom.delete(item.id)
+    entityApis.bom.delete(toApiId(item.id) ?? 0)
   } else if (item.type === NODE_TYPES.SPECIFICATION) {
-    entityApis.specification.delete(item.id)
+    entityApis.specification.delete(toApiId(item.id) ?? 0)
   }
+  await refresh()
 }
 </script>
 

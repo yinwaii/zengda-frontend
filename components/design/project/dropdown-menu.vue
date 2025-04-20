@@ -2,8 +2,8 @@
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
       <Button variant="outline" size="sm">
-        <Plus class="mr-2 h-4 w-4" />
-        新建
+        <Settings class="mr-2 h-4 w-4" />
+        操作
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
@@ -31,7 +31,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, Layers } from 'lucide-vue-next'
+import { Copy, Layers, Settings } from 'lucide-vue-next'
 import type { ZdProject } from '~/models/entity/project'
 import { LucideTrash } from 'lucide-vue-next'
 // import { useProjectStore } from '@/stores/project'
