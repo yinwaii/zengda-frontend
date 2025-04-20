@@ -101,6 +101,7 @@ onMounted(async () => {
 
 // 监听系统变化，初始化表单
 watch(() => props.system, (newSystem) => {
+  console.log('newSystem:', newSystem)
   if (newSystem) {
     form.value = { ...newSystem }
   } else {
@@ -110,6 +111,7 @@ watch(() => props.system, (newSystem) => {
 
 // 监听对话框开关状态
 watch(() => props.open, (isOpen) => {
+  console.log('isOpen:', isOpen)
   if (!isOpen) {
     form.value = {} as ZdPSystem
   }

@@ -21,10 +21,10 @@ import type { ExtendedZdTComponent } from '~/types/extended'
 export const useEntityTree = () => {
   const entityApis = useEntityApis()
   const { success, error } = useMessage()
-  
+
   // 加载状态
   const isLoading = ref(false)
-  
+
   // 各种实体数据转换为树节点函数
   const projectTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.PROJECT])
   const templateTreeNodeFactory = createTreeNodeFactory([NODE_TYPES.TEMPLATE])
@@ -115,7 +115,7 @@ export const useEntityTree = () => {
         try {
           // 直接使用templateId获取特定模板，而不是分页查询所有模板
           const template = await entityApis.template.get(project.templateId)
-          
+
           if (template) {
             // 转换API响应中的ID为前端使用的复合ID
             const templateWithCompositeId = convertApiResponseIds([template], NODE_TYPES.TEMPLATE)[0]
@@ -174,29 +174,29 @@ export const useEntityTree = () => {
             continue
           }
 
-            // 提取原始ID用于API调用
-            const templateId = toApiId(template.id)
-            if (templateId === null) {
-              console.warn(`无效的模板ID: ${template.id}`)
-              continue
-            }
+          // 提取原始ID用于API调用
+          const templateId = toApiId(template.id)
+          if (templateId === null) {
+            console.warn(`无效的模板ID: ${template.id}`)
+            continue
+          }
 
-            // 获取模板关联的产品系统
-            const response = await entityApis.template_psystem.getByTemplateId(templateId)
+          // 获取模板关联的产品系统
+          const response = await entityApis.template_psystem.getByTemplateId(templateId)
 
-            if (response && response.list && response.list.length) {
-              // 转换API响应中的ID为前端使用的复合ID
-              const psystemsWithCompositeIds = convertApiResponseIds(response.list, NODE_TYPES.PSYSTEM)
+          if (response && response.list && response.list.length) {
+            // 转换API响应中的ID为前端使用的复合ID
+            const psystemsWithCompositeIds = convertApiResponseIds(response.list, NODE_TYPES.PSYSTEM)
 
-              // 将产品系统转换为树节点并添加到模板节点下
-              const psystemNodes = psystemsWithCompositeIds.map((psystem: Record<string, any>) =>
-                psystemTreeNodeFactory(psystem)
-              )
+            // 将产品系统转换为树节点并添加到模板节点下
+            const psystemNodes = psystemsWithCompositeIds.map((psystem: Record<string, any>) =>
+              psystemTreeNodeFactory(psystem)
+            )
 
-              // 挂载产品系统节点到模板节点下
-              templateNode.children = (templateNode.children || []).concat(psystemNodes)
-            }
-          } catch (err) {
+            // 挂载产品系统节点到模板节点下
+            templateNode.children = (templateNode.children || []).concat(psystemNodes)
+          }
+        } catch (err) {
           console.error(`加载模板 ${templateNode.id} 的产品系统失败:`, err)
         }
       }
@@ -211,127 +211,59 @@ export const useEntityTree = () => {
   }
 
   /**
-   * 根据模板ID加载组件数据并根据psystemId挂载到相应的系统节点下
-   * @param projectNodes 项目节点数组
-   * @returns 更新后的项目节点数组
+   * 根据产品系统ID加载组件数据并挂载到相应的系统节点下
+   * @param treeNodes 树节点数组
+   * @returns 更新后的树节点数组
    */
-  const loadComponentByTemplate = async (projectNodes: TreeNodeData[]): Promise<TreeNodeData[]> => {
+  const loadComponentByPSystem = async (treeNodes: TreeNodeData[]): Promise<TreeNodeData[]> => {
     // 处理空数组入参
-    if (!projectNodes || projectNodes.length === 0) {
-      return projectNodes || []
+    if (!treeNodes || treeNodes.length === 0) {
+      return treeNodes || []
     }
 
     try {
-      // 第一步：遍历并收集所有模板节点
-      const templateNodes = traverseNodesByTypes(projectNodes, [NODE_TYPES.TEMPLATE])
-      console.log(`共找到 ${templateNodes.length} 个模板节点需要处理`)
 
-      // 第二步：处理每个模板节点，加载组件数据
-      for (const templateNode of templateNodes) {
+      const psystemNodes = traverseNodesByTypes(treeNodes, [NODE_TYPES.PSYSTEM])
+      console.log(`共找到 ${psystemNodes.length} 个PSystem节点需要处理`, psystemNodes)
+
+      // 第二步：为每个PSystem节点加载组件数据
+      for (const psystemNode of psystemNodes) {
         try {
-          // 增强检查，确保originalData存在且有效
-          if (!templateNode.originalData) {
-            console.warn('发现无效模板节点', templateNode)
-            continue
+          const psystemId = toApiId(psystemNode.id)
+          if (!psystemId) continue
+
+          // 获取该PSystem下的所有组件
+          const response = await entityApis.psystem_component.getAll(toApiId(psystemId))
+          console.log('response:', response)
+          if (!response) continue
+
+          const componentNodes: TreeNodeData[] = []
+          // 转换组件数据为树节点
+          for (const componentId of response) {
+            const component = await entityApis.component.get(componentId)
+            // 使用工厂函数创建组件节点
+            const componentNode = componentTreeNodeFactory({
+              ...component,
+              id: component.id,
+              type: NODE_TYPES.COMPONENT
+            })
+            componentNodes.push(componentNode)
           }
+          console.log('componentNodes:', componentNodes)
 
-          const template = templateNode.originalData as ZdTemplate
-          // 增强ID检查
-          if (!template || typeof template.id === 'undefined' || template.id === null) {
-            console.warn('发现无效模板数据', template)
-            continue
-          }
-
-            // 提取原始ID用于API调用
-            const templateId = toApiId(template.id)
-            if (templateId === null) {
-              console.warn(`无效的模板ID: ${template.id}`)
-              continue
-            }
-
-            // 获取模板关联的组件
-            const response = await entityApis.template_component.getByTemplateId(templateId)
-
-            if (response && response.list && response.list.length) {
-              // 组件数据需要特殊处理，因为它们需要挂载到对应的系统节点下
-              const tComponentsWithIds = response.list.map((tComponent: ZdTComponent) => {
-                // 使用toApiId提取纯数字ID
-                const componentId = toApiId(tComponent.componentId)
-                const psystemId = toApiId(tComponent.psystemId)
-                const templateId = toApiId(tComponent.templateId)
-
-                // 检查数字有效性
-                if (componentId === null || psystemId === null || templateId === null) {
-                  console.warn('发现无效组件ID:', tComponent)
-                  return null
-                }
-
-                // 使用扩展类型
-                return {
-                  ...tComponent,
-                  originalComponentId: componentId,
-                  originalPsystemId: psystemId,
-                  originalTemplateId: templateId
-                } as ExtendedZdTComponent
-              }).filter(Boolean) as ExtendedZdTComponent[] // 过滤无效组件
-
-              // 创建组件节点
-              const componentNodes = tComponentsWithIds.map((tComponent: ExtendedZdTComponent) => {
-                // 构建ID时避免重复使用复合ID
-                const compId = tComponent.originalComponentId
-
-                // 为组件获取完整信息，并确保设置type属性
-                return componentTreeNodeFactory({
-                  id: compId, // 使用纯数字ID，让工厂函数添加前缀
-                  originalId: compId,
-                  name: `组件${compId}`,
-                  description: tComponent.description,
-                  psystemId: tComponent.originalPsystemId,
-                  templateId: tComponent.originalTemplateId,
-                  originalTComponent: tComponent,
-                  type: NODE_TYPES.COMPONENT
-                })
-              })
-
-              // 根据psystemId将组件挂载到对应的系统节点下
-              for (const componentNode of componentNodes) {
-                // 确保componentNode和其originalData存在
-                if (!componentNode || !componentNode.originalData) continue
-
-                // 从原始数据中获取psystemId
-                const component = componentNode.originalData
-                const psystemId = Number(component.psystemId)
-
-                // 确保psystemId存在且有效
-                if (isNaN(psystemId)) {
-                  console.warn('发现无效psystemId:', component)
-                  continue
-                }
-
-                // 查找对应的系统节点
-                const psystemNode = findPSystemNode(templateNode, psystemId)
-
-                if (psystemNode) {
-                  // 挂载组件到系统节点
-                  psystemNode.children = (psystemNode.children || []).concat([componentNode])
-                } else {
-                  console.warn(`未找到psystemId=${psystemId}的系统节点，组件${component.id}将挂载到模板节点`)
-                  // 如果找不到对应的系统节点，直接挂载到模板节点
-                  templateNode.children = (templateNode.children || []).concat([componentNode])
-                }
-              }
-            }
-          } catch (err) {
-          console.error(`加载模板 ${templateNode.id} 的组件失败:`, err)
+          // 将组件节点添加到PSystem节点下
+          psystemNode.children = (psystemNode.children || []).concat(componentNodes)
+          console.log(`为PSystem ${psystemId} 添加了 ${componentNodes.length} 个组件节点`)
+        } catch (err) {
+          console.error(`加载PSystem ${psystemNode.id} 的组件数据失败:`, err)
         }
       }
 
-      console.log('组件数据加载完成')
-      return projectNodes
+      return treeNodes
     } catch (err) {
       console.error('加载组件数据失败:', err)
       error('加载组件数据失败')
-      return projectNodes
+      return treeNodes
     }
   }
 
@@ -350,45 +282,45 @@ export const useEntityTree = () => {
       // 第一步：遍历并收集所有组件节点
       const componentNodes = traverseNodesByTypes(projectNodes, [NODE_TYPES.COMPONENT])
       console.log(`共找到 ${componentNodes.length} 个组件节点需要处理`)
-      
+
       // 第二步：处理每个组件节点，加载完整的组件信息
       for (const componentNode of componentNodes) {
-              try {
-                // 从节点原始数据中获取组件ID
-                const component = componentNode.originalData
+        try {
+          // 从节点原始数据中获取组件ID
+          const component = componentNode.originalData
           if (!component || !component.id) {
             console.warn('发现无效组件数据', component)
             continue
           }
 
-                // 提取原始ID用于API调用
-                const componentId = toApiId(component.id)
-                if (componentId === null) {
-                  console.warn(`无效的组件ID: ${component.id}`)
-                  continue
-                }
+          // 提取原始ID用于API调用
+          const componentId = toApiId(component.id)
+          if (componentId === null) {
+            console.warn(`无效的组件ID: ${component.id}`)
+            continue
+          }
 
-                // 获取完整的组件信息
-                const response = await entityApis.component.get(componentId)
+          // 获取完整的组件信息
+          const response = await entityApis.component.get(componentId)
           if (!response) {
             console.warn(`未找到组件详情，ID: ${componentId}`)
             continue
           }
 
-                // 转换API响应中的ID为前端使用的复合ID
-                const componentWithCompositeId = convertApiResponseIds([response], NODE_TYPES.COMPONENT)[0]
+          // 转换API响应中的ID为前端使用的复合ID
+          const componentWithCompositeId = convertApiResponseIds([response], NODE_TYPES.COMPONENT)[0]
 
-                // 使用新的组件信息创建更新后的节点
-                const updatedNode = componentTreeNodeFactory(componentWithCompositeId)
+          // 使用新的组件信息创建更新后的节点
+          const updatedNode = componentTreeNodeFactory(componentWithCompositeId)
 
-                // 保留原节点的子节点
-                updatedNode.children = componentNode.children || []
+          // 保留原节点的子节点
+          updatedNode.children = componentNode.children || []
 
           // 更新原节点的数据
           Object.assign(componentNode, updatedNode)
           console.log(`已更新组件节点(ID: ${componentNode.id})的详细信息`)
-              } catch (err) {
-                console.error(`加载组件详情失败:`, err)
+        } catch (err) {
+          console.error(`加载组件详情失败:`, err)
         }
       }
 
@@ -409,14 +341,14 @@ export const useEntityTree = () => {
    */
   const traverseNodesByTypes = (treeNodes: TreeNodeData[], nodeTypes: string[]): TreeNodeData[] => {
     const resultList: TreeNodeData[] = [];
-    
+
     // 创建DFS遍历函数
     const traverse = (node: TreeNodeData): void => {
       // 检查节点类型是否符合条件
       if (node.type && nodeTypes.includes(node.type)) {
         resultList.push(node);
       }
-      
+
       // 递归遍历子节点
       if (node.children && node.children.length > 0) {
         for (const child of node.children) {
@@ -424,12 +356,12 @@ export const useEntityTree = () => {
         }
       }
     };
-    
+
     // 对输入的每个根节点进行DFS遍历
     for (const node of treeNodes) {
       traverse(node);
     }
-    
+
     return resultList;
   };
 
@@ -443,12 +375,12 @@ export const useEntityTree = () => {
     if (!treeNodes || treeNodes.length === 0) {
       return treeNodes || [];
     }
-    
+
     try {
       // 第一步：遍历并收集所有组件节点
       const componentNodes = traverseNodesByTypes(treeNodes, [NODE_TYPES.COMPONENT]);
       console.log(`共找到 ${componentNodes.length} 个组件节点需要处理`);
-      
+
       // 第二步：处理每个组件节点，加载BOM数据
       for (const node of componentNodes) {
         try {
@@ -463,27 +395,27 @@ export const useEntityTree = () => {
               // 获取BOM信息
               console.log(`加载组件(ID: ${component.id})的BOM数据(ID: ${bomId})`);
               const response = await entityApis.bom.get(bomId);
-              
+
               if (response) {
                 // 转换API响应中的ID为前端使用的复合ID
                 const bomWithCompositeId = convertApiResponseIds([response], NODE_TYPES.BOM)[0];
-                
+
                 // 创建BOM节点
                 const bomNode = bomTreeNodeFactory(bomWithCompositeId);
-                
+
                 // 将BOM数据存储到组件节点，方便后续使用
                 node.bomData = response;
-                
+
                 // 将BOM节点添加到组件节点的子节点列表，避免重复添加
                 if (!node.children) {
                   node.children = [];
                 }
-                
+
                 // 检查是否已存在同ID的BOM节点，避免重复
-                const existingBomNode = node.children.find(child => 
+                const existingBomNode = node.children.find(child =>
                   child.type === NODE_TYPES.BOM && child.originalData?.id === bomWithCompositeId.id
                 );
-                
+
                 if (!existingBomNode) {
                   node.children.push(bomNode);
                   console.log(`已将BOM节点(ID: ${bomNode.id})添加到组件节点(ID: ${node.id})下`);
@@ -497,7 +429,7 @@ export const useEntityTree = () => {
           console.error(`加载组件(ID: ${node.id})的BOM数据失败:`, err);
         }
       }
-      
+
       console.log('BOM数据加载完成');
       return treeNodes;
     } catch (err) {
@@ -719,7 +651,7 @@ export const useEntityTree = () => {
           // 获取项目关联的配置
           const configId = toApiId(project.id)
           const configResponse = await entityApis.configuration.getByTemplateId(project.templateId, configId ?? 0)
-          
+
           if (configResponse && configResponse.list && configResponse.list.length > 0) {
             // 遍历配置列表，为每个配置创建树节点
             for (const config of configResponse.list) {
@@ -777,7 +709,7 @@ export const useEntityTree = () => {
       loadBoms = true,
       loadSpecifications = true
     } = options
-    
+
     try {
       isLoading.value = true
       console.log('开始加载实体树数据')
@@ -811,9 +743,9 @@ export const useEntityTree = () => {
           if (loadComponents) {
             try {
               // 步骤4: 为模板加载组件数据并根据psystemId挂载到相应的系统节点下
-              nodes = await loadComponentByTemplate(nodes)
+              nodes = await loadComponentByPSystem(nodes)
               console.log('步骤4完成: 已加载组件数据')
-              
+
               if (loadFullComponents) {
                 try {
                   // 步骤5: 获取完整的组件信息并更新组件节点
@@ -823,7 +755,7 @@ export const useEntityTree = () => {
                   console.error('加载完整组件信息失败:', err)
                 }
               }
-              
+
               if (loadBoms) {
                 try {
                   // 步骤6: 为组件加载BOM数据
@@ -837,7 +769,7 @@ export const useEntityTree = () => {
               console.error('加载组件数据失败:', err)
             }
           }
-          
+
           if (loadSpecifications) {
             try {
               // 步骤7: 为模板和系统加载规格数据
@@ -886,7 +818,7 @@ export const useEntityTree = () => {
         id: generateCompositeId(NODE_TYPES.TEMPLATE, template.id)
       }
       const templateNode = templateTreeNodeFactory(templateWithCompositeId)
-      
+
       // 返回仅包含模板节点的树
       return { treeData: [templateNode], loading: false }
     } catch (err) {
@@ -921,7 +853,7 @@ export const useEntityTree = () => {
         id: generateCompositeId(NODE_TYPES.PROJECT, project.id)
       }
       const projectNode = projectTreeNodeFactory(projectWithCompositeId)
-      
+
       // 返回仅包含项目节点的树
       return { treeData: [projectNode], loading: false }
     } catch (err) {
@@ -940,7 +872,7 @@ export const useEntityTree = () => {
    * @returns 更新后的树节点数据
    */
   const loadEntityChildren = async (
-    treeData: TreeNodeData[], 
+    treeData: TreeNodeData[],
     options: {
       loadSystems?: boolean,
       loadComponents?: boolean,
@@ -953,18 +885,18 @@ export const useEntityTree = () => {
       loadSystems = true,
       loadComponents = true,
       loadFullComponents = true,
-      loadBoms = true, 
+      loadBoms = true,
       loadSpecifications = true
     } = options
-    
+
     try {
       isLoading.value = true
       console.log('开始加载实体子元素')
-      
+
       // 临时包装到root节点
-      let nodes: TreeNodeData[] = [{ 
-        id: 'temp-root' as string | number, 
-        label: 'Root', 
+      let nodes: TreeNodeData[] = [{
+        id: 'temp-root' as string | number,
+        label: 'Root',
         children: [...treeData],
         type: 'root'
       } as TreeNodeData]
@@ -972,12 +904,12 @@ export const useEntityTree = () => {
       // 在加载前收集现有ID，用于防止重复添加
       const collectExistingIds = (node: TreeNodeData, type: string): Set<string | number> => {
         const ids = new Set<string | number>()
-        
+
         // 检查当前节点是否匹配类型
         if (node.type === type && node.id) {
           ids.add(node.id)
         }
-        
+
         // 递归处理子节点
         if (node.children && node.children.length > 0) {
           for (const child of node.children) {
@@ -985,14 +917,14 @@ export const useEntityTree = () => {
             childIds.forEach(id => ids.add(id))
           }
         }
-        
+
         return ids
       }
-      
+
       // 收集所有现有节点ID
       const existingPSystemIds = collectExistingIds(nodes[0], NODE_TYPES.PSYSTEM)
       const existingComponentIds = collectExistingIds(nodes[0], NODE_TYPES.COMPONENT)
-      
+
       console.log(`初始状态: 已有 ${existingPSystemIds.size} 个产品系统节点, ${existingComponentIds.size} 个组件节点`)
 
       if (loadSystems && existingPSystemIds.size === 0) {
@@ -1010,40 +942,40 @@ export const useEntityTree = () => {
       if (loadComponents) {
         // 重新检查现有组件节点
         const currentComponentIds = collectExistingIds(nodes[0], NODE_TYPES.COMPONENT)
-        
+
         if (currentComponentIds.size === 0) {
-        try {
-          // 步骤2: 加载组件数据
-          nodes = await loadComponentByTemplate(nodes)
-          console.log('步骤2完成: 已加载组件数据')
+          try {
+            // 步骤2: 加载组件数据
+            nodes = await loadComponentByPSystem(nodes)
+            console.log('步骤2完成: 已加载组件数据')
           } catch (err) {
             console.error('加载组件数据失败:', err)
           }
         } else {
           console.log('跳过加载组件数据: 已存在组件节点')
         }
-          
-          if (loadFullComponents) {
-            try {
-              // 步骤3: 获取完整的组件信息
-              nodes = await loadComponentByComponent(nodes)
-              console.log('步骤3完成: 已加载完整组件信息')
-            } catch (err) {
-              console.error('加载完整组件信息失败:', err)
-            }
+
+        if (loadFullComponents) {
+          try {
+            // 步骤3: 获取完整的组件信息
+            nodes = await loadComponentByComponent(nodes)
+            console.log('步骤3完成: 已加载完整组件信息')
+          } catch (err) {
+            console.error('加载完整组件信息失败:', err)
           }
-          
-          if (loadBoms) {
-            try {
-              // 步骤4: 加载BOM数据
-              nodes = await loadBomByComponent(nodes)
-              console.log('步骤4完成: 已加载BOM数据')
-            } catch (err) {
-              console.error('加载BOM数据失败:', err)
-            }
+        }
+
+        if (loadBoms) {
+          try {
+            // 步骤4: 加载BOM数据
+            nodes = await loadBomByComponent(nodes)
+            console.log('步骤4完成: 已加载BOM数据')
+          } catch (err) {
+            console.error('加载BOM数据失败:', err)
+          }
         }
       }
-      
+
       if (loadSpecifications) {
         try {
           // 步骤5: 加载规格数据
@@ -1056,7 +988,7 @@ export const useEntityTree = () => {
 
       // 解包临时root节点的子元素
       const resultData = nodes[0].children || []
-      
+
       success('加载实体子元素成功')
       return { treeData: resultData, loading: false }
     } catch (err) {
@@ -1091,7 +1023,7 @@ export const useEntityTree = () => {
         id: generateCompositeId(NODE_TYPES.PSYSTEM, psystem.id)
       }
       const psystemNode = psystemTreeNodeFactory(psystemWithCompositeId)
-      
+
       // 返回仅包含产品系统节点的树
       return { treeData: [psystemNode], loading: false }
     } catch (err) {
@@ -1117,26 +1049,26 @@ export const useEntityTree = () => {
     try {
       isLoading.value = true
       console.log('开始加载产品系统相关的规格数据')
-      
+
       // 递归遍历树，为每个PSystem节点加载规格
       const processNode = async (node: TreeNodeData): Promise<void> => {
         // 检查是否为PSystem节点
         if (node.type === NODE_TYPES.PSYSTEM && node.originalData) {
           const psystem = node.originalData as Record<string, any>
-          
+
           // 检查是否有规格ID
           if (psystem.specId && psystem.specId > 0) {
             try {
               console.log(`为产品系统 ${psystem.id} 加载规格数据，规格ID：${psystem.specId}`)
-              
+
               // 获取规格数据
               const specification = await entityApis.specification.getAll(psystem.specId)
-              
+
               if (specification) {
                 // 转换为树节点结构
                 const specWithCompositeId = convertApiResponseIds([specification], NODE_TYPES.SPECIFICATION)[0]
                 const specNode = specificationTreeNodeFactory(specWithCompositeId)
-                
+
                 // 添加到PSystem节点的子节点列表
                 node.children = node.children || []
                 node.children.unshift(specNode)
@@ -1147,7 +1079,7 @@ export const useEntityTree = () => {
             }
           }
         }
-        
+
         // 递归处理子节点
         if (node.children && node.children.length > 0) {
           for (const child of node.children) {
@@ -1155,12 +1087,12 @@ export const useEntityTree = () => {
           }
         }
       }
-      
+
       // 为每个顶级节点处理
       for (const node of treeData) {
         await processNode(node)
       }
-      
+
       console.log('产品系统规格数据加载完成')
       return treeData
     } catch (err) {
@@ -1195,7 +1127,7 @@ export const useEntityTree = () => {
         id: generateCompositeId(NODE_TYPES.COMPONENT, component.id)
       }
       const componentNode = componentTreeNodeFactory(componentWithCompositeId)
-      
+
       // 返回仅包含组件节点的树
       return { treeData: [componentNode], loading: false }
     } catch (err) {
@@ -1210,7 +1142,7 @@ export const useEntityTree = () => {
   return {
     // 状态
     isLoading,
-    
+
     // 核心功能
     loadEntityTree,
     loadTemplateById,
@@ -1218,23 +1150,23 @@ export const useEntityTree = () => {
     loadProjectById,
     loadPSystemById,
     loadComponentById,
-    
+
     // 单步加载函数
     loadProjectByPage,
     loadTemplateByProject,
     loadPSystemByTemplate,
-    loadComponentByTemplate,
+    loadComponentByPSystem,
     loadComponentByComponent,
     loadBomByComponent,
     loadSpecificationByTemplate,
     loadSpecificationByPSystem,
     loadConfigurationByProject,
-    
+
     // 工具函数
     findPSystemNode,
     extractSpecIds,
     findSpecById,
-    
+
     // 工厂函数
     projectTreeNodeFactory,
     templateTreeNodeFactory,
