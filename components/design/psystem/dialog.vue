@@ -101,7 +101,7 @@ onMounted(async () => {
 
 // 监听系统变化，初始化表单
 watch(() => props.system, (newSystem) => {
-  console.log('newSystem:', newSystem)
+  // console.log('newSystem:', newSystem)
   if (newSystem) {
     form.value = { ...newSystem }
   } else {

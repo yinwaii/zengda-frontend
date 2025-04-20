@@ -1,7 +1,7 @@
 <template>
 	<div class="space-y-6">
 		<!-- 配置选择器区域 -->
-		<shadcn-card v-if="configurations && configurations.length > 0">
+		<shadcn-card v-if="configurations">
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<h3 class="text-lg font-medium">项目配置</h3>
@@ -244,9 +244,9 @@
 									<LucideCalculator class="mr-2 h-4 w-4" />
 									报价结果计算
 								</shadcn-button>
-								<shadcn-button variant="outline" disabled>
+								<shadcn-button variant="outline" @click="generateSpecification" :disabled="specLoading">
 									<LucideFileText class="mr-2 h-4 w-4" />
-									规格书生成
+									{{ specLoading ? '生成中...' : '规格书生成' }}
 								</shadcn-button>
 							</dd>
 						</div>
@@ -841,6 +841,109 @@ const priceConfigId = ref<number | null>(null)
 const priceLoading = ref(false)
 const priceData = ref<ZdPrice | null>(null)
 const priceItems = ref<ZdPriceItem[]>([])
+
+// 规格书生成相关状态
+const specLoading = ref(false)
+
+// 规格书生成处理函数
+const generateSpecification = async () => {
+	if (!project.value || !project.value.templateId) {
+		toast({
+			title: '错误',
+			description: '项目信息不完整',
+			variant: 'destructive'
+		})
+		return
+	}
+
+	try {
+		specLoading.value = true
+
+		// 1. 获取模板信息
+		const template = templates.value.find(t => t.id === project.value.templateId)
+		if (!template || !template.specId) {
+			toast({
+				title: '错误',
+				description: '未找到模板规格书配置',
+				variant: 'destructive'
+			})
+			return
+		}
+
+		// 2. 获取规格书配置
+		console.log('template.specId:', template.specId)
+		const specConfig = await entityApis.specification.getAll(template.specId)
+		if (!specConfig) {
+			toast({
+				title: '错误',
+				description: '未找到规格书配置',
+				variant: 'destructive'
+			})
+			return
+		}
+
+		// 清理specConfig中的null值
+		const cleanSpecConfig = (obj: any): any => {
+			if (obj === null || obj === undefined) {
+				return undefined
+			}
+			if (Array.isArray(obj)) {
+				return obj.map(item => cleanSpecConfig(item)).filter(item => item !== undefined)
+			}
+			if (typeof obj === 'object') {
+				const cleaned: any = {}
+				for (const [key, value] of Object.entries(obj)) {
+					const cleanedValue = cleanSpecConfig(value)
+					if (cleanedValue !== undefined) {
+						cleaned[key] = cleanedValue
+					}
+				}
+				return Object.keys(cleaned).length > 0 ? cleaned : undefined
+			}
+			return obj
+		}
+
+		const cleanedSpecConfig = cleanSpecConfig(specConfig)
+
+		// 3. 创建规格书查询对象
+		// const specQuery = {
+		// 	projectId: project.value.id,
+		// 	templateId: project.value.templateId,
+		// 	specId: template.specId,
+		// 	configId: selectedConfigId.value || undefined
+		// }
+
+		// 4. 渲染规格书
+		console.log('selectedConfigId.value:', selectedConfigId.value, cleanedSpecConfig)
+		const renderUrl = await entityApis.specification.render(selectedConfigId.value, cleanedSpecConfig)
+		if (!renderUrl) {
+			toast({
+				title: '错误',
+				description: '规格书渲染失败',
+				variant: 'destructive'
+			})
+			return
+		}
+
+		// 5. 下载文件
+		console.log('renderUrl:', renderUrl)
+		await entityApis.system.download(renderUrl)
+
+		toast({
+			title: '成功',
+			description: '规格书生成成功'
+		})
+	} catch (error) {
+		console.error('生成规格书失败:', error)
+		toast({
+			title: '错误',
+			description: '生成规格书失败',
+			variant: 'destructive'
+		})
+	} finally {
+		specLoading.value = false
+	}
+}
 
 // 价格项表格列定义
 const priceColumns = ref([

@@ -685,13 +685,7 @@ const handleSubmit = async () => {
         const nodeType = type || 'COMPONENT'
         
         // 实际节点ID（可能包含在字符串ID中，如 "COMPONENT:123"）
-        let entityId = originalData.id
-        if (typeof node.id === 'string' && node.id.includes(':')) {
-          const idParts = node.id.split(':')
-          if (idParts.length > 1) {
-            entityId = parseInt(idParts[1], 10) || entityId
-          }
-        }
+        let entityId = toApiId(node.id)
         
         // 使用类型:ID作为键，确保不同类型节点配置不冲突
         const configKey = `${nodeType}:${entityId}`
@@ -711,6 +705,7 @@ const handleSubmit = async () => {
               if (existingConfig[configKey]) {
                 nodeValues = existingConfig[configKey]
                 console.log(`从现有配置中获取节点 ${configKey} 的值:`, nodeValues)
+                console.log(configKey, nodeValues)
               }
             } catch (e) {
               console.warn('解析原有值配置失败，将使用默认值', e)
