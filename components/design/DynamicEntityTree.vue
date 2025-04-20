@@ -56,6 +56,7 @@
         v-model:current-item-id="currentItemId"
         @node-click="handleNodeClick"
         @node-toggle="handleNodeToggle"
+        class="tree-container"
       >
         <!-- 图标插槽 -->
         <template #icon="{ node, type }">
@@ -309,6 +310,8 @@ const getComponentDataProps = (node: TreeNodeData) => {
   } else {
     // 其他类型
     props[propName] = node.originalData || node
+    props[propName].id = node.id
+    props[propName].type = node.type
     props.parameters = node.parameters || []
     props.data = node
   }
@@ -376,6 +379,7 @@ const handleClone = (item: any) => {
   
   // 根据节点类型打开对应的对话框进行克隆
   const nodeType = item.type || 'default'
+  console.log('nodeType:', nodeType)
   dialogType.value = nodeType
   dialogProps.value = {
     open: true,
@@ -441,4 +445,44 @@ const handleMenuDialogSubmit = (data: any) => {
   // 关闭菜单对话框
   showMenuDialog.value = false
 }
-</script> 
+</script>
+
+<style scoped>
+.tree-container :deep(.tree-node) {
+  padding-left: 0.75rem;
+  position: relative;
+}
+
+.tree-container :deep(.tree-node::before) {
+  content: '';
+  position: absolute;
+  left: 0.375rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background-color: var(--border-color);
+}
+
+.tree-container :deep(.tree-node:last-child::before) {
+  height: 50%;
+}
+
+.tree-container :deep(.tree-node:first-child::before) {
+  top: 50%;
+}
+
+.tree-container :deep(.tree-node-content) {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.125rem 0;
+}
+
+.tree-container :deep(.tree-node-icon) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+</style> 

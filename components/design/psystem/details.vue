@@ -82,7 +82,7 @@
 
     <shadcn-separator />
 
-    <design-parameter-preview :nodeId="system?.id || 0" />
+    <design-parameter-preview :nodeId="system?.id || 0" type="psystem" />
   </div>
 </template>
 

@@ -101,13 +101,16 @@ const loadSpecificPSystem = async () => {
 		
 		// 步骤2: 加载所有PSystem节点的组件数据
 		console.log('加载组件数据...')
-
 		// 使用DFS搜索所有PSystem节点
 		const findPSystemNodes = (nodes: TreeNodeData[]): TreeNodeData[] => {
 			let result: TreeNodeData[] = []
 			for (const node of nodes) {
 				// 检查当前节点是否为PSystem节点
 				if (node.type === NODE_TYPES.PSYSTEM) {
+					// 确保originalId是复合ID
+					if (node.originalId && typeof node.originalId === 'number') {
+						node.originalId = generateCompositeId(NODE_TYPES.PSYSTEM, node.originalId)
+					}
 					result.push(node)
 				}
 				// 递归处理子节点
@@ -119,9 +122,11 @@ const loadSpecificPSystem = async () => {
 		}
 
 		// 确保根节点被包含在搜索中
-		const psystemNodes = findPSystemNodes(psystemData)
+		const psystemNodes = psystemData[0].type === NODE_TYPES.PSYSTEM 
+			? [psystemData[0], ...findPSystemNodes(psystemData[0].children || [])]
+			: findPSystemNodes(psystemData)
 			
-		console.log(`找到 ${psystemNodes.length} 个PSystem节点 ${psystemNodes}`)
+		console.log(`找到 ${psystemNodes.length} 个PSystem节点`)
 
 		// 为每个PSystem节点加载组件数据
 		for (const psystemNode of psystemNodes) {

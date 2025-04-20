@@ -6,6 +6,7 @@ export interface ZdParameter extends BasicProperty, TimeStamp {
 	objectId: number
 	objectType: string
 	dtype?: string
+	unit?: string
 	value: any
 	isReadonly?: boolean
 	isDeleted: boolean
