@@ -89,7 +89,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="template.id || 0" />
+		<design-parameter-preview :nodeId="template.id || 0" type="template" />
 	</div>
 </template>
 

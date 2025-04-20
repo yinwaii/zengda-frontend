@@ -97,7 +97,7 @@
 
     <shadcn-separator />
 
-    <design-parameter-preview :nodeId="specification.id" />
+    <design-parameter-preview :nodeId="specification.id" type="specification" />
     
     <!-- 编辑器对话框 -->
     <Dialog v-model:open="showEditorDialog">

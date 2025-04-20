@@ -71,10 +71,13 @@
 <script setup lang="ts">
 import type { ZdParameter } from '~/models/entity/parameter'
 import { ref, computed, watch } from 'vue'
+import { object } from 'zod';
 
 const props = defineProps<{
   open: boolean
   parameter?: ZdParameter
+  nodeId?: string | number
+  type?: string
 }>()
 
 const emit = defineEmits<{
@@ -115,7 +118,9 @@ const onSubmit = async () => {
     // 准备提交数据
     const submitData: ZdParameter = {
       ...formState.value,
-      id: isEdit.value && props.parameter ? props.parameter.id : -1
+      id: isEdit.value && props.parameter ? props.parameter.id : -1,
+      objectId: toApiId(props.nodeId??0)??0,
+      objectType: props.type || ''
     }
     
     // 触发提交事件

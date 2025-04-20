@@ -263,7 +263,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="project.id" />
+		<design-parameter-preview :nodeId="project.id" type="project" />
 
 		<!-- 配置数据表格区域 -->
 		<shadcn-card v-if="selectedConfig">

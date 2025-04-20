@@ -22,6 +22,8 @@
 	<design-parameter-dialog
 		v-model:open="dialogVisible"
 		:parameter="editingParameter"
+		:nodeId="props.nodeId"
+		:type="props.type"
 		@save="handleParameterSubmit"
 	/>
 </template>
@@ -36,6 +38,7 @@ import { toApiId } from '~/utils/idConverter'
 
 const props = defineProps<{
 	nodeId: string | number // 复合ID，格式为 "type:id"
+	type?: string
 }>()
 
 const emit = defineEmits<{
@@ -253,6 +256,7 @@ const handleDelete = async (parameter: ZdParameter) => {
 const handleParameterSubmit = async (parameter: ZdParameter) => {
 	try {
 		let result;
+		console.log('parameter:', parameter)
 		if (parameter.id && parameter.id > 0) {
 			// 更新现有参数
 			result = await apis.parameter.update(parameter);
