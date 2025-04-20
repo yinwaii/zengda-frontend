@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="isOpen" @update:open="$emit('update:isOpen', $event)">
-    <shadcn-dialog-content class="sm:max-w-[1000px] max-h-[80vh] overflow-hidden">
+    <shadcn-dialog-content class="sm:max-w-[1000px] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ isEditing ? '编辑物料项' : title }}</shadcn-dialog-title>
         <shadcn-dialog-description>
@@ -198,7 +198,7 @@ const handleSelect = (item: ZdItem) => {
   if(item.itemId) {
     form.value.itemId = item.itemId
     form.value.itemName = item.name
-    form.value.note = item.note
+    form.value.note = item.model
   }
 }
 

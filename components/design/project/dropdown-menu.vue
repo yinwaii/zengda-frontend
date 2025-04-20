@@ -15,6 +15,10 @@
         <Layers class="mr-2 h-4 w-4" />
         添加产品系统
       </DropdownMenuItem>
+      <DropdownMenuItem @click="$emit('delete', props.project)" class="text-destructive">
+        <LucideTrash class="mr-2 h-4 w-4" />
+        删除
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
@@ -29,6 +33,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Plus, Copy, Layers } from 'lucide-vue-next'
 import type { ZdProject } from '~/models/entity/project'
+import { LucideTrash } from 'lucide-vue-next'
 // import { useProjectStore } from '@/stores/project'
 
 // const projectStore = useProjectStore()
@@ -40,6 +45,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'clone', project: ZdProject): void
   (e: 'addPsystem', project: ZdProject): void
+  (e: 'delete', project: ZdProject): void
 }>()
 
 const handleClone = () => {

@@ -1,6 +1,6 @@
 <template>
 	<shadcn-dialog :open="modelValue" @update:open="$emit('update:modelValue', $event)">
-		<shadcn-dialog-content class="sm:max-w-[425px]">
+		<shadcn-dialog-content class="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
 			<shadcn-dialog-header>
 				<shadcn-dialog-title>添加 PSYSTEM</shadcn-dialog-title>
 				<shadcn-dialog-description>

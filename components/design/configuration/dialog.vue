@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="modelValue" @update:open="$emit('update:modelValue', $event)">
-    <shadcn-dialog-content class="sm:max-w-[900px] max-h-[90vh] overflow-hidden flex flex-col">
+    <shadcn-dialog-content class="sm:max-w-[900px] max-h-[90vh] overflow-y-auto flex flex-col">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ editingItem?.id ? '编辑配置' : '新增配置' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

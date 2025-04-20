@@ -15,6 +15,14 @@
         <FileSpreadsheet class="mr-2 h-4 w-4" />
         添加规格
       </DropdownMenuItem>
+      <!-- <DropdownMenuItem @click="$emit('edit')">
+        <LucidePencil class="mr-2 h-4 w-4" />
+        编辑
+      </DropdownMenuItem> -->
+      <DropdownMenuItem @click="$emit('delete', props.bom)" class="text-destructive">
+        <LucideTrash class="mr-2 h-4 w-4" />
+        删除
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
@@ -27,7 +35,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, FileSpreadsheet } from 'lucide-vue-next'
+import { Plus, Copy, FileSpreadsheet, LucidePencil, LucideTrash } from 'lucide-vue-next'
 import type { ZdBom } from '~/models/entity/bom'
 
 const props = defineProps<{
@@ -37,6 +45,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'clone', bom: ZdBom): void
   (e: 'addSpecification', bom: ZdBom): void
+  (e: 'delete', bom: ZdBom): void
 }>()
 
 const handleClone = () => {

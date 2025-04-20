@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="open" @update:open="$emit('update:open', $event)">
-    <shadcn-dialog-content>
+    <shadcn-dialog-content class="max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ isEdit ? '编辑模板' : isClone ? '克隆模板' : '创建模板' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="open" @update:open="setIsOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ specification?.id ? '编辑规格' : '新建规格' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

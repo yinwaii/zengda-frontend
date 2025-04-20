@@ -15,6 +15,14 @@
         <Package class="mr-2 h-4 w-4" />
         添加组件
       </DropdownMenuItem>
+      <!-- <DropdownMenuItem @click="$emit('edit')">
+        <LucidePencil class="mr-2 h-4 w-4" />
+        编辑
+      </DropdownMenuItem> -->
+      <DropdownMenuItem @click="$emit('delete', props.psystem)" class="text-destructive">
+        <LucideTrash class="mr-2 h-4 w-4" />
+        删除
+      </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
 </template>
@@ -27,7 +35,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, Package } from 'lucide-vue-next'
+import { Plus, Copy, Package, LucidePencil, LucideTrash } from 'lucide-vue-next'
 import type { ZdPSystem } from '~/models/entity/psystem'
 
 const props = defineProps<{
@@ -37,6 +45,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'clone', psystem: ZdPSystem): void
   (e: 'addComponent', psystem: ZdPSystem): void
+  (e: 'delete', psystem: ZdPSystem): void
 }>()
 
 const handleClone = () => {

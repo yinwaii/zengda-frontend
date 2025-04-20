@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="isOpen" @update:open="$emit('update:isOpen', $event)">
-    <shadcn-dialog-content class="sm:max-w-[700px]">
+    <shadcn-dialog-content class="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>物料详情</shadcn-dialog-title>
         <shadcn-dialog-description>

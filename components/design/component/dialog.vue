@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="open" @update:open="handleUpdateOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
+    <shadcn-dialog-content class="max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ isEdit ? '编辑组件' : '新建组件' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

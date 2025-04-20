@@ -282,15 +282,19 @@ const handleQueryItem = (item: ZdBomChild) => {
 // 处理物料项表单提交
 const handleItemSubmit = async (updatedItem: ZdBomChild) => {
 	try {
+		console.log('更新前的BOM数据:', props.bom)
 		// 创建一个新的BOM对象，更新或添加物料项
 		const updatedBom: ZdBom = {
 			...toRaw(props.bom),
 			items: [...(props.bom.items || [])]
 		}
+		console.log('更新后的BOM数据:', updatedBom)
 		
 		if (!updatedBom.items) {
 			updatedBom.items = []
 		}
+
+		updatedItem.bomId = toApiId(props.bom.id) ?? 0
 		
 		if (selectedItemIndex.value >= 0) {
 			// 更新现有物料项
@@ -302,6 +306,7 @@ const handleItemSubmit = async (updatedItem: ZdBomChild) => {
 		
 		// 调用API更新BOM
 		console.log('发送修改后的BOM数据:', updatedBom)
+		updatedBom.id = toApiId(props.bom.id) ?? 0
 		await entityApis.bom.update(updatedBom)
 		
 		// 发出事件通知更新

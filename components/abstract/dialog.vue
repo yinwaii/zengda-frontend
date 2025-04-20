@@ -5,7 +5,7 @@
         编辑
       </shadcn-button>
     </shadcn-dialog-trigger>
-    <shadcn-dialog-content class="sm:max-w-[425px]">
+    <shadcn-dialog-content class="sm:max-w-[425px] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>编辑</shadcn-dialog-title>
         <shadcn-dialog-description>

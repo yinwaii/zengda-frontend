@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog v-model:open="open">
-    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
+    <shadcn-dialog-content class="max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ ptype?.id ? '编辑产品类型' : '新建产品类型' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

@@ -9,6 +9,7 @@
           v-if="currentItem && currentItem.type === 'TEMPLATE'"
           :template="(currentItem.originalData as ZdTemplate)"
           @clone="handleClone"
+          @delete="handleDelete"
           @addPsystem="handleAddPsystem"
           @addComponent="handleAddComponent"
           @addConfiguration="handleAddConfiguration"
@@ -18,6 +19,7 @@
           v-else-if="currentItem && currentItem.type === 'PROJECT'"
           :project="(currentItem.originalData as ZdProject)"
           @clone="handleClone"
+          @delete="handleDelete"
         />
         <!-- 产品系统下拉菜单 -->
         <PsystemDropdownMenu
@@ -25,6 +27,7 @@
           :psystem="(currentItem.originalData as ZdPSystem)"
           @clone="handleClone"
           @addComponent="handleAddComponent"
+          @delete="handleDelete"
         />
         <!-- 组件下拉菜单 -->
         <ComponentDropdownMenu
@@ -32,18 +35,21 @@
           :component="(currentItem.originalData as ZdComponent)"
           @clone="handleClone"
           @addBom="handleAddBom"
+          @delete="handleDelete"
         />
         <!-- BOM下拉菜单 -->
         <BomDropdownMenu
           v-else-if="currentItem && currentItem.type === 'BOM'"
           :bom="(currentItem.originalData as ZdBom)"
           @clone="handleClone"
+          @delete="handleDelete"
         />
         <!-- 规格下拉菜单 -->
         <SpecificationDropdownMenu
           v-else-if="currentItem && currentItem.type === 'SPECIFICATION'"
           :specification="(currentItem.originalData as ZdSpecification)"
           @clone="handleClone"
+          @delete="handleDelete"
         />
       </div>
       
@@ -160,6 +166,8 @@ const emit = defineEmits<{
   (e: 'create', data: any, nodeType: string): void
   // 克隆事件
   (e: 'clone', template: ZdTemplate): void
+  // 删除事件
+  (e: 'delete', item: any): void
 }>()
 
 // 当前状态管理
@@ -459,6 +467,25 @@ const handleMenuDialogSubmit = (data: any) => {
   }
   // 关闭菜单对话框
   showMenuDialog.value = false
+}
+const entityApis = useEntityApis()
+// 处理删除事件
+const handleDelete = (item: any) => {
+  console.log('DynamicEntityTree 收到删除事件，item:', item)
+  if (item.type === NODE_TYPES.TEMPLATE) {
+    entityApis.template.delete(item.id)
+    
+  } else if (item.type === NODE_TYPES.PROJECT) {
+    entityApis.project.delete(item.id)
+  } else if (item.type === NODE_TYPES.PSYSTEM) {
+    entityApis.psystem.delete(item.id)
+  } else if (item.type === NODE_TYPES.COMPONENT) {
+    entityApis.component.delete(item.id)
+  } else if (item.type === NODE_TYPES.BOM) {
+    entityApis.bom.delete(item.id)
+  } else if (item.type === NODE_TYPES.SPECIFICATION) {
+    entityApis.specification.delete(item.id)
+  }
 }
 </script>
 

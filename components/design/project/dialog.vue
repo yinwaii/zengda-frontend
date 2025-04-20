@@ -1,6 +1,6 @@
 <template>
   <shadcn-dialog :open="open" @update:open="setIsOpen">
-    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
+    <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh] overflow-y-auto">
       <shadcn-dialog-header>
         <shadcn-dialog-title>{{ project?.id ? '编辑项目' : '新建项目' }}</shadcn-dialog-title>
         <shadcn-dialog-description>

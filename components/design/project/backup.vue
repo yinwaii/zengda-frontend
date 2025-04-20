@@ -308,7 +308,7 @@
 
 	<!-- 报价结果对话框 -->
 	<shadcn-dialog v-model:open="isPriceDialogOpen">
-		<shadcn-dialog-content class="max-w-3xl">
+		<shadcn-dialog-content class="max-w-3xl max-h-[80vh] overflow-y-auto">
 			<shadcn-dialog-header>
 				<shadcn-dialog-title>报价结果计算</shadcn-dialog-title>
 				<shadcn-dialog-description>
