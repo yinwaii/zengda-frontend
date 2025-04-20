@@ -96,6 +96,7 @@ const setIsOpen = (value: boolean) => {
 }
 
 const entityApis = useEntityApis()
+const refresh = inject('refresh') as () => Promise<void>
 // 处理表单提交
 const handleSubmit = async () => {
   // 表单验证
@@ -119,5 +120,6 @@ const handleSubmit = async () => {
   // }
   
   setIsOpen(false)
+  await refresh()
 }
 </script> 
