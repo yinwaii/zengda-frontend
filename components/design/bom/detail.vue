@@ -246,7 +246,7 @@ const handleDeleteItem = async (item: ZdBomChild, index: number) => {
 		}
 		
 		if (updatedBom.items && updatedBom.items.length > index) {
-		updatedBom.items.splice(index, 1)
+			updatedBom.items.splice(index, 1)
 		}
 		
 		// 调用API更新BOM
@@ -301,6 +301,7 @@ const handleItemSubmit = async (updatedItem: ZdBomChild) => {
 		}
 		
 		// 调用API更新BOM
+		console.log('发送修改后的BOM数据:', updatedBom)
 		await entityApis.bom.update(updatedBom)
 		
 		// 发出事件通知更新

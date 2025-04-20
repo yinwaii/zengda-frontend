@@ -179,13 +179,13 @@ export const useEntityApis = (): any => {
 
     item: {
       get: (id: string) => api.get<ZdItem>(`/item/${id}`),
-      getByPage: (query: ZdItemQuery) => api.get<ZdItemPaged>(`/item`, {}, {
+      getByPage: (query: ZdItemQuery) => api.post<ZdItemPaged>(`/item`, {}, {
         body: query,
         headers: {
           'Content-Type': 'application/json'
         }
       }),
-      search: (searchValue: string, query: ZdItemQueryPage) => api.get<ZdItemPaged>(`/item/search`, { searchValue }, {
+      search: (searchValue: string, query: ZdItemQueryPage) => api.get<ZdItem[]>(`/item/search?searchValue=${searchValue}`, {
         body: query,
         headers: {
           'Content-Type': 'application/json'

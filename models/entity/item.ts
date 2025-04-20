@@ -5,7 +5,7 @@ export interface ZdItem {
 	number?: string
 	note?: string
 	orderPrice: number
-	erpcIsId: number
+	erpclsId: number
 }
 
 export interface ZdItemQuery {
