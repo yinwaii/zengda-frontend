@@ -195,6 +195,7 @@ export const useEntityApis = (): any => {
 
     bom: {
       get: (id: number) => api.get<ZdBom>(`/bom/${id}`),
+      getByComponentId: (componentId: number) => api.get<Array<number>>(`/bom/`, { componentId }),
       create: (data: Partial<ZdBom>) => api.post<ZdBom>('/bom', data),
       update: (data: Partial<ZdBom>) => api.put<ZdBom>('/bom', data),
       data: (id: number) => api.delete<ZdBom>(`/bom/${id}`)
@@ -228,11 +229,16 @@ export const useEntityApis = (): any => {
       }),
       download: (filename: string) => {
         // 使用服务端代理而不是直接调用外部服务
-        return api.getRaw<Blob>(`/api/proxy/${filename}`, {}, {
+        systemApi.getRaw<Blob>(`/${filename}`, {}, {
           headers: {
             'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
           }
         })
+        // return api.getRaw<Blob>(`/api/proxy/${filename}`, {}, {
+          // headers: {
+          //   'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+          // }
+        // })
       },
       upload: (filename: string, file: File) => systemApi.put<object>(`/${filename}`, file, {
         headers: {

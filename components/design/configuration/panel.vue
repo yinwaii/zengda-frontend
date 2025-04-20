@@ -603,8 +603,8 @@ const onConfigSubmit = async (config: ZdConfiguration) => {
 			// 创建
 			const newConfig = await entityApis.configuration.create({
 				...config,
-				project_id: props.projectId,
-				template_id: props.templateId
+				projectId: props.projectId,
+				templateId: props.templateId
 			})
 			toast({
 				title: '成功',

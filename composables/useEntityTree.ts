@@ -385,44 +385,15 @@ export const useEntityTree = () => {
       for (const node of componentNodes) {
         try {
           // 从组件原始数据中获取BOM ID
-          const component = node.originalData;
-          if (component && component.bomId) {
-            // 提取原始ID用于API调用
-            const bomId = toApiId(component.bomId);
-            if (bomId === null) {
-              console.warn(`无效的BOM ID: ${component.bomId}`);
-            } else {
-              // 获取BOM信息
-              console.log(`加载组件(ID: ${component.id})的BOM数据(ID: ${bomId})`);
-              const response = await entityApis.bom.get(bomId);
-
-              if (response) {
-                // 转换API响应中的ID为前端使用的复合ID
-                const bomWithCompositeId = convertApiResponseIds([response], NODE_TYPES.BOM)[0];
-
-                // 创建BOM节点
-                const bomNode = bomTreeNodeFactory(bomWithCompositeId);
-
-                // 将BOM数据存储到组件节点，方便后续使用
-                node.bomData = response;
-
-                // 将BOM节点添加到组件节点的子节点列表，避免重复添加
-                if (!node.children) {
-                  node.children = [];
-                }
-
-                // 检查是否已存在同ID的BOM节点，避免重复
-                const existingBomNode = node.children.find(child =>
-                  child.type === NODE_TYPES.BOM && child.originalData?.id === bomWithCompositeId.id
-                );
-
-                if (!existingBomNode) {
-                  node.children.push(bomNode);
-                  console.log(`已将BOM节点(ID: ${bomNode.id})添加到组件节点(ID: ${node.id})下`);
-                } else {
-                  console.log(`组件节点(ID: ${node.id})下已存在BOM节点(ID: ${bomNode.id})，跳过添加`);
-                }
-              }
+          const componentId = toApiId(node.id);
+          const bomIds = await entityApis.bom.getByComponentId(componentId);
+          for (const bomId of bomIds) {
+            const bom = await entityApis.bom.get(bomId);
+            if (bom) {
+              const bomWithCompositeId = convertApiResponseIds([bom], NODE_TYPES.BOM)[0];
+              const bomNode = bomTreeNodeFactory(bomWithCompositeId);
+              node.children = (node.children || []).concat([bomNode]);
+              console.log(`组件节点(ID: ${node.id})下BOM节点列表:`, node.children);
             }
           }
         } catch (err) {

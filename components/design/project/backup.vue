@@ -804,8 +804,8 @@ const onConfigSubmit = async (config: ZdConfiguration) => {
 
 			const newConfig = await entityApis.configuration.create({
 				...config,
-				project_id: projectNumericId,
-				template_id: project.value.templateId
+				projectId: projectNumericId,
+				templateId: project.value.templateId
 			})
 			toast({
 				title: '成功',

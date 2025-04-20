@@ -1,8 +1,8 @@
 {
 	"id": 43,
 	"name": "骆志国",
-	"template_id": 65,
-	"project_id": 80,
+	"templateId": 65,
+	"projectId": 80,
 	"isShow": false,
 	"lastVersionId": 60,
 	"valueConfig": "Excepteur",
@@ -10,8 +10,8 @@
 	"package": {
 		"id": 1,
 		"name": "骆志国",	
-		"template_id": 65,
-		"project_id": 80,
+		"templateId": 65,
+		"projectId": 80,
 		"isShow": false,
 		"lastVersionId": 60,
 		"valueConfig": "Excepteur",

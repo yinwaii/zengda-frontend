@@ -134,7 +134,7 @@ const handlePsystemSelected = async () => {
 		const psystem = await entityApis.psystem.get(selectedProductTypeId.value)
 		
 		await entityApis.template_psystem.create({
-			template_id: props.templateId,
+			templateId: props.templateId,
 			psystem_id: psystem.id
 		})
 		

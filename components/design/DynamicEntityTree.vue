@@ -31,6 +31,7 @@
           v-else-if="currentItem && currentItem.type === 'COMPONENT'"
           :component="(currentItem.originalData as ZdComponent)"
           @clone="handleClone"
+          @addBom="handleAddBom"
         />
         <!-- BOM下拉菜单 -->
         <BomDropdownMenu
@@ -385,6 +386,20 @@ const handleClone = (item: any) => {
     open: true,
     [getPropNameByType(nodeType)]: item,
     isClone: true
+  }
+  showDialog.value = true
+}
+
+const handleAddBom = (component: ZdComponent) => {
+  console.log('DynamicEntityTree 收到添加BOM事件，component:', component)
+  // 打开BOM对话框进行添加
+  dialogType.value = NODE_TYPES.BOM
+  dialogProps.value = {
+    open: true,
+    bom: {
+      componentId: toApiId(component.id)
+    },
+    isClone: false
   }
   showDialog.value = true
 }

@@ -335,7 +335,7 @@ const handleConfigSubmit = async (configuration: ZdConfiguration) => {
 			
 			const configWithCorrectId = {
 				...configuration,
-				project_id: projectNumericId
+				projectId: projectNumericId
 			}
 			await entityApis.configuration.create(configWithCorrectId)
 			toast.toast({

@@ -734,8 +734,8 @@ const onConfigSubmit = async (config: ZdConfiguration) => {
 			
 			const newConfig = await entityApis.configuration.create({
 				...config,
-				project_id: projectNumericId,
-				template_id: project.value.templateId
+				projectId: projectNumericId,
+				templateId: project.value.templateId
 			})
 			toast({
 				title: '成功',
@@ -893,6 +893,21 @@ const generateSpecification = async () => {
 			if (typeof obj === 'object') {
 				const cleaned: any = {}
 				for (const [key, value] of Object.entries(obj)) {
+					// 对于texts、bools和imgs属性，保留对象但清理内部null值
+					if (key === 'texts' || key === 'bools' || key === 'imgs') {
+						if (value && typeof value === 'object') {
+							const cleanedValue: any = {}
+							for (const [k, v] of Object.entries(value)) {
+								if (v !== null) {
+									cleanedValue[k] = v
+								}
+							}
+							cleaned[key] = cleanedValue
+						} else {
+							cleaned[key] = {}
+						}
+						continue
+					}
 					const cleanedValue = cleanSpecConfig(value)
 					if (cleanedValue !== undefined) {
 						cleaned[key] = cleanedValue
@@ -927,7 +942,17 @@ const generateSpecification = async () => {
 
 		// 5. 下载文件
 		console.log('renderUrl:', renderUrl)
-		await entityApis.system.download(renderUrl)
+		const blob = await entityApis.system.download(renderUrl)
+		console.log('blob:', blob)
+		// 创建下载链接
+		const url = window.URL.createObjectURL(blob)
+		const link = document.createElement('a')
+		link.href = url
+		link.download = `规格书_${project.value.name}_${new Date().toISOString().split('T')[0]}.docx`
+		document.body.appendChild(link)
+		link.click()
+		document.body.removeChild(link)
+		window.URL.revokeObjectURL(url)
 
 		toast({
 			title: '成功',

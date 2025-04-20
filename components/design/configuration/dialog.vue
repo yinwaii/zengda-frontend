@@ -14,11 +14,11 @@
           <!-- 隐藏项目和模板选择器，仅展示当前所选 -->
           <div class="space-y-2 mb-4">
             <div class="flex justify-between">
-              <shadcn-label for="project_id">项目</shadcn-label>
+              <shadcn-label for="projectId">项目</shadcn-label>
               <span class="text-sm font-medium">{{ selectedProject?.name || '加载中...' }}</span>
             </div>
             <div class="flex justify-between">
-              <shadcn-label for="template_id">模板</shadcn-label>
+              <shadcn-label for="templateId">模板</shadcn-label>
               <span class="text-sm font-medium">{{ selectedTemplate?.name || '加载中...' }}</span>
             </div>
           </div>
@@ -182,8 +182,8 @@ const getCurrentProjectId = (): number | undefined => {
 
 // 表单数据
 const form = ref<Partial<ZdConfiguration>>({
-  project_id: getCurrentProjectId() || 0,
-  template_id: props.templateId || 0,
+  projectId: getCurrentProjectId() || 0,
+  templateId: props.templateId || 0,
   isShow: true,
   valueConfig: '',
   componentConfig: ''
@@ -191,25 +191,25 @@ const form = ref<Partial<ZdConfiguration>>({
 
 // 选中的项目和模板
 const selectedProject = computed(() => 
-  projects.value.find(p => p.id === form.value.project_id)
+  projects.value.find(p => p.id === form.value.projectId)
 )
 
 const selectedTemplate = computed(() => 
-  templates.value.find(t => t.id === form.value.template_id)
+  templates.value.find(t => t.id === form.value.templateId)
 )
 
 // 是否可以提交
 const canSubmit = computed(() => {
   // 对于新建配置，需要满足所有条件
   if (!props.editingItem?.id) {
-    return form.value.project_id && form.value.template_id && currentNode.value
+    return form.value.projectId && form.value.templateId && currentNode.value
   }
   
   // 对于编辑现有配置，只要有项目ID和模板ID就可以提交
-  const canSubmitResult = form.value.project_id && form.value.template_id;
+  const canSubmitResult = form.value.projectId && form.value.templateId;
   console.log('编辑模式下canSubmit状态:', canSubmitResult, {
-    project_id: form.value.project_id,
-    template_id: form.value.template_id,
+    projectId: form.value.projectId,
+    templateId: form.value.templateId,
     currentNode: currentNode.value
   });
   return canSubmitResult;
@@ -284,8 +284,8 @@ const init = async () => {
     // 如果是编辑模式，设置表单值
     if (props.editingItem) {
       form.value = {
-        project_id: props.editingItem.project_id,
-        template_id: props.editingItem.template_id,
+        projectId: props.editingItem.projectId,
+        templateId: props.editingItem.templateId,
         isShow: props.editingItem.isShow,
         valueConfig: props.editingItem.valueConfig || '',
         componentConfig: props.editingItem.componentConfig || ''
@@ -319,8 +319,8 @@ const init = async () => {
       }
       
       form.value = {
-        project_id: currentProjectId || (projects.value.length > 0 ? projects.value[0].id : 0),
-        template_id: defaultTemplateId,
+        projectId: currentProjectId || (projects.value.length > 0 ? projects.value[0].id : 0),
+        templateId: defaultTemplateId,
         isShow: true,
         valueConfig: '',
         componentConfig: ''
@@ -336,7 +336,7 @@ const init = async () => {
     }
     
     // 初始化后立即加载项目树
-    if (form.value.project_id && form.value.template_id) {
+    if (form.value.projectId && form.value.templateId) {
       await loadProjectTree()
       
       // 检查加载和状态情况
@@ -358,15 +358,15 @@ const init = async () => {
 
 // 从项目模板树中加载组件树结构
 const loadProjectTree = async () => {
-  console.log("loadProjectTree", form.value.project_id, form.value.template_id)
-  if (!form.value.project_id || !form.value.template_id) return
+  console.log("loadProjectTree", form.value.projectId, form.value.templateId)
+  if (!form.value.projectId || !form.value.templateId) return
   
   try {
     // 使用useEntityTree组合API，获取专业的树加载实现
     const entityTree = useEntityTree()
 
     // 1. 首先加载模板基本数据
-    const { treeData: templateData } = await entityTree.loadTemplateById(form.value.template_id)
+    const { treeData: templateData } = await entityTree.loadTemplateById(form.value.templateId)
     
     if (templateData.length === 0) {
       throw new Error('未找到模板信息')
@@ -435,8 +435,8 @@ const loadProjectTree = async () => {
     console.log('成功加载模板组件树', treeData.value)
     console.log('树加载后的当前节点:', currentNode.value)
     console.log('当前canSubmit状态:', canSubmit.value, '条件:', {
-      project_id: form.value.project_id,
-      template_id: form.value.template_id,
+      projectId: form.value.projectId,
+      templateId: form.value.templateId,
       currentNode: currentNode.value !== null
     })
   } catch (error) {
@@ -632,7 +632,7 @@ const handleNodeClick = (node: TreeNodeData) => {
   currentNode.value = node
   currentNodeId.value = node.id
   
-  console.log('点击节点:', node, '当前canSubmit状态:', form.value.project_id && form.value.template_id && node)
+  console.log('点击节点:', node, '当前canSubmit状态:', form.value.projectId && form.value.templateId && node)
   
   // 加载节点参数，但不要求节点类型必须是COMPONENT
   loadComponentParameters()
@@ -664,7 +664,7 @@ const handleSubmit = async () => {
   isSubmitting.value = true
   
   try {
-    if (!form.value.project_id || !form.value.template_id) {
+    if (!form.value.projectId || !form.value.templateId) {
       throw new Error('请选择项目和模板')
     }
     

@@ -5,7 +5,7 @@
         <div class="flex items-center justify-between">
           <div>
             <h2 class="text-2xl font-bold">配置信息</h2>
-            <p class="text-sm text-muted-foreground mt-1">项目: {{ configuration.project_id }}, 模板: {{ configuration.template_id }}</p>
+            <p class="text-sm text-muted-foreground mt-1">项目: {{ configuration.projectId }}, 模板: {{ configuration.templateId }}</p>
           </div>
           <div class="flex items-center gap-2">
             <shadcn-button @click="$emit('edit')">
@@ -48,11 +48,11 @@
             </div>
             <div class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">项目ID</dt>
-              <dd class="mt-1">{{ configuration.project_id }}</dd>
+              <dd class="mt-1">{{ configuration.projectId }}</dd>
             </div>
             <div class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">模板ID</dt>
-              <dd class="mt-1">{{ configuration.template_id }}</dd>
+              <dd class="mt-1">{{ configuration.templateId }}</dd>
             </div>
             <div class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">是否显示</dt>

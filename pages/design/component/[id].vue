@@ -124,59 +124,6 @@ const loadSpecificComponent = async () => {
     console.log('加载BOM数据...')
     currentTreeData = await entityTree.loadBomByComponent(currentTreeData)
     
-    // 步骤3: 加载子组件数据
-    console.log('加载子组件数据...')
-    currentTreeData = await entityTree.loadComponentByComponent(currentTreeData)
-    
-    // 步骤4: 递归加载二级BOM数据
-    if (currentTreeData && currentTreeData.length > 0 && currentTreeData[0]?.children && currentTreeData[0].children.length > 0) {
-      console.log('加载子组件的BOM数据...')
-      currentTreeData = await entityTree.loadBomByComponent(currentTreeData)
-    }
-    
-    // 步骤5: 遍历整棵树，检查每个节点是否是组件节点，并加载其BOM数据
-    // 这个函数递归遍历所有节点
-    const traverseAndLoadBOM = async (nodes: TreeNodeData[]): Promise<TreeNodeData[]> => {
-      if (!nodes || nodes.length === 0) return nodes;
-      
-      // 创建一个新的节点数组，避免引用问题
-      const newNodes = [...nodes];
-      
-      // 对每个节点进行处理
-      for (let i = 0; i < newNodes.length; i++) {
-        const node = newNodes[i];
-        
-        // 如果是组件节点且有bomId但没有bomData，则获取其BOM数据
-        if (node.type === NODE_TYPES.COMPONENT && 
-            node.originalData && 
-            node.originalData.bomId && 
-            !node.bomData) {
-          try {
-            console.log(`加载组件 ${node.originalData.id} 的BOM数据...`);
-            const bomId = node.originalData.bomId;
-            const bom = await entityApis.bom.get(bomId);
-            if (bom) {
-              // 将BOM数据附加到节点上
-              node.bomData = bom;
-              console.log(`成功加载组件 ${node.originalData.id} 的BOM数据:`, bom);
-            }
-          } catch (error) {
-            console.error(`加载组件 ${node.originalData.id} 的BOM数据失败:`, error);
-          }
-        }
-        
-        // 如果有子节点，递归处理
-        if (node.children && node.children.length > 0) {
-          node.children = await traverseAndLoadBOM(node.children);
-        }
-      }
-      
-      return newNodes;
-    };
-    
-    // 执行遍历并加载BOM数据
-    currentTreeData = await traverseAndLoadBOM(currentTreeData);
-    
     if (currentTreeData.length > 0) {
       // 更新树数据
       componentTreeData.value = currentTreeData

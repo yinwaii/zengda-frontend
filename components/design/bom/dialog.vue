@@ -95,8 +95,9 @@ const setIsOpen = (value: boolean) => {
   emit('update:open', value)
 }
 
+const entityApis = useEntityApis()
 // 处理表单提交
-const handleSubmit = () => {
+const handleSubmit = async () => {
   // 表单验证
   if (!form.value.number || !form.value.version) {
     console.error('编号和版本不能为空')
@@ -107,14 +108,15 @@ const handleSubmit = () => {
   const submitData = { ...form.value }
   
   // 如果是创建，不传入 id 和 isDeleted
-  if (!props.bom?.id) {
-    const { id, isDeleted, ...createData } = submitData
-    emit('save', createData as CreateBomData)
-  } else {
-    // 如果是编辑，不传入 isDeleted
-    const { isDeleted, ...updateData } = submitData
-    emit('save', updateData as UpdateBomData)
-  }
+  // if (!props.bom?.id) {
+  const { id, isDeleted, ...createData } = submitData
+  await entityApis.bom.create(createData as CreateBomData)
+    // emit('save', createData as CreateBomData)
+  // } else {
+  //   // 如果是编辑，不传入 isDeleted
+  //   const { isDeleted, ...updateData } = submitData
+  //   emit('save', updateData as UpdateBomData)
+  // }
   
   setIsOpen(false)
 }

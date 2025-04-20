@@ -45,6 +45,7 @@ const handleClone = () => {
 }
 
 const handleAddBom = () => {
+  console.log('添加bom，component:', props.component)
   emit('addBom', props.component)
 }
 </script> 
