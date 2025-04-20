@@ -221,6 +221,8 @@ onMounted(async () => {
   await loadSpecificComponent()
 })
 
+provide('refresh', loadSpecificComponent)
+
 // 页面元数据
 definePageMeta({
   layout: 'default',

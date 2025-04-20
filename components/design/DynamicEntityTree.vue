@@ -7,33 +7,42 @@
         <!-- 模板下拉菜单 -->
         <TemplateDropdownMenu
           v-if="currentItem && currentItem.type === 'TEMPLATE'"
-          :template="(currentItem as ZdTemplate)"
+          :template="(currentItem.originalData as ZdTemplate)"
           @clone="handleClone"
+          @addPsystem="handleAddPsystem"
+          @addComponent="handleAddComponent"
+          @addConfiguration="handleAddConfiguration"
         />
         <!-- 项目下拉菜单 -->
         <ProjectDropdownMenu
           v-else-if="currentItem && currentItem.type === 'PROJECT'"
-          :project="currentItem"
+          :project="(currentItem.originalData as ZdProject)"
+          @clone="handleClone"
         />
         <!-- 产品系统下拉菜单 -->
         <PsystemDropdownMenu
           v-else-if="currentItem && currentItem.type === 'PSYSTEM'"
-          :psystem="currentItem"
+          :psystem="(currentItem.originalData as ZdPSystem)"
+          @clone="handleClone"
+          @addComponent="handleAddComponent"
         />
         <!-- 组件下拉菜单 -->
         <ComponentDropdownMenu
           v-else-if="currentItem && currentItem.type === 'COMPONENT'"
-          :component="currentItem"
+          :component="(currentItem.originalData as ZdComponent)"
+          @clone="handleClone"
         />
         <!-- BOM下拉菜单 -->
         <BomDropdownMenu
           v-else-if="currentItem && currentItem.type === 'BOM'"
-          :bom="currentItem"
+          :bom="(currentItem.originalData as ZdBom)"
+          @clone="handleClone"
         />
         <!-- 规格下拉菜单 -->
         <SpecificationDropdownMenu
           v-else-if="currentItem && currentItem.type === 'SPECIFICATION'"
-          :specification="currentItem"
+          :specification="(currentItem.originalData as ZdSpecification)"
+          @clone="handleClone"
         />
       </div>
       
@@ -83,12 +92,19 @@
       v-bind="dialogProps"
       @save="handleDialogSave"
     />
+    <component
+      v-if="showMenuDialog"
+      :is="getMenuDialogComponent(menuDialogType)"
+      v-model="showMenuDialog"
+      v-bind="menuDialogProps"
+      @submit="handleMenuDialogSubmit"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, h, toRaw, watch } from 'vue'
-import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucideCpu, LucidePlus, LucideTag, LucideSettings2, LucideLayoutTemplate, LucidePackage, LucideComponent, LucideFileSpreadsheet, LucideBoxes } from 'lucide-vue-next'
+import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucidePlus, LucideTag, LucideSettings2, LucideLayoutTemplate, LucidePackage, LucideComponent, LucideFileSpreadsheet, LucideBoxes } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import { NODE_TYPES } from '~/models/entity/node-types'
@@ -118,7 +134,9 @@ import PsystemDropdownMenu from '~/components/design/psystem/dropdown-menu.vue'
 import ComponentDropdownMenu from '~/components/design/component/dropdown-menu.vue'
 import BomDropdownMenu from '~/components/design/bom/dropdown-menu.vue'
 import SpecificationDropdownMenu from '~/components/design/specification/dropdown-menu.vue'
-
+import TemplateAddPsystemDialog from '~/components/design/template/add-psystem-dialog.vue'
+import TemplateAddComponentDialog from '~/components/design/template/add-component-dialog.vue'
+import PsystemAddComponentDialog from '~/components/design/psystem/add-component-dialog.vue'
 const props = defineProps<{
   treeData: TreeNodeData[]
   treeTitle?: string
@@ -150,6 +168,9 @@ const showDialog = ref(false)
 const dialogType = ref('')
 const dialogProps = ref<Record<string, any>>({})
 const expandedKeys = ref<(string | number)[]>(props.defaultExpandedKeys || [])
+const showMenuDialog = ref(false)
+const menuDialogType = ref('')
+const menuDialogProps = ref<Record<string, any>>({})
 
 // 节点类型对应的图标
 const iconMap: Record<string, any> = {
@@ -214,6 +235,13 @@ const dialogComponents: Record<string, any> = {
   [NODE_TYPES.CONFIGURATION]: ConfigurationDialog
 }
 
+const menuDialogComponents: Record<string, any> = {
+  'template-add-psystem': TemplateAddPsystemDialog,
+  'template-add-component': TemplateAddComponentDialog,
+  'psystem-add-component': PsystemAddComponentDialog,
+  // 'template-add-configuration': TemplateAddConfigurationDialog
+}
+
 // 获取节点图标
 const getNodeIcon = (type: string = 'default') => {
   return iconMap[type] || iconMap.default
@@ -234,6 +262,9 @@ const getDialogComponent = (type: string = 'default') => {
   return dialogComponents[type] || null
 }
 
+const getMenuDialogComponent = (type: string = 'default') => {
+  return menuDialogComponents[type] || null
+}
 // 获取详情组件的数据props
 const getComponentDataProps = (node: TreeNodeData) => {
   if (!node) return {}
@@ -330,38 +361,84 @@ const cancelEditing = () => {
   isEditing.value = false
 }
 
-// 处理添加新项
-const handleAddNew = () => {
-  // 默认使用当前选中项的类型，如果没有选中项，则使用第一个节点的类型
-  const type = currentItem.value?.type || 
-               (props.treeData[0]?.type || NODE_TYPES.PROJECT)
-  
-  dialogType.value = type
-  dialogProps.value = {}
-  showDialog.value = true
-}
 
 // 处理对话框保存
 const handleDialogSave = (data: any) => {
-  if (dialogType.value === NODE_TYPES.TEMPLATE && dialogProps.value.isClone) {
-    emit('clone', data)
-  } else {
+  if (dialogType.value === NODE_TYPES.TEMPLATE) {
     emit('create', data, dialogType.value)
   }
   showDialog.value = false
 }
 
 // 处理克隆事件
-const handleClone = (template: ZdTemplate) => {
-  console.log('DynamicEntityTree 收到克隆事件，template:', template)
+const handleClone = (item: any) => {
+  console.log('DynamicEntityTree 收到克隆事件，item:', item)
   
-  // 打开模板对话框进行克隆
-  dialogType.value = NODE_TYPES.TEMPLATE
+  // 根据节点类型打开对应的对话框进行克隆
+  const nodeType = item.type || 'default'
+  dialogType.value = nodeType
   dialogProps.value = {
     open: true,
-    template,
+    [getPropNameByType(nodeType)]: item,
     isClone: true
   }
   showDialog.value = true
+}
+
+// 处理添加PSYSTEM事件
+const handleAddPsystem = (template: ZdTemplate) => {
+  console.log('DynamicEntityTree 收到添加PSYSTEM事件，template:', template)
+  // 打开PSYSTEM对话框进行添加
+  menuDialogType.value = 'template-add-psystem'
+  menuDialogProps.value = {
+    modelValue: true,
+    templateId: toApiId(template.id)
+  }
+  showMenuDialog.value = true
+}
+
+// 处理添加COMPONENT事件
+const handleAddComponent = (item: any) => {
+  console.log('DynamicEntityTree 收到添加COMPONENT事件，item:', item)
+  // 根据节点类型打开对应的对话框进行添加
+  if (item.type === 'TEMPLATE') {
+    menuDialogType.value = 'template-add-component'
+    menuDialogProps.value = {
+      modelValue: true,
+      templateId: toApiId(item.id)
+    }
+  } else if (item.type === 'PSYSTEM') {
+    menuDialogType.value = 'psystem-add-component'
+    menuDialogProps.value = {
+      modelValue: true,
+      psystemId: toApiId(item.id)
+    }
+  }
+  showMenuDialog.value = true
+}
+
+const handleAddConfiguration = (template: ZdTemplate) => {
+  console.log('DynamicEntityTree 收到添加CONFIGURATION事件，template:', template)
+  // 打开CONFIGURATION对话框进行添加
+  menuDialogType.value = 'template-add-configuration'
+  menuDialogProps.value = {
+    open: true,
+    template,
+    isClone: false
+  }
+  showMenuDialog.value = true
+}
+
+// 处理菜单对话框提交
+const handleMenuDialogSubmit = (data: any) => {
+  console.log('DynamicEntityTree 收到菜单对话框提交，data:', data)
+  // 根据菜单对话框类型执行不同的操作
+  switch (menuDialogType.value) {
+    case 'template-add-psystem':
+      // 处理添加PSYSTEM事件
+      break
+  }
+  // 关闭菜单对话框
+  showMenuDialog.value = false
 }
 </script> 

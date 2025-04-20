@@ -11,12 +11,8 @@
         <Copy class="mr-2 h-4 w-4" />
         克隆
       </DropdownMenuItem>
-      <DropdownMenuItem @click="handleAddSubComponent">
-        <PackagePlus class="mr-2 h-4 w-4" />
-        添加子组件
-      </DropdownMenuItem>
       <DropdownMenuItem @click="handleAddBom">
-        <ListPlus class="mr-2 h-4 w-4" />
+        <Package class="mr-2 h-4 w-4" />
         添加BOM
       </DropdownMenuItem>
     </DropdownMenuContent>
@@ -31,17 +27,24 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, PackagePlus, ListPlus } from 'lucide-vue-next'
+import { Plus, Copy, Package } from 'lucide-vue-next'
+import type { ZdComponent } from '~/models/entity/component'
 
-const handleClone = async () => {
-  // TODO: 实现克隆逻辑
+const props = defineProps<{
+  component: ZdComponent
+}>()
+
+const emit = defineEmits<{
+  (e: 'clone', component: ZdComponent): void
+  (e: 'addBom', component: ZdComponent): void
+}>()
+
+const handleClone = () => {
+  console.log('克隆按钮被点击，component:', props.component)
+  emit('clone', props.component)
 }
 
-const handleAddSubComponent = async () => {
-  // TODO: 实现添加子组件逻辑
-}
-
-const handleAddBom = async () => {
-  // TODO: 实现添加BOM逻辑
+const handleAddBom = () => {
+  emit('addBom', props.component)
 }
 </script> 

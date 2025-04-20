@@ -135,14 +135,14 @@ const handleSubmit = (event: Event) => {
   const submitData = { ...form.value }
   
   // 如果是创建，不传入 id 和 isDeleted
-  if (!props.system?.id) {
+  // if (!props.system?.id) {
     const { id, isDeleted, ...createData } = submitData
     emit('save', createData as CreatePSystemData)
-  } else {
-    // 如果是编辑，不传入 isDeleted
-    const { isDeleted, ...updateData } = submitData
-    emit('save', updateData as UpdatePSystemData)
-  }
+  // } else {
+  //   // 如果是编辑，不传入 isDeleted
+  //   const { isDeleted, ...updateData } = submitData
+  //   emit('save', updateData as UpdatePSystemData)
+  // }
   
   setIsOpen(false)
 }

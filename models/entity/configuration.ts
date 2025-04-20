@@ -12,6 +12,7 @@ export interface ZdConfiguration extends BasicProperty, TimeStamp {
 	// bomConfig: 
 }
 
+
 export const ZdConfigurationColumns = getColumns<ZdConfiguration>([
 	{ accessorKey: 'isShow', header: packHeader<ZdConfiguration>('是否显示') },
 	{ accessorKey: 'template_id', header: packHeader<ZdConfiguration>('模板ID') },

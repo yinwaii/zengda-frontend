@@ -106,7 +106,7 @@ const handleSubmit = (event: Event) => {
   // 创建新对象，根据是否是编辑模式决定是否包含id
   const updatedData = {
     ...formData,
-    ...(props.isEdit ? { id: formData.id } : {})
+    // ...(props.isEdit ? { id: formData.id } : {})
   }
   
   // 使用 JSON 序列化再解析来创建普通对象的深拷贝，移除 Proxy

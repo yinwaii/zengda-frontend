@@ -11,13 +11,9 @@
         <Copy class="mr-2 h-4 w-4" />
         克隆
       </DropdownMenuItem>
-      <DropdownMenuItem @click="handleAddSubSpecification">
-        <FileText class="mr-2 h-4 w-4" />
-        添加子规范
-      </DropdownMenuItem>
-      <DropdownMenuItem @click="handleBindPsystem">
-        <Link class="mr-2 h-4 w-4" />
-        绑定产品系统
+      <DropdownMenuItem @click="handleAddPtype">
+        <Boxes class="mr-2 h-4 w-4" />
+        添加产品类型
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
@@ -31,17 +27,24 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, FileText, Link } from 'lucide-vue-next'
+import { Plus, Copy, Boxes } from 'lucide-vue-next'
+import type { ZdSpecification } from '~/models/entity/specification'
 
-const handleClone = async () => {
-  // TODO: 实现克隆逻辑
+const props = defineProps<{
+  specification: ZdSpecification
+}>()
+
+const emit = defineEmits<{
+  (e: 'clone', specification: ZdSpecification): void
+  (e: 'addPtype', specification: ZdSpecification): void
+}>()
+
+const handleClone = () => {
+  console.log('克隆按钮被点击，specification:', props.specification)
+  emit('clone', props.specification)
 }
 
-const handleAddSubSpecification = async () => {
-  // TODO: 实现添加子规范逻辑
-}
-
-const handleBindPsystem = async () => {
-  // TODO: 实现绑定产品系统逻辑
+const handleAddPtype = () => {
+  emit('addPtype', props.specification)
 }
 </script> 

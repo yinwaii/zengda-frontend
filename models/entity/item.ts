@@ -20,6 +20,13 @@ export interface ZdItemQuery {
 	}
 }
 
+export interface ZdItemQueryPage {
+	page: {
+		current: string
+		size: string
+	}
+}
+
 export interface ZdItemPaged {
 	records: Array<ZdItem>
 	total: number

@@ -69,7 +69,7 @@
 <script setup lang="ts">
 import { LucidePlus, LucideBox, LucideSettings } from 'lucide-vue-next'
 import { ref } from 'vue'
-import PsystemSelectDialog from '~/components/design/template/psystem-select-dialog.vue'
+import PsystemSelectDialog from '~/components/design/template/add-psystem-dialog.vue'
 import { useToast } from '~/components/ui/toast'
 import { ChevronDown } from 'lucide-vue-next'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '~/components/ui/dropdown-menu'

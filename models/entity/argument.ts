@@ -17,3 +17,10 @@ export interface ZdBomConfiguration {
 	tcomponentId: number
 	bomId: number
 }
+
+export interface ZdComponentConfiguration {
+	configId: number
+	tcomponentId: number
+	enabled: number
+	quantity: number
+}

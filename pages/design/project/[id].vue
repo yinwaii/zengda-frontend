@@ -375,6 +375,8 @@ onMounted(async () => {
 	await loadSpecificProject()
 })
 
+provide('refresh', loadSpecificProject)
+
 // 监听配置对话框关闭
 watch(() => isConfigDialogOpen.value, (isOpen) => {
 	if (!isOpen) {

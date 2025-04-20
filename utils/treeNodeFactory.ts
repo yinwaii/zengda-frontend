@@ -220,6 +220,7 @@ export const getConfigurationTreeNodeStruct: TreeNodeFactory<any> = (config) => 
  */
 export const combineTreeNodeFactories = (factories: Record<string, TreeNodeFactory<any>>) => {
   return (node: any) => {
+    // console.log('combineTreeNodeFactories:', node)
     // 如果节点已经有type属性，直接使用对应的工厂函数
     if (node.type && factories[node.type]) {
       // 如果已有type但没有复合ID，预先设置一个

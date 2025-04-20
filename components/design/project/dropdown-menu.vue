@@ -7,9 +7,13 @@
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
-      <DropdownMenuItem @click="handleCreateTemplate">
-        <FileText class="mr-2 h-4 w-4" />
-        生成模板
+      <DropdownMenuItem @click="handleClone">
+        <Copy class="mr-2 h-4 w-4" />
+        克隆
+      </DropdownMenuItem>
+      <DropdownMenuItem @click="handleAddPsystem">
+        <Layers class="mr-2 h-4 w-4" />
+        添加产品系统
       </DropdownMenuItem>
     </DropdownMenuContent>
   </DropdownMenu>
@@ -23,12 +27,27 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, FileText } from 'lucide-vue-next'
+import { Plus, Copy, Layers } from 'lucide-vue-next'
+import type { ZdProject } from '~/models/entity/project'
 // import { useProjectStore } from '@/stores/project'
 
 // const projectStore = useProjectStore()
 
-const handleCreateTemplate = async () => {
-  // TODO: 实现生成模板的逻辑
+const props = defineProps<{
+  project: ZdProject
+}>()
+
+const emit = defineEmits<{
+  (e: 'clone', project: ZdProject): void
+  (e: 'addPsystem', project: ZdProject): void
+}>()
+
+const handleClone = () => {
+  console.log('克隆按钮被点击，project:', props.project)
+  emit('clone', props.project)
+}
+
+const handleAddPsystem = () => {
+  emit('addPsystem', props.project)
 }
 </script> 

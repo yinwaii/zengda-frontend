@@ -84,9 +84,23 @@ export const useEntityApis = (): any => {
         body: param
       }),
     },
+    component_configuration: {
+      get: (configId: number) => api.get<Array<ZdComponentConfiguration>>(`/configuration/${configId}/component`),
+      create: (configId: number, param: ZdComponentConfiguration) => api.post<ZdComponentConfiguration>(`/configuration/${configId}/component`, param),
+      update: (configId: number, param: ZdComponentConfiguration) => api.put<ZdComponentConfiguration>(`/configuration/${configId}/component`, param),
+      createBatch: (configId: number, param: Array<ZdComponentConfiguration>) => api.post<boolean>(`/configuration/${configId}/component/batch`, param),
+      updateBatch: (configId: number, param: Array<ZdComponentConfiguration>) => api.put<boolean>(`/configuration/${configId}/component/batch`, param),
+      delete: (configId: number, componentId: number) => api.delete<boolean>(`/configuration/${configId}/component/`, { id: componentId })
+    },
     psystem_component: {
       getAll: (psystemId: number) => api.get<Array<number>>(`/pSystem/${psystemId}/components`),
-      update: (psystemId: number, componentIds: number[]) => api.put<Array<number>>(`/pSystem/${psystemId}/components`, { componentIds }),
+      update: (psystemId: number, componentIds: number[]) => api.put<Array<number>>(`/pSystem/${psystemId}/components`, componentIds,
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      ),
       delete: (psystemId: number) => api.delete<null>(`/pSystem/${psystemId}/components`)
     },
 
@@ -127,11 +141,11 @@ export const useEntityApis = (): any => {
 
     template_psystem: {
       getByTemplateId: (templateId: number) => api.get<VOList<ZdPSystem>>(`/template/${templateId}/pSystem`),
-      create: (data: ZdPSystem) => api.post<ZdPSystem>('/pSystem/', data),
-      createBatch: (data: Array<ZdPSystem>) => api.post<boolean>('/pSystem/batch', data), 
-      // update: (data: ZdPSystem) => api.put<ZdPSystem>('/pSystem', data),
-      updateBatch: (data: Array<ZdPSystem>) => api.put<boolean>('/pSystem/batch', data),
-      delete: (id: number) => api.delete<ZdPSystem>(`/pSystem/${id}`)
+      create: (templateId: number, psystemId: number) => api.post<ZdPSystem>(`/template/${templateId}/pSystem/${psystemId}`),
+      createBatch: (templateId: number, psystemId: Array<number>) => api.post<boolean>(`/template/${templateId}/pSystem/`, psystemId), 
+      update: (templateId: number, psystemId: number) => api.put<ZdPSystem>(`/template/${templateId}/pSystem/${psystemId}`),
+      updateBatch: (templateId: number, psystemIds: Array<number>) => api.put<boolean>(`/template/${templateId}/pSystem/`, psystemIds),
+      delete: (templateId: number, psystemId: number) => api.delete<ZdPSystem>(`/template/${templateId}/pSystem/${psystemId}`)
     },
 
     // Product Type APIs
@@ -156,16 +170,22 @@ export const useEntityApis = (): any => {
     // Template Component APIs
     template_component: {
       getByTemplateId: (templateId: number) => api.get<VOList<ZdTComponent>>('/tComponent/', { tid: templateId }),
-      create: (data: ZdTComponent) => api.post<ZdTComponent>('/tComponent/', data),
-      createBatch: (data: Array<ZdTComponent>) => api.post<boolean>('/tComponent/batch', data),
-      update: (data: ZdTComponent) => api.put<ZdTComponent>('/tComponent', data),
-      updateBatch: (data: Array<ZdTComponent>) => api.put<boolean>('/tComponent/batch', data),
+      create: (data: Partial<ZdTComponent>) => api.post<ZdTComponent>('/tComponent/', data),
+      createBatch: (data: Array<Partial<ZdTComponent>>) => api.post<boolean>('/tComponent/batch', data),
+      update: (data: Partial<ZdTComponent>) => api.put<ZdTComponent>('/tComponent', data),
+      updateBatch: (data: Array<Partial<ZdTComponent>>) => api.put<boolean>('/tComponent/batch', data),
       delete: (id: number) => api.delete<ZdTComponent>(`/tComponent/${id}`)
     },
 
     item: {
       get: (id: string) => api.get<ZdItem>(`/item/${id}`),
       getByPage: (query: ZdItemQuery) => api.get<ZdItemPaged>(`/item`, {}, {
+        body: query,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      }),
+      search: (searchValue: string, query: ZdItemQueryPage) => api.get<ZdItemPaged>(`/item/search`, { searchValue }, {
         body: query,
         headers: {
           'Content-Type': 'application/json'

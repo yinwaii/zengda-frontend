@@ -358,6 +358,7 @@ const init = async () => {
 
 // 从项目模板树中加载组件树结构
 const loadProjectTree = async () => {
+  console.log("loadProjectTree", form.value.project_id, form.value.template_id)
   if (!form.value.project_id || !form.value.template_id) return
   
   try {

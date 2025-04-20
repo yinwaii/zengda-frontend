@@ -1,5 +1,5 @@
 <template>
-	<shadcn-dialog v-model:open="modelValue" @update:open="$emit('update:modelValue', $event)">
+	<shadcn-dialog :open="modelValue" @update:open="$emit('update:modelValue', $event)">
 		<shadcn-dialog-content class="sm:max-w-[425px]">
 			<shadcn-dialog-header>
 				<shadcn-dialog-title>添加 PSYSTEM</shadcn-dialog-title>
@@ -40,19 +40,21 @@
 
 	<!-- PSYSTEM 创建对话框 -->
 	<psystem-dialog
-		v-model:open="showCreateDialog"
+		:open="showCreateDialog"
+		:psystem="psystem"
 		@submit="handlePsystemCreated"
 	/>
 </template>
 
 <script setup lang="ts">
 import { LucidePlus } from 'lucide-vue-next'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, inject } from 'vue'
 // import type { ZdPSystem } from '~/models/entity/psystem'
 import PsystemDialog from '~/components/design/psystem/dialog.vue'
 import { useToast } from '~/components/ui/toast'
 
 const props = defineProps<{
+	templateId: number
 	modelValue: boolean
 }>()
 
@@ -64,10 +66,13 @@ const emit = defineEmits<{
 const toast = useToast().toast
 const entityApis = useEntityApis()
 
+const refresh = inject('refresh') as () => Promise<void>
+
 // 状态
 const psystems = ref<ZdPSystem[]>([])
 const selectedPsystemId = ref<number | null>(null)
 const showCreateDialog = ref(false)
+const psystem = ref<ZdPSystem>()
 
 // 加载 PSYSTEM 列表
 const loadPsystems = async () => {
@@ -93,6 +98,8 @@ const openCreateDialog = () => {
 
 // 处理 PSYSTEM 创建完成
 const handlePsystemCreated = async (newPsystem: ZdPSystem) => {
+	psystem.value = newPsystem
+	await entityApis.template.create(psystem.value)
 	// 重新加载 PSYSTEM 列表
 	await loadPsystems()
 	// 自动选择新创建的 PSYSTEM
@@ -101,10 +108,12 @@ const handlePsystemCreated = async (newPsystem: ZdPSystem) => {
 }
 
 // 处理提交
-const handleSubmit = () => {
+const handleSubmit = async () => {
 	if (selectedPsystemId.value) {
-		emit('submit', selectedPsystemId.value)
+		await entityApis.template_psystem.create(toApiId(props.templateId), selectedPsystemId.value)
 		emit('update:modelValue', false)
+		// 调用refresh函数刷新树状结构
+		await refresh()
 	}
 }
 

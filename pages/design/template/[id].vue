@@ -146,6 +146,8 @@ const handleCreate = (data: any, nodeType: string) => {
 	return entityHandlers.handleCreate(data, nodeType, loadSpecificTemplate)
 }
 
+provide('refresh', loadSpecificTemplate)
+
 // 初始化时加载数据
 onMounted(async () => {
 	await loadSpecificTemplate()

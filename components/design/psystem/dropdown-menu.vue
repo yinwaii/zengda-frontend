@@ -11,10 +11,6 @@
         <Copy class="mr-2 h-4 w-4" />
         克隆
       </DropdownMenuItem>
-      <DropdownMenuItem @click="handleAddSubPsystem">
-        <Layers class="mr-2 h-4 w-4" />
-        添加子产品系统
-      </DropdownMenuItem>
       <DropdownMenuItem @click="handleAddComponent">
         <Package class="mr-2 h-4 w-4" />
         添加组件
@@ -31,17 +27,24 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Plus, Copy, Layers, Package } from 'lucide-vue-next'
+import { Plus, Copy, Package } from 'lucide-vue-next'
+import type { ZdPSystem } from '~/models/entity/psystem'
 
-const handleClone = async () => {
-  // TODO: 实现克隆逻辑
+const props = defineProps<{
+  psystem: ZdPSystem
+}>()
+
+const emit = defineEmits<{
+  (e: 'clone', psystem: ZdPSystem): void
+  (e: 'addComponent', psystem: ZdPSystem): void
+}>()
+
+const handleClone = () => {
+  console.log('克隆按钮被点击，psystem:', props.psystem)
+  emit('clone', props.psystem)
 }
 
-const handleAddSubPsystem = async () => {
-  // TODO: 实现添加子产品系统逻辑
-}
-
-const handleAddComponent = async () => {
-  // TODO: 实现添加组件逻辑
+const handleAddComponent = () => {
+  emit('addComponent', props.psystem)
 }
 </script> 
