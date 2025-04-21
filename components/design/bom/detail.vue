@@ -66,6 +66,10 @@
 							<dt class="text-sm font-medium text-muted-foreground">备注</dt>
 							<dd class="mt-1">{{ bom.note || '暂无备注' }}</dd>
 						</div>
+						<div class="space-y-2 p-4 border rounded-lg">
+							<dt class="text-sm font-medium text-muted-foreground">物料成本</dt>
+							<dd class="mt-1">￥{{ bom.price.toFixed(3) || 0 }}</dd>
+						</div>
 					</div>
 					
 					<h3 class="text-lg font-medium mt-8 mb-4">子物料项</h3>
@@ -160,6 +164,10 @@
 				<dt class="text-sm font-medium text-muted-foreground">物料名称</dt>
 				<dd class="mt-1">{{ selectedBomItem.itemName }}</dd>
 			</div>
+			<div class="space-y-2 p-4 border rounded-lg">
+				<dt class="text-sm font-medium text-muted-foreground">物料用量</dt>
+				<dd class="mt-1">{{ selectedBomItem.itemNumber }}</dd>
+			</div>
 			<div class="col-span-2 space-y-2 p-4 border rounded-lg">
 				<dt class="text-sm font-medium text-muted-foreground">备注</dt>
 				<dd class="mt-1">{{ selectedBomItem.note || '暂无备注' }}</dd>
@@ -245,9 +253,12 @@ const handleDeleteItem = async (item: ZdBomChild, index: number) => {
 			items: [...(props.bom.items || [])]
 		}
 		
+		updatedBom.id = toApiId(props.bom.id) ?? 0
+
 		if (updatedBom.items && updatedBom.items.length > index) {
 			updatedBom.items.splice(index, 1)
 		}
+
 		
 		// 调用API更新BOM
 		await entityApis.bom.update(updatedBom)
@@ -266,6 +277,7 @@ const handleAddItem = () => {
 		bomId: props.bom.id,
 		itemId: 0,
 		itemName: '',
+		itemNumber: 1,
 		note: ''
 	}
 	selectedItemIndex.value = -1
@@ -328,6 +340,11 @@ const bomItemColumns = computed(() => [
 		accessorKey: 'itemName',
 		header: packHeader<ZdBomChild>('物料名称'),
 		meta: { width: '180px' }
+	},
+	{
+		accessorKey: 'itemNumber',
+		header: packHeader<ZdBomChild>('物料用量'),
+		meta: { width: '100px' }
 	},
 	{
 		accessorKey: 'note',

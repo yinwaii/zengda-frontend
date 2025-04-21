@@ -35,6 +35,19 @@
 							<shadcn-checkbox id="isRequired" v-model="editForm.isRequired" />
 						</div>
 						<div class="space-y-2">
+							<shadcn-label for="bomId">默认BOM</shadcn-label>
+							<shadcn-select v-model="editForm.bomId">
+								<shadcn-select-trigger>
+									<shadcn-select-value placeholder="请选择BOM" />
+								</shadcn-select-trigger>
+								<shadcn-select-content>
+									<shadcn-select-item v-for="bom in bomData" :key="bom.id" :value="bom.id">
+										BOM {{ bom.id }}
+									</shadcn-select-item>
+								</shadcn-select-content>
+							</shadcn-select>
+						</div>
+						<div class="space-y-2">
 							<shadcn-label for="price">价格计算公式/默认价格</shadcn-label>
 							<shadcn-input id="price" v-model="editForm.price" />
 						</div>
@@ -84,7 +97,8 @@
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">BOM ID</dt>
-							<dd class="mt-1">{{ hasBom ? (bomData ? bomData.id : '未关联BOM') : '未关联BOM' }}</dd>
+							<!--<dd class="mt-1">{{ hasBom ? (bomData ? bomData.id : '未关联BOM') : '未关联BOM' }}</dd> -->
+							<dd class="mt-1">{{ component.bomId || '未关联BOM' }}</dd>
 						</div>
 						<div class="space-y-2 p-4 border rounded-lg">
 							<dt class="text-sm font-medium text-muted-foreground">创建时间</dt>
@@ -113,6 +127,7 @@ import type { ZdComponent } from '~/models/entity/component'
 import type { ZdParameter } from '~/models/entity/parameter'
 import type { ZdBom } from '~/models/entity/bom'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
+import { useEntityApis } from '~/composables/use-entity-apis'
 
 const props = defineProps<{
 	data: TreeNodeData,
@@ -120,6 +135,9 @@ const props = defineProps<{
 	parameters?: ZdParameter[],
 	bom?: ZdBom
 }>()
+
+// api获取bom列表
+const bomIds = ref<number[]>([ 1, 2, 3])
 
 // 计算组件数据，优先使用component，如果不存在则从data中提取
 const component = computed(() => {

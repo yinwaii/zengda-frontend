@@ -64,6 +64,10 @@
                 <shadcn-label for="itemName">物料名称</shadcn-label>
                 <shadcn-input id="itemName" v-model="form.itemName" />
               </div>
+              <div class="space-y-2 flex-1">
+                <shadcn-label for="itemNumber">物料用量</shadcn-label>
+                <shadcn-input id="itemNumber" v-model="form.itemNumber" />
+              </div>
             </div>
             <div class="space-y-2">
               <shadcn-label for="note">备注</shadcn-label>
@@ -180,6 +184,7 @@ const form = ref<ZdBomChild>({
   bomId: props.item?.bomId || 0,
   itemId: props.item?.itemId || 0,
   itemName: props.item?.itemName || '',
+  itemNumber: props.item?.itemNumber || 1,
   note: props.item?.note || ''
 })
 

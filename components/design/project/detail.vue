@@ -420,7 +420,13 @@ const showDeleteConfirm = ref(false)
 // 获取所有配置
 const loadConfigurations = async () => {
 	try {
-		if (!project.value || !project.value.id || !project.value.templateId) return
+		if (!project.value || !project.value.id || !project.value.templateId) {
+			console.log('Missing required project data:', {
+				projectId: project.value?.id,
+				templateId: project.value?.templateId
+			})
+			return
+		}
 
 		// 使用toApiId转换项目ID为纯数字
 		const projectNumericId = toApiId(project.value.id)
@@ -434,16 +440,25 @@ const loadConfigurations = async () => {
 			return
 		}
 		
+		console.log('Loading configurations for:', {
+			projectId: projectNumericId,
+			templateId: project.value.templateId
+		})
+		
 		const response = await entityApis.configuration.getByTemplateId(
 			project.value.templateId,
 			projectNumericId
 		)
 
+		console.log('Configuration response:', response)
+
 		if (response && response.list && response.list.length > 0) {
 			configurations.value = response.list
+			console.log('Current selectedConfigId:', selectedConfigId.value)
 			// 默认选择第一个配置
 			if (!selectedConfigId.value && response.list.length > 0) {
 				selectedConfigId.value = response.list[0].id
+				console.log('Updated selectedConfigId to:', selectedConfigId.value)
 			}
 			
 			// 加载当前节点的参数
@@ -452,6 +467,7 @@ const loadConfigurations = async () => {
 				await loadNodeArguments()
 			}
 		} else {
+			console.log('No configurations found')
 			configurations.value = []
 			selectedConfigId.value = null
 			objectArgument.value = null
@@ -651,6 +667,23 @@ const generateSpecification = async () => {
 		return
 	}
 
+	// 检查是否选择了配置
+	if (!selectedConfigId.value) {
+		toast({
+			title: '错误',
+			description: '请先选择一个配置',
+			variant: 'destructive'
+		})
+		return
+	}
+
+	console.log('开始生成规格书:', {
+		projectId: project.value.id,
+		templateId: project.value.templateId,
+		selectedConfigId: selectedConfigId.value,
+		configurations: configurations.value
+	})
+
 	try {
 		specLoading.value = true
 
@@ -666,7 +699,11 @@ const generateSpecification = async () => {
 		}
 
 		// 2. 获取规格书配置
-		console.log('template.specId:', template.specId)
+		console.log('获取规格书配置:', {
+			templateId: template.id,
+			specId: template.specId
+		})
+		
 		const specConfig = await entityApis.specification.getAll(template.specId)
 		if (!specConfig) {
 			toast({
@@ -715,16 +752,13 @@ const generateSpecification = async () => {
 
 		const cleanedSpecConfig = cleanSpecConfig(specConfig)
 
-		// 3. 创建规格书查询对象
-		// const specQuery = {
-		// 	projectId: project.value.id,
-		// 	templateId: project.value.templateId,
-		// 	specId: template.specId,
-		// 	configId: selectedConfigId.value || undefined
-		// }
+		// 3. 渲染规格书
+		console.log('准备渲染规格书:', {
+			selectedConfigId: selectedConfigId.value,
+			configExists: configurations.value.some(c => c.id === selectedConfigId.value),
+			cleanedSpecConfig
+		})
 
-		// 4. 渲染规格书
-		console.log('selectedConfigId.value:', selectedConfigId.value, cleanedSpecConfig)
 		const renderUrl = await entityApis.specification.render(selectedConfigId.value, cleanedSpecConfig)
 		if (!renderUrl) {
 			toast({
@@ -1154,4 +1188,18 @@ watch([currentNode, selectedConfigId], () => {
 		objectArgument.value = null
 	}
 })
+
+// 添加对 selectedConfigId 的监听
+watch(selectedConfigId, (newValue, oldValue) => {
+	console.log('selectedConfigId changed:', {
+		oldValue,
+		newValue,
+		configurations: configurations.value
+	})
+	
+	// 如果配置发生变化，重新加载参数
+	if (newValue && currentNode.value) {
+		loadNodeArguments()
+	}
+}, { immediate: true })
 </script> 

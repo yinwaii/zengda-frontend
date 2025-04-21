@@ -2,6 +2,7 @@ export interface ZdBomChild {
 	bomId: number
 	itemId: number
 	itemName: string
+	itemNumber: number
 	note?: string
 }
 
