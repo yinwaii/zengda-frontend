@@ -15,6 +15,10 @@
         <Package class="mr-2 h-4 w-4" />
         添加组件
       </DropdownMenuItem>
+      <DropdownMenuItem @click="handleAddSubPSystem">
+        <Package class="mr-2 h-4 w-4" />
+        添加子系统
+      </DropdownMenuItem>
       <!-- <DropdownMenuItem @click="$emit('edit')">
         <LucidePencil class="mr-2 h-4 w-4" />
         编辑
@@ -45,6 +49,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'clone', psystem: ZdPSystem): void
   (e: 'addComponent', psystem: ZdPSystem): void
+  (e: 'addSubPSystem', psystem: ZdPSystem): void
   (e: 'delete', psystem: ZdPSystem): void
 }>()
 
@@ -55,5 +60,9 @@ const handleClone = () => {
 
 const handleAddComponent = () => {
   emit('addComponent', props.psystem)
+}
+
+const handleAddSubPSystem = () => {
+  emit('addSubPSystem', props.psystem)
 }
 </script> 

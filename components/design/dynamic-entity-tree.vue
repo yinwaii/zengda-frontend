@@ -9,7 +9,7 @@
           v-if="currentItem && currentItem.type === 'TEMPLATE'"
           :template="(currentItem.originalData as ZdTemplate)"
           @clone="handleClone"
-          @delete="handleDelete"
+          @delete="handleDelete(currentItem)"
           @addPsystem="handleAddPsystem"
           @addComponent="handleAddComponent"
           @addConfiguration="handleAddConfiguration"
@@ -19,7 +19,7 @@
           v-else-if="currentItem && currentItem.type === 'PROJECT'"
           :project="(currentItem.originalData as ZdProject)"
           @clone="handleClone"
-          @delete="handleDelete"
+          @delete="handleDelete(currentItem)"
         />
         <!-- 产品系统下拉菜单 -->
         <PsystemDropdownMenu
@@ -27,7 +27,8 @@
           :psystem="(currentItem.originalData as ZdPSystem)"
           @clone="handleClone"
           @addComponent="handleAddComponent"
-          @delete="handleDelete"
+          @addSubPSystem="handleAddSubPSystem"
+          @delete="handleDelete(currentItem)"
         />
         <!-- 组件下拉菜单 -->
         <ComponentDropdownMenu
@@ -35,21 +36,21 @@
           :component="(currentItem.originalData as ZdComponent)"
           @clone="handleClone"
           @addBom="handleAddBom"
-          @delete="handleDelete"
+          @delete="handleDelete(currentItem)"
         />
         <!-- BOM下拉菜单 -->
         <BomDropdownMenu
           v-else-if="currentItem && currentItem.type === 'BOM'"
           :bom="(currentItem.originalData as ZdBom)"
           @clone="handleClone"
-          @delete="handleDelete"
+          @delete="handleDelete(currentItem)"
         />
         <!-- 规格下拉菜单 -->
         <SpecificationDropdownMenu
           v-else-if="currentItem && currentItem.type === 'SPECIFICATION'"
           :specification="(currentItem.originalData as ZdSpecification)"
           @clone="handleClone"
-          @delete="handleDelete"
+          @delete="handleDelete(currentItem)"
         />
       </div>
       
@@ -119,6 +120,7 @@ import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdTemplate } from '~/models/entity/template'
+import { useToast } from '~/components/ui/toast'
 
 // 导入各模块的组件
 import BomDetail from '~/components/design/bom/detail.vue'
@@ -146,6 +148,7 @@ import SpecificationDropdownMenu from '~/components/design/specification/dropdow
 import TemplateAddPsystemDialog from '~/components/design/template/add-psystem-dialog.vue'
 import TemplateAddComponentDialog from '~/components/design/template/add-component-dialog.vue'
 import PsystemAddComponentDialog from '~/components/design/psystem/add-component-dialog.vue'
+import PsystemAddSubPSystemDialog from '~/components/design/psystem/add-psystem-dialog.vue'
 const props = defineProps<{
   treeData: TreeNodeData[]
   treeTitle?: string
@@ -250,6 +253,7 @@ const menuDialogComponents: Record<string, any> = {
   'template-add-psystem': TemplateAddPsystemDialog,
   'template-add-component': TemplateAddComponentDialog,
   'psystem-add-component': PsystemAddComponentDialog,
+  'psystem-add-sub-psystem': PsystemAddSubPSystemDialog
   // 'template-add-configuration': TemplateAddConfigurationDialog
 }
 
@@ -457,6 +461,17 @@ const handleAddConfiguration = (template: ZdTemplate) => {
   showMenuDialog.value = true
 }
 
+const handleAddSubPSystem = (psystem: ZdPSystem) => {
+  console.log('DynamicEntityTree 收到添加SUB PSYSTEM事件，psystem:', psystem)
+  // 打开SUB PSYSTEM对话框进行添加
+  menuDialogType.value = 'psystem-add-sub-psystem'
+  menuDialogProps.value = {
+    open: true, 
+    parentId: toApiId(psystem.id)
+  }
+  showMenuDialog.value = true
+}
+
 // 处理菜单对话框提交
 const handleMenuDialogSubmit = (data: any) => {
   console.log('DynamicEntityTree 收到菜单对话框提交，data:', data)
@@ -471,23 +486,74 @@ const handleMenuDialogSubmit = (data: any) => {
 }
 const entityApis = useEntityApis()
 const refresh = inject('refresh') as () => Promise<void>
+const { toast } = useToast()
 // 处理删除事件
-const handleDelete = async(item: any) => {
-  console.log('DynamicEntityTree 收到删除事件，item:', item)
-  if (item.type === NODE_TYPES.TEMPLATE) {
-    entityApis.template.delete(toApiId(item.id) ?? 0)
-  } else if (item.type === NODE_TYPES.PROJECT) {
-    entityApis.project.delete(toApiId(item.id) ?? 0)
-  } else if (item.type === NODE_TYPES.PSYSTEM) {
-    entityApis.psystem.delete(toApiId(item.id) ?? 0)
-  } else if (item.type === NODE_TYPES.COMPONENT) {
-    entityApis.component.delete(toApiId(item.id) ?? 0)
-  } else if (item.type === NODE_TYPES.BOM) {
-    entityApis.bom.delete(toApiId(item.id) ?? 0)
-  } else if (item.type === NODE_TYPES.SPECIFICATION) {
-    entityApis.specification.delete(toApiId(item.id) ?? 0)
+const handleDelete = async (node: TreeNodeData) => {
+  if (!node) return
+
+  const parentNode = findParentNode(props.treeData, `${node.type}:${toApiId(node.id)}`)
+  console.log(node, parentNode, `${node.type}:${toApiId(node.id)}`)
+  if (node.type === NODE_TYPES.TEMPLATE && parentNode?.type === NODE_TYPES.PROJECT) {
+    toast({
+      title: '删除失败',
+      description: '模板不能直接删除，请先删除关联的组件',
+      variant: 'destructive',
+    })
   }
+  if (node.type === NODE_TYPES.PSYSTEM && parentNode?.type === NODE_TYPES.TEMPLATE) {
+    entityApis.template_psystem.delete(toApiId(node.id) ?? 0)
+    toast({
+      title: '删除成功',
+      description: 'PSYSTEM已成功删除',
+    })
+  }
+  if (node.type === NODE_TYPES.PSYSTEM && parentNode?.type === NODE_TYPES.PSYSTEM) {
+    parentNode.originalData.children = parentNode.originalData.children.filter((child: any) => child.id !== node.id)
+    entityApis.psystem.update(parentNode.originalData)
+    toast({
+      title: '删除成功',
+      description: 'PSYSTEM已成功删除',
+    })
+  }
+  if (node.type === NODE_TYPES.COMPONENT && parentNode?.type === NODE_TYPES.PSYSTEM) {
+    const componentIds = await entityApis.psystem_component.getAll(toApiId(parentNode.id) ?? 0)
+    const newComponentIds = componentIds.filter((id: number) => id !== toApiId(node.id))
+    console.log(componentIds, newComponentIds)
+    entityApis.psystem_component.update(toApiId(parentNode.id), newComponentIds)
+    // parentNode.originalData.children = parentNode.originalData.children.filter((child: any) => child.id !== node.id)
+    toast({
+      title: '删除成功',
+      description: 'COMPONENT已成功删除',
+    })
+  }
+  if (node.type === NODE_TYPES.BOM && parentNode?.type === NODE_TYPES.COMPONENT) {
+    entityApis.bom.delete(toApiId(node.id) ?? 0)
+    toast({
+      title: '删除成功',
+      description: 'BOM已成功删除',
+    })
+  }
+  // if (node.type === NODE_TYPES.SPECIFICATION && parentNode?.type === NODE_TYPES.COMPONENT) {
   await refresh()
+}
+
+// 使用DFS查找父节点
+const findParentNode = (nodes: TreeNodeData[], targetId: string): TreeNodeData | null => {
+  for (const node of nodes) {
+    // 如果当前节点有子节点，检查子节点中是否包含目标节点
+    if (node.children && node.children.length > 0) {
+      const found = node.children.find(child => child.id === targetId)
+      if (found) {
+        return node
+      }
+      // 递归检查子节点
+      const parent = findParentNode(node.children, targetId)
+      if (parent) {
+        return parent
+      }
+    }
+  }
+  return null
 }
 </script>
 

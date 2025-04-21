@@ -101,8 +101,8 @@
     
     <!-- 编辑器对话框 -->
     <Dialog v-model:open="showEditorDialog">
-      <DialogContent class="sm:max-w-4xl">
-        <DialogHeader>
+      <DialogContent class="sm:max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader class="sticky top-0 bg-background/95 backdrop-blur-sm border-b z-10 shadow-sm">
           <DialogTitle>{{ specification.name }} - 编辑内容</DialogTitle>
           <DialogDescription>
             {{ specification.fileTag ? `标签: ${specification.fileTag}` : '内容编辑' }}
@@ -123,7 +123,7 @@
           />
         </div>
         
-        <DialogFooter>
+        <DialogFooter class="sticky bottom-0 bg-background/95 backdrop-blur-sm border-t z-10 shadow-sm">
           <div class="flex justify-between w-full">
             <shadcn-button 
               type="button" 
@@ -162,8 +162,8 @@
     
     <!-- 上传对话框 -->
     <Dialog v-model:open="showUploadDialog">
-      <DialogContent class="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent class="sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader class="sticky top-0 bg-background/95 backdrop-blur-sm border-b z-10 shadow-sm">
           <DialogTitle>上传文档</DialogTitle>
           <DialogDescription>
             请选择一个Word文档(.docx)上传
@@ -404,11 +404,34 @@ const handleUploadFile = async () => {
 }
 
 // 处理文档下载
-const handleDownload = () => {
+const handleDownload = async () => {
   if (!props.specification.url) return
   
-  // 调用原有的下载处理函数
-  emit('download', props.specification)
+  try {
+    const blob = await entityApis.system.download(props.specification.url, {
+      mode: 'no-cors'
+    })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = `${props.specification.name}_${new Date().toISOString().split('T')[0]}.docx`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
+    
+    toast({
+      title: '下载成功',
+      description: '文档已开始下载',
+    })
+  } catch (error) {
+    console.error('下载文档失败:', error)
+    toast({
+      title: '下载失败',
+      description: '无法下载文档，请稍后重试',
+      variant: 'destructive',
+    })
+  }
 }
 
 // 格式化文件大小

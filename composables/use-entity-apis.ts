@@ -227,18 +227,14 @@ export const useEntityApis = (): any => {
       hash: (filename: string, hash: string) => systemApi.getRaw<ArrayBuffer>(`/${filename}`, { hash }, {
         responseType: 'arrayBuffer'
       }),
-      download: (filename: string) => {
+      download: (filename: string, options: { mode?: 'no-cors' } = {}) => {
         // 使用服务端代理而不是直接调用外部服务
-        systemApi.getRaw<Blob>(`/${filename}`, {}, {
+        return systemApi.getRaw<Blob>(`/${filename}`, {}, {
           headers: {
             'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          }
+          },
+          mode: options.mode || 'cors'
         })
-        // return api.getRaw<Blob>(`/api/proxy/${filename}`, {}, {
-          // headers: {
-          //   'Accept': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-          // }
-        // })
       },
       upload: (filename: string, file: File) => systemApi.put<object>(`/${filename}`, file, {
         headers: {
