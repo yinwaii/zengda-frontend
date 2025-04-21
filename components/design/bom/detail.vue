@@ -253,9 +253,12 @@ const handleDeleteItem = async (item: ZdBomChild, index: number) => {
 			items: [...(props.bom.items || [])]
 		}
 		
+		updatedBom.id = toApiId(props.bom.id) ?? 0
+
 		if (updatedBom.items && updatedBom.items.length > index) {
 			updatedBom.items.splice(index, 1)
 		}
+
 		
 		// 调用API更新BOM
 		await entityApis.bom.update(updatedBom)
