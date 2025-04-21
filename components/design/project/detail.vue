@@ -1,44 +1,5 @@
 <template>
 	<div class="space-y-6">
-		<!-- 配置选择器区域 -->
-		<shadcn-card v-if="configurations">
-			<shadcn-card-header>
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-medium">项目配置</h3>
-					<div class="flex items-center gap-2">
-						<shadcn-button size="sm" variant="outline" @click="handleAddConfig">
-							<LucidePlus class="h-4 w-4 mr-1" />
-							新增配置
-						</shadcn-button>
-					</div>
-				</div>
-			</shadcn-card-header>
-			<shadcn-card-content>
-				<div class="flex items-center gap-3">
-					<shadcn-select v-model="selectedConfigId">
-						<shadcn-select-trigger class="w-full max-w-xs">
-							<template #default>
-								{{ getSelectedConfigName() }}
-							</template>
-						</shadcn-select-trigger>
-						<shadcn-select-content>
-							<shadcn-select-item v-for="config in configurations" :key="config.id" :value="config.id">
-								{{ config.id }} - 最后更新: {{ formatDate(config.updatedTime) || formatDate(config.createdTime) || '未知' }}
-							</shadcn-select-item>
-						</shadcn-select-content>
-					</shadcn-select>
-					<shadcn-button size="sm" variant="outline" @click="handleEditConfig" :disabled="!selectedConfig">
-						<LucidePencil class="h-4 w-4 mr-1" />
-						编辑
-					</shadcn-button>
-					<shadcn-button size="sm" variant="destructive" @click="handleDeleteConfig" :disabled="!selectedConfig">
-						<LucideTrash class="h-4 w-4 mr-1" />
-						删除
-					</shadcn-button>
-				</div>
-			</shadcn-card-content>
-		</shadcn-card>
-
 		<shadcn-card>
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
@@ -235,21 +196,6 @@
 							<dt class="text-sm font-medium text-muted-foreground">修改时间</dt>
 							<dd class="mt-1">{{ formatDate(project.updatedTime) || '暂无修改时间' }}</dd>
 						</div>
-
-						<!-- 添加报价和规格书生成按钮 -->
-						<div class="space-y-2 p-4 border rounded-lg col-span-2">
-							<dt class="text-sm font-medium text-muted-foreground">项目操作</dt>
-							<dd class="mt-3 flex gap-3">
-								<shadcn-button variant="outline" @click="openPriceDialog">
-									<LucideCalculator class="mr-2 h-4 w-4" />
-									报价结果计算
-								</shadcn-button>
-								<shadcn-button variant="outline" @click="generateSpecification" :disabled="specLoading">
-									<LucideFileText class="mr-2 h-4 w-4" />
-									{{ specLoading ? '生成中...' : '规格书生成' }}
-								</shadcn-button>
-							</dd>
-						</div>
 					</div>
 					<div class="flex justify-end mt-4">
 						<shadcn-button @click="$emit('edit')">
@@ -264,162 +210,11 @@
 		<shadcn-separator />
 
 		<design-parameter-preview :nodeId="project.id" type="project" />
-
-		<!-- 配置数据表格区域 -->
-		<shadcn-card v-if="selectedConfig">
-			<shadcn-card-header>
-				<div class="flex items-center justify-between">
-					<h3 class="text-lg font-medium">配置信息</h3>
-					<h4 v-if="currentNodeName" class="text-sm font-medium text-muted-foreground">
-						当前节点: {{ currentNodeName }}
-					</h4>
-				</div>
-			</shadcn-card-header>
-			<shadcn-card-content>
-				<div class="grid grid-cols-2 gap-4 mb-4">
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">配置ID</dt>
-						<dd class="mt-1">{{ selectedConfig?.id }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">最后版本ID</dt>
-						<dd class="mt-1">{{ selectedConfig?.lastVersionId }}</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
-						<dd class="mt-1">
-							<shadcn-badge :variant="selectedConfig?.isShow ? 'default' : 'outline'">
-								{{ selectedConfig?.isShow ? '是' : '否' }}
-							</shadcn-badge>
-						</dd>
-					</div>
-					<div class="space-y-2 p-4 border rounded-lg">
-						<dt class="text-sm font-medium text-muted-foreground">更新时间</dt>
-						<dd class="mt-1">{{ formatDate(selectedConfig?.updatedTime) || formatDate(selectedConfig?.createdTime) || '暂无' }}</dd>
-					</div>
-				</div>
-
-				<shadcn-tabs default-value="arguments" class="w-full">
-					<shadcn-tabs-list class="grid w-full grid-cols-3">
-						<shadcn-tabs-trigger value="arguments">节点参数</shadcn-tabs-trigger>
-						<shadcn-tabs-trigger value="valueConfig">值配置</shadcn-tabs-trigger>
-						<shadcn-tabs-trigger value="componentConfig">组件配置</shadcn-tabs-trigger>
-					</shadcn-tabs-list>
-					
-					<shadcn-tabs-content value="arguments" class="pt-4">
-						<div class="flex justify-between items-center mb-4">
-							<h3 class="text-base font-semibold">节点参数配置</h3>
-							<shadcn-button size="sm" variant="outline" @click="handleAddArgument">
-								<LucidePlus class="h-4 w-4 mr-1" />
-								新增参数
-							</shadcn-button>
-						</div>
-						
-						<div v-if="isEditingArgument" class="border p-4 rounded-lg mb-4">
-							<h4 class="text-sm font-medium mb-3">{{ editingArgument.id ? '编辑参数' : '新增参数' }}</h4>
-							<div class="space-y-4">
-								<div class="grid grid-cols-2 gap-4">
-									<div class="space-y-2">
-										<shadcn-label for="arg-name">参数名称</shadcn-label>
-										<shadcn-input id="arg-name" v-model="editingArgument.name" placeholder="输入参数名称" />
-									</div>
-									<div class="space-y-2">
-										<shadcn-label for="arg-type">参数类型</shadcn-label>
-										<shadcn-select v-model="editingArgument.type">
-											<shadcn-select-trigger>
-												<shadcn-select-value placeholder="选择参数类型" />
-											</shadcn-select-trigger>
-											<shadcn-select-content>
-												<shadcn-select-item value="string">字符串</shadcn-select-item>
-												<shadcn-select-item value="number">数字</shadcn-select-item>
-												<shadcn-select-item value="boolean">布尔值</shadcn-select-item>
-												<shadcn-select-item value="object">对象</shadcn-select-item>
-												<shadcn-select-item value="array">数组</shadcn-select-item>
-											</shadcn-select-content>
-										</shadcn-select>
-									</div>
-								</div>
-								<div class="space-y-2">
-									<shadcn-label for="arg-value">参数值</shadcn-label>
-									<shadcn-textarea id="arg-value" v-model="editingArgument.value" placeholder="输入参数值" />
-									<p class="text-xs text-muted-foreground">
-										根据选择的类型输入相应格式的值。数字类型直接输入数字，布尔类型输入true/false，对象和数组请输入有效的JSON格式。
-									</p>
-								</div>
-								<div class="flex justify-end space-x-2">
-									<shadcn-button variant="outline" @click="cancelEditArgument">取消</shadcn-button>
-									<shadcn-button @click="saveArgument">保存</shadcn-button>
-								</div>
-							</div>
-						</div>
-						
-						<div v-if="objectArgument && objectArgument.arguments && objectArgument.arguments.length > 0">
-							<div class="rounded-md border">
-								<shadcn-table>
-									<shadcn-table-header>
-										<shadcn-table-row>
-											<shadcn-table-head>名称</shadcn-table-head>
-											<shadcn-table-head>类型</shadcn-table-head>
-											<shadcn-table-head>值</shadcn-table-head>
-											<shadcn-table-head class="w-[100px]">操作</shadcn-table-head>
-										</shadcn-table-row>
-									</shadcn-table-header>
-									<shadcn-table-body>
-										<shadcn-table-row v-for="arg in objectArgument.arguments" :key="arg.id">
-											<shadcn-table-cell>{{ arg.name }}</shadcn-table-cell>
-											<shadcn-table-cell>{{ arg.type }}</shadcn-table-cell>
-											<shadcn-table-cell class="max-w-[300px] truncate" :title="arg.value">
-												{{ arg.value }}
-											</shadcn-table-cell>
-											<shadcn-table-cell>
-												<div class="flex items-center gap-2">
-													<shadcn-button size="icon" variant="ghost" @click="handleEditArgument(arg)">
-														<LucidePencil class="h-4 w-4" />
-													</shadcn-button>
-													<shadcn-button size="icon" variant="ghost" @click="handleDeleteArgument(arg)">
-														<LucideTrash class="h-4 w-4" />
-													</shadcn-button>
-												</div>
-											</shadcn-table-cell>
-										</shadcn-table-row>
-									</shadcn-table-body>
-								</shadcn-table>
-							</div>
-						</div>
-						<div v-else-if="objectArgument" class="p-4 bg-muted/10 rounded-lg text-center">
-							<p class="text-muted-foreground">当前节点暂无参数配置</p>
-							<shadcn-button variant="outline" size="sm" class="mt-2" @click="handleAddArgument">
-								添加第一个参数
-							</shadcn-button>
-						</div>
-						<div v-else class="p-4 bg-muted/10 rounded-lg text-center">
-							<p class="text-muted-foreground">请选择一个节点查看配置参数</p>
-						</div>
-					</shadcn-tabs-content>
-					
-					<shadcn-tabs-content value="valueConfig">
-						<div class="p-4 bg-muted/20 rounded-lg">
-							<pre class="overflow-auto max-h-80 text-xs whitespace-pre-wrap">{{ formatConfig(selectedConfig?.valueConfig) }}</pre>
-						</div>
-					</shadcn-tabs-content>
-					
-					<shadcn-tabs-content value="componentConfig">
-						<div class="p-4 bg-muted/20 rounded-lg">
-							<pre class="overflow-auto max-h-80 text-xs whitespace-pre-wrap">{{ formatConfig(selectedConfig?.componentConfig) }}</pre>
-						</div>
-					</shadcn-tabs-content>
-				</shadcn-tabs>
-			</shadcn-card-content>
-		</shadcn-card>
 	</div>
 
 	<!-- 配置对话框 -->
-	<configuration-dialog 
-		:modelValue="showConfigDialog"
-		@update:modelValue="showConfigDialog = $event"
-		:editing-item="editingConfig"
-		@submit="onConfigSubmit" 
-	/>
+	<configuration-dialog :modelValue="showConfigDialog" @update:modelValue="showConfigDialog = $event"
+		:editing-item="editingConfig" @submit="onConfigSubmit" />
 
 	<!-- 确认删除对话框 -->
 	<shadcn-alert-dialog v-model:open="showDeleteConfirm">

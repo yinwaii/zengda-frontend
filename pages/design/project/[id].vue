@@ -1,28 +1,61 @@
 <template>
+		<design-project-configuration-selector 
+		:project="project"
+		v-model:selectedConfigId="selectedConfigId"
+		v-model:configurations="configurations"
+	/>
 	<div class="p-4 h-full">
-		<div v-if="pageLoading" class="flex items-center justify-center h-full">
-					<div class="animate-pulse flex space-x-4">
-						<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
-						<div class="flex-1 space-y-3 py-1">
+	<div v-if="pageLoading" class="flex items-center justify-center h-full">
+				<div class="animate-pulse flex space-x-4">
+					<div class="rounded-full bg-accent-foreground/10 h-10 w-10"></div>
+					<div class="flex-1 space-y-3 py-1">
+						<div class="h-2 bg-accent-foreground/10 rounded"></div>
+						<div class="space-y-1">
 							<div class="h-2 bg-accent-foreground/10 rounded"></div>
-							<div class="space-y-1">
-								<div class="h-2 bg-accent-foreground/10 rounded"></div>
-							</div>
-						</div>
 						</div>
 					</div>
-					
-		<design-dynamic-entity-tree
-			v-else
-			:tree-data="projectTreeData"
-			tree-title="项目详情"
-			:default-expanded-keys="expandedKeys"
-			@node-click="handleNodeClick"
-			@node-toggle="handleNodeToggle"
-			@save="handleSave"
-			@create="handleCreate"
-			class="h-full"
-		/>
+					</div>
+				</div>
+				
+	<design-dynamic-entity-tree
+		v-else
+		:tree-data="projectTreeData"
+		tree-title="项目详情"
+		:default-expanded-keys="expandedKeys"
+		@node-click="handleNodeClick"
+		@node-toggle="handleNodeToggle"
+		@save="handleSave"
+		@create="handleCreate"
+		class="h-full"
+	>
+		<template #detail-top="{ node }">
+			<div class="mb-4">
+				<shadcn-card v-if="node && selectedConfigId" class="shadow-none">
+					<shadcn-card-header class="py-2">
+						<div class="flex items-center justify-between">
+							<h3 class="text-lg font-medium">节点参数配置</h3>
+							<Button size="sm" variant="outline" @click="handleAddArgument">
+								<LucidePlus class="h-4 w-4 mr-1" />
+								新增参数
+							</Button>
+						</div>
+					</shadcn-card-header>
+					<shadcn-card-content class="py-2">
+						<abstract-data-table 
+							v-if="nodeArguments.length > 0"
+							:columns="argumentColumns" 
+							:data="nodeArguments"
+							searchColumn="name"
+							searchPlaceholder="搜索参数名称..."
+						/>
+						<div v-else class="text-center py-4 text-muted-foreground">
+							暂无参数配置
+						</div>
+					</shadcn-card-content>
+				</shadcn-card>
+			</div>
+		</template>
+	</design-dynamic-entity-tree>
 	</div>
 	
 	<!-- 配置生成对话框 -->
@@ -33,10 +66,34 @@
 			:editing-item="editingConfigItem"
 			@submit="handleConfigSubmit"
 	/>
+
+	<!-- 参数编辑对话框 -->
+	<design-argument-dialog
+		:modelValue="isArgumentDialogOpen"
+		@update:modelValue="isArgumentDialogOpen = $event"
+		:editingItem="editingArgument"
+		@submit="handleArgumentSubmit"
+	/>
+
+	<!-- 确认删除参数对话框 -->
+	<shadcn-alert-dialog v-model:open="showDeleteArgConfirm">
+		<shadcn-alert-dialog-content>
+			<shadcn-alert-dialog-header>
+				<shadcn-alert-dialog-title>确认删除参数</shadcn-alert-dialog-title>
+				<shadcn-alert-dialog-description>
+					您确定要删除此参数吗？此操作不可撤销。
+				</shadcn-alert-dialog-description>
+			</shadcn-alert-dialog-header>
+			<shadcn-alert-dialog-footer>
+				<shadcn-alert-dialog-cancel>取消</shadcn-alert-dialog-cancel>
+				<shadcn-alert-dialog-action @click="confirmDeleteArgument">删除</shadcn-alert-dialog-action>
+			</shadcn-alert-dialog-footer>
+		</shadcn-alert-dialog-content>
+	</shadcn-alert-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, h } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useRoute } from 'vue-router'
 import { useEntityTree } from '@/composables/useEntityTree'
@@ -44,6 +101,10 @@ import { useEntityHandlers } from '@/composables/useEntityHandlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdConfiguration } from '~/models/entity/configuration'
 import { toApiId } from '~/utils/idConverter'
+import type { ZdProject } from '~/models/entity/project'
+import type { ZdParameter } from '~/models/entity/parameter'
+import { LucidePlus, LucidePencil, LucideTrash } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
 // import { NODE_TYPES } from 'models/entity/node-types'
 
 // 添加 keepalive 配置
@@ -59,6 +120,16 @@ definePageMeta({
 // 通过路由获取项目ID
 const route = useRoute()
 const projectId = computed(() => Number(route.params.id))
+
+// 添加 project 对象
+const project = computed(() => {
+	// 获取项目详情
+	const projectDetail = projectTreeData.value[0]?.originalData
+	return {
+		id: projectId.value.toString(),
+		templateId: projectDetail?.templateId || 0
+	}
+})
 
 const toast = useToast()
 const entityApis = useEntityApis()
@@ -78,6 +149,54 @@ const projectConfiguration = ref<ZdConfiguration | null>(null)
 
 // 默认展开的节点
 const expandedKeys = ref<(string | number)[]>([])
+
+// 添加配置选择器组件
+const selectedConfigId = ref<number | null>(null)
+const configurations = ref<ZdConfiguration[]>([])
+
+// 节点参数相关状态
+const nodeArguments = ref<any[]>([])
+const argumentColumns = ref([
+	{
+		accessorKey: 'name',
+		header: '参数名称',
+	},
+	{
+		accessorKey: 'type',
+		header: '类型',
+	},
+	{
+		accessorKey: 'value',
+		header: '值',
+	},
+	{
+		accessorKey: 'actions',
+		header: '操作',
+		cell: ({ row }: { row: any }) => {
+			return h('div', { class: 'flex items-center gap-2' }, [
+				h(Button, {
+					size: 'icon',
+					variant: 'ghost',
+					onClick: () => handleEditArgument(row.original)
+				}, () => h(LucidePencil, { class: 'h-4 w-4' })),
+				h(Button, {
+					size: 'icon',
+					variant: 'ghost',
+					onClick: () => handleDeleteArgument(row.original)
+				}, () => h(LucideTrash, { class: 'h-4 w-4' }))
+			])
+		}
+	}
+])
+
+// 添加当前选中节点的状态
+const currentNode = ref<TreeNodeData | null>(null)
+
+// 参数对话框状态
+const isArgumentDialogOpen = ref(false)
+const editingArgument = ref<ZdParameterArgument | undefined>(undefined)
+const showDeleteArgConfirm = ref(false)
+const argumentToDelete = ref<ZdParameterArgument | null>(null)
 
 /**
  * 打开配置对话框
@@ -178,13 +297,13 @@ const loadSpecificProject = async () => {
 			// 使用enhancedData替换completeData
 			completeData.splice(0, completeData.length, ...enhancedData)
 			
-			// 步骤4: 显式加载配置节点数据
-			console.log('显式加载配置节点数据...')
-			const dataWithConfig = await entityTree.loadConfigurationByProject(completeData)
-			console.log('配置节点加载完成，更新数据')
+			// // 步骤4: 显式加载配置节点数据
+			// console.log('显式加载配置节点数据...')
+			// const dataWithConfig = await entityTree.loadConfigurationByProject(completeData)
+			// console.log('配置节点加载完成，更新数据')
 			
 			// 使用dataWithConfig替换completeData
-			completeData.splice(0, completeData.length, ...dataWithConfig)
+			// completeData.splice(0, completeData.length, ...dataWithConfig)
 		}
 		
 		if (completeData.length > 0) {
@@ -268,7 +387,9 @@ const loadSpecificProject = async () => {
  */
 const handleNodeClick = (node: TreeNodeData) => {
 	console.log('节点点击:', node)
-	// 这里可以添加额外的处理逻辑
+	currentNode.value = node
+	// 加载节点参数
+	loadNodeArguments(node)
 }
 
 /**
@@ -335,7 +456,7 @@ const handleConfigSubmit = async (configuration: ZdConfiguration) => {
 			
 			const configWithCorrectId = {
 				...configuration,
-				projectId: projectNumericId
+				project_id: projectNumericId
 			}
 			await entityApis.configuration.create(configWithCorrectId)
 			toast.toast({
@@ -368,6 +489,250 @@ const handleLoadConfiguration = async () => {
 		title: "成功",
 		description: "重新加载配置成功",
 	})
+}
+
+// 加载节点参数
+const loadNodeArguments = async (node: TreeNodeData) => {
+	if (!selectedConfigId.value || !node?.id) {
+		nodeArguments.value = []
+		return
+	}
+
+	try {
+		// 解析节点ID，确保id是字符串类型
+		const nodeId = node.id.toString()
+		const [objectType, objectId] = nodeId.split(':')
+		if (!objectType || !objectId) {
+			nodeArguments.value = []
+			return
+		}
+
+		console.log('加载节点参数:', {
+			configId: selectedConfigId.value,
+			objectType,
+			objectId
+		})
+
+		// 1. 获取模板参数定义
+		const parameters = await entityApis.parameter.get(objectId, objectType.toLowerCase())
+		
+		// 2. 尝试获取现有的参数配置
+		let response
+		try {
+			response = await entityApis.argument.get(
+				selectedConfigId.value,
+				objectType.toLowerCase(),
+				objectId
+			)
+			// 过滤掉每个参数中的 paramId 字段
+			if (response && response.arguments) {
+				response.arguments = response.arguments.map((arg: any) => {
+					const { paramId, ...rest } = arg
+					return rest
+				})
+			}
+		} catch (error) {
+			console.warn('获取现有参数配置失败，将创建新的参数配置:', error)
+			response = null
+		}
+		
+
+		console.log('获取现有参数配置:', response)
+
+		// 3. 创建或获取参数对象
+		let argumentObject = response || {
+			objectType: objectType.toLowerCase(),
+			objectId,
+			arguments: [],
+			children: []
+		}
+
+		// 4. 记录补全前的状态
+		console.log('补全前的参数:', {
+			existingArguments: argumentObject.arguments,
+			templateParameters: parameters
+		})
+
+		// 5. 比对并补全缺失的参数
+		if (parameters && parameters.length > 0) {
+			const existingArgNames = new Set(argumentObject.arguments.map((arg: any) => arg.name))
+			const missingParameters = parameters.filter((param: any) => !existingArgNames.has(param.name))
+
+			if (missingParameters.length > 0 || !response) {
+				console.log('发现缺失的参数:', missingParameters)
+
+				// 补全缺失的参数
+				const newArguments = missingParameters.map((param: any) => ({
+					name: param.name,
+					type: param.dtype,
+					value: param.value || '' // 使用模板参数中的默认值
+				}))
+
+				// 合并现有参数和新参数
+				argumentObject.arguments = [...argumentObject.arguments, ...newArguments]
+
+				// 6. 记录补全后的状态
+				console.log('补全后的参数:', argumentObject.arguments)
+
+				// 7. 更新到服务器
+				try {
+					if (!response) {
+						// 如果之前没有参数配置，使用 create
+						await entityApis.argument.create(selectedConfigId.value, argumentObject)
+						console.log('参数已创建到服务器')
+					} else {
+						// 如果已有参数配置，使用 update
+						await entityApis.argument.update(selectedConfigId.value, argumentObject)
+						console.log('参数已更新到服务器')
+					}
+				} catch (error) {
+					console.error('保存参数到服务器失败:', error)
+					toast.toast({
+						title: '错误',
+						description: '保存参数到服务器失败',
+						variant: 'destructive'
+					})
+				}
+			}
+		}
+
+		// 8. 更新本地状态
+		nodeArguments.value = argumentObject.arguments || []
+		console.log('节点参数加载完成:', nodeArguments.value)
+	} catch (error) {
+		console.error('加载节点参数失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '加载节点参数失败',
+			variant: 'destructive'
+		})
+		nodeArguments.value = []
+	}
+}
+
+// 监听节点变化
+watch(() => selectedConfigId.value, () => {
+	if (selectedConfigId.value && currentNode.value) {
+		// 重新加载当前节点的参数
+		loadNodeArguments(currentNode.value)
+	} else {
+		nodeArguments.value = []
+	}
+})
+
+// 处理新增参数
+const handleAddArgument = () => {
+	editingArgument.value = undefined
+	isArgumentDialogOpen.value = true
+}
+
+// 处理编辑参数
+const handleEditArgument = (arg: ZdParameterArgument) => {
+	editingArgument.value = arg
+	isArgumentDialogOpen.value = true
+}
+
+// 处理删除参数
+const handleDeleteArgument = (arg: ZdParameterArgument) => {
+	argumentToDelete.value = arg
+	showDeleteArgConfirm.value = true
+}
+
+// 确认删除参数
+const confirmDeleteArgument = async () => {
+	if (!argumentToDelete.value || !currentNode.value) return
+
+	try {
+		// 从参数列表中移除要删除的参数
+		const updatedArguments = nodeArguments.value.filter(
+			arg => arg.id !== argumentToDelete.value?.id
+		)
+
+		// 更新对象参数
+		const updatedObjectArgument = {
+			objectType: currentNode.value.type?.toLowerCase() || '',
+			objectId: toApiId(currentNode.value.id)?.toString() || '',
+			arguments: updatedArguments,
+			children: []
+		}
+
+		// 保存到服务器
+		await entityApis.argument.update(selectedConfigId.value, updatedObjectArgument)
+
+		// 更新本地状态
+		nodeArguments.value = updatedArguments
+
+		toast.toast({
+			title: '成功',
+			description: '参数已删除'
+		})
+
+		// 关闭确认对话框
+		showDeleteArgConfirm.value = false
+		argumentToDelete.value = null
+	} catch (error) {
+		console.error('删除参数失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '删除参数失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 处理参数提交
+const handleArgumentSubmit = async (argument: ZdParameterArgument) => {
+	if (!currentNode.value) return
+
+	try {
+		// 创建或更新参数对象
+		const updatedArguments = [...nodeArguments.value]
+		const existingIndex = updatedArguments.findIndex(arg => arg.name === argument.name)
+
+		// 创建一个不包含 paramId 的新参数对象
+		const cleanArgument = {
+			id: argument.id,
+			name: argument.name,
+			type: argument.type,
+			value: argument.value
+		}
+
+		if (existingIndex >= 0) {
+			// 更新现有参数
+			updatedArguments[existingIndex] = cleanArgument
+		} else {
+			// 添加新参数
+			updatedArguments.push(cleanArgument)
+		}
+
+		console.log('更新参数:', updatedArguments)
+
+		// 更新对象参数
+		const updatedObjectArgument = {
+			objectType: currentNode.value.type?.toLowerCase() || '',
+			objectId: toApiId(currentNode.value.id)?.toString() || '',
+			arguments: updatedArguments,
+			children: []
+		}
+
+		// 保存到服务器
+		await entityApis.argument.update(selectedConfigId.value, updatedObjectArgument)
+
+		// 更新本地状态
+		nodeArguments.value = updatedArguments
+
+		toast.toast({
+			title: '成功',
+			description: `参数已${existingIndex >= 0 ? '更新' : '创建'}`
+		})
+	} catch (error) {
+		console.error('保存参数失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '保存参数失败',
+			variant: 'destructive'
+		})
+	}
 }
 
 // 初始化时加载数据

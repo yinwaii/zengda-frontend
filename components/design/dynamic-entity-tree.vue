@@ -1,7 +1,7 @@
 <template>
   <div class="flex h-full">
     <!-- 左侧树 -->
-    <div class="w-[320px] min-w-[320px] h-full border-r pr-2 overflow-auto">
+    <div class="w-[320px] min-w-[320px] h-full pr-4 overflow-auto">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">{{ treeTitle }}</h2>
         <!-- 模板下拉菜单 -->
@@ -71,10 +71,16 @@
         </template>
       </abstract-tree>
     </div>
-    
-    <!-- 右侧详情 -->
-    <div class="flex-1 pl-4 overflow-auto">
-      <template v-if="currentItem">
+
+    <!-- 右侧详情区域 -->
+    <div v-if="currentItem" class="flex-1 flex flex-col h-full">
+      <!-- detail-top slot -->
+      <div class="px-6 py-4">
+        <slot name="detail-top" :node="currentItem"></slot>
+      </div>
+      
+      <!-- detail 组件 -->
+      <div class="flex-1 overflow-auto px-6">
         <component 
           :is="getDetailComponent(currentItem.type)" 
           :key="currentItemId"
@@ -84,12 +90,7 @@
           @cancel="cancelEditing"
           @save="(data: any) => currentItem && emit('save', data, currentItem.type || 'default')"
         />
-      </template>
-      <template v-else>
-        <div class="flex h-full items-center justify-center text-muted-foreground">
-          <p>请从左侧选择一个项目查看详情</p>
-        </div>
-      </template>
+      </div>
     </div>
     
     <!-- 对话框 -->
@@ -527,5 +528,13 @@ const handleDelete = async(item: any) => {
   justify-content: center;
   width: 1.25rem;
   height: 1.25rem;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
+}
+
+.overflow-auto {
+  overflow: auto;
 }
 </style> 
