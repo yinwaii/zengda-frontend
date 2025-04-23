@@ -44,16 +44,23 @@ export const lazyLoadDirective = {
   }
 }
 
-export default defineNuxtPlugin({
-  name: 'lazy-load',
-  setup(nuxtApp) {
-    // 注册图片懒加载指令
-    nuxtApp.vueApp.directive('lazy', lazyLoadDirective)
-    
-    return {
-      provide: {
-        lazyLoad: useLazyLoad
-      }
+export default defineNuxtPlugin((nuxtApp) => {
+  // 注册图片懒加载指令
+  nuxtApp.vueApp.directive('lazy', lazyLoadDirective)
+  
+  // 配置需要懒加载的组件
+  nuxtApp.vueApp.component('TinyMCE', () => import('@tinymce/tinymce-vue'))
+  
+  // 图表组件懒加载
+  nuxtApp.vueApp.component('LineChart', () => import('recharts').then(m => m.LineChart))
+  nuxtApp.vueApp.component('AreaChart', () => import('recharts').then(m => m.AreaChart))
+  
+  // 文档预览组件懒加载
+  nuxtApp.vueApp.component('DocxPreview', () => import('docx-preview'))
+
+  return {
+    provide: {
+      lazyLoad: useLazyLoad
     }
   }
 }) 

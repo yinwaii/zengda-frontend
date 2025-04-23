@@ -66,10 +66,11 @@ export default defineNuxtConfig({
       crawlLinks: true,
       routes: ['/']
     },
-    // 添加服务端缓存
+    // 修改为文件系统缓存
     storage: {
       cache: {
-        driver: 'memory',
+        driver: 'fs',
+        base: './.nuxt/cache',
         ttl: 60 * 60 // 1小时缓存
       }
     },
@@ -84,16 +85,31 @@ export default defineNuxtConfig({
   vite: {
     optimizeDeps: {
       include: ['tinymce/tinymce'],
-      exclude: ['tinymce/plugins/*'], // 避免预构建全部插件
-      force: true // 强制预构建依赖
+      exclude: ['tinymce/plugins/*'],
+      force: true,
+      esbuildOptions: {
+        target: 'esnext',
+        treeShaking: true
+      }
     },
     build: {
       rollupOptions: {
-        external: ['tinymce/tinymce']
+        output: {
+          manualChunks: {
+            'recharts': ['recharts'],
+            'docx': ['docx', 'docx-preview']
+          }
+        }
       },
-      // 优化chunk大小
       chunkSizeWarningLimit: 1000,
-      cssCodeSplit: true // CSS代码分割
+      cssCodeSplit: true,
+      minify: 'terser',
+      terserOptions: {
+        compress: {
+          drop_console: true,
+          drop_debugger: true
+        }
+      }
     },
     // 减少网络请求
     server: {
@@ -120,7 +136,11 @@ export default defineNuxtConfig({
   // 确保路由相关插件优先加载
   plugins: [
     // 路由修复插件应该首先加载
-    { src: '~/plugins/router-fix.ts', mode: 'client' }
+    { src: '~/plugins/router-fix.ts', mode: 'client' },
+    // 添加懒加载插件
+    { src: '~/plugins/lazy-load.ts', mode: 'client' },
+    // 添加内存监控插件
+    { src: '~/plugins/memory-monitor.ts', mode: 'client' }
   ],
   
   // 添加路由相关的构建优化
