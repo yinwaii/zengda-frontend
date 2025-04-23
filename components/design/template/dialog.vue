@@ -43,6 +43,7 @@ import ProductTypeSelect from '~/components/design/product-type-select.vue'
 const props = defineProps<{
   open: boolean
   template?: ZdTemplate
+  // isEdit?: boolean
   isClone?: boolean
 }>()
 

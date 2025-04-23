@@ -14,7 +14,7 @@ definePageMeta({
 	// }
 })
 
-// 定义产品系统的列信息
+// 定义模块的列信息
 const ZdPSystemColumns = [
     { accessorKey: 'id', header: '序号', meta: { width: '80px' } },
     { accessorKey: 'name', header: '名称', meta: { width: '200px' } },
@@ -104,26 +104,26 @@ const handleDelete = async (psystem: ZdPSystem) => {
 	if (!psystem.id) {
 		toast({
 			title: '删除失败',
-			description: '无效的产品系统ID',
+			description: '无效的模块ID',
 			variant: 'destructive'
 		})
 		return
 	}
 
 	try {
-		if (confirm('确定要删除此产品系统吗？')) {
+		if (confirm('确定要删除此模块吗？')) {
 			await psystemApi.delete(psystem.id)
 			toast({
 				title: '删除成功',
-				description: `产品系统 "${psystem.name}" 已被删除`
+				description: `模块 "${psystem.name}" 已被删除`
 			})
 			await handleRefresh()
 		}
 	} catch (error) {
-		console.error('删除产品系统失败:', error)
+		console.error('删除模块失败:', error)
 		toast({
 			title: '删除失败',
-			description: '无法删除产品系统，请稍后重试',
+			description: '无法删除模块，请稍后重试',
 			variant: 'destructive'
 		})
 	}
@@ -133,34 +133,35 @@ const handleDelete = async (psystem: ZdPSystem) => {
 const handlePSystemSubmit = async (psystem: Partial<ZdPSystem>) => {
 	try {
 		let result
+		console.log('提交模块:', psystem)
 		if (psystem.id) {
-			// 更新现有产品系统
+			// 更新现有模块
 			result = await psystemApi.update(psystem)
 			toast({
 				title: '更新成功',
-				description: `产品系统 "${psystem.name}" 已更新`
+				description: `模块 "${psystem.name}" 已更新`
 			})
 		} else {
-			// 创建新产品系统
+			// 创建新模块
 			result = await psystemApi.create(psystem)
 			toast({
 				title: '创建成功',
-				description: `产品系统 "${psystem.name}" 已创建`
+				description: `模块 "${psystem.name}" 已创建`
 			})
 		}
 		await handleRefresh()
 		dialogVisible.value = false
 	} catch (error) {
-		console.error('保存产品系统失败:', error)
+		console.error('保存模块失败:', error)
 		toast({
 			title: '保存失败',
-			description: '无法保存产品系统，请稍后重试',
+			description: '无法保存模块，请稍后重试',
 			variant: 'destructive'
 		})
 	}
 }
 
-// 添加新产品系统
+// 添加新模块
 const handleAddPSystem = () => {
 	editingPSystem.value = undefined
 	dialogVisible.value = true
@@ -233,8 +234,8 @@ const onClick = (row: ZdPSystem) => {
 <template>
 	<div>
 		<div class="flex justify-between items-center mb-4">
-			<h2 class="text-xl font-bold">产品系统列表</h2>
-			<shadcn-button @click="handleAddPSystem">新建产品系统</shadcn-button>
+			<h2 class="text-xl font-bold">模块列表</h2>
+			<shadcn-button @click="handleAddPSystem">新建模块</shadcn-button>
 		</div>
 		
 		<abstract-data-table ref="dataTable" :data="data" :columns="psystemColumns" v-model:selected-rows="selectedRows"

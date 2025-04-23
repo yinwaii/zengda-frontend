@@ -7,18 +7,18 @@
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
-      <DropdownMenuItem @click="handleClone">
+      <!-- <DropdownMenuItem @click="handleClone">
         <Copy class="mr-2 h-4 w-4" />
         克隆
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
       <DropdownMenuItem @click="handleAddComponent">
         <Package class="mr-2 h-4 w-4" />
         添加组件
       </DropdownMenuItem>
-      <DropdownMenuItem @click="handleAddSubPSystem">
+      <!-- <DropdownMenuItem @click="handleAddSubPSystem">
         <Package class="mr-2 h-4 w-4" />
         添加子系统
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
       <DropdownMenuItem @click="handleUploadSpec">
         <FileUp class="mr-2 h-4 w-4" />
         上传规格书

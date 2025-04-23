@@ -130,12 +130,24 @@ const handleDelete = async (template: ZdTemplateType) => {
 // 处理表单提交
 const handleTemplateSubmit = async (template: any) => {
 	try {
-		// 处理模板提交逻辑，根据实际需要修改
-		await templateApi.update(template)
-		toast({ 
-			title: "成功", 
-			description: "模板已更新" 
-		})
+		if (editingTemplate.value?.id) {
+			// 更新现有模板
+			template.id = editingTemplate.value.id
+			await templateApi.update(template)
+			toast({ 
+				title: "成功", 
+				description: "模板已更新" 
+			})
+		} else {
+			// 创建新模板
+			await templateApi.create(template)
+			toast({ 
+				title: "成功", 
+				description: "模板已创建" 
+			})
+		}
+		// 关闭对话框
+		dialogVisible.value = false
 		// 刷新数据
 		await handleRefresh()
 	} catch (err) {
@@ -150,7 +162,7 @@ const handleTemplateSubmit = async (template: any) => {
 
 // 添加新模板
 const handleAddTemplate = () => {
-	editingTemplate.value = undefined
+	editingTemplate.value = undefined // 清空编辑状态，表示新建模板
 	dialogVisible.value = true
 }
 
@@ -219,14 +231,16 @@ const onClick = (row: ZdTemplateType) => {
 }
 </script>
 <template>
-	<div>
+	<div class="p-4 w-full overflow-x-hidden">
 		<div class="flex justify-between items-center mb-4">
 			<h2 class="text-xl font-bold">项目模板列表</h2>
 			<shadcn-button @click="handleAddTemplate">新建模板</shadcn-button>
 		</div>
 
-		<abstract-data-table ref="dataTable" :data="data" :columns="templateColumns" v-model:selected-rows="selectedRows"
-			:on-row-click="onClick"></abstract-data-table>
+		<div class="overflow-x-auto">
+			<abstract-data-table ref="dataTable" :data="data" :columns="templateColumns" v-model:selected-rows="selectedRows"
+				:on-row-click="onClick"></abstract-data-table>
+		</div>
 
 		<!-- 编辑对话框 -->
 		<design-template-dialog v-model:open="dialogVisible" :template="editingTemplate"

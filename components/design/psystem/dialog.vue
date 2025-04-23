@@ -2,9 +2,9 @@
   <shadcn-dialog :open="open" @update:open="setIsOpen">
     <shadcn-dialog-content class="sm:max-w-[500px] max-h-[80vh]">
       <shadcn-dialog-header>
-        <shadcn-dialog-title>{{ (system && system.id > 0) ? '编辑产品系统' : '新建产品系统' }}</shadcn-dialog-title>
+        <shadcn-dialog-title>{{ (system && system.id > 0) ? '编辑模块' : '新建模块' }}</shadcn-dialog-title>
         <shadcn-dialog-description>
-          {{ (system && system.id > 0) ? '修改产品系统信息' : '创建新的产品系统' }}
+          {{ (system && system.id > 0) ? '修改模块信息' : '创建新的模块' }}
         </shadcn-dialog-description>
       </shadcn-dialog-header>
       <div class="overflow-y-auto max-h-[calc(80vh-8rem)]">
@@ -65,6 +65,7 @@ type UpdatePSystemData = Omit<ZdPSystem, 'isDeleted'>
 
 const props = defineProps<{
   open: boolean
+  isEdit?: boolean
   system?: ZdPSystem | null
 }>()
 
@@ -94,7 +95,7 @@ onMounted(async () => {
     const response = await entityApis.psystem.getAll(true)
     parentSystems.value = response || []
   } catch (error) {
-    console.error('获取产品系统列表失败:', error)
+    console.error('获取模块列表失败:', error)
     parentSystems.value = []
   }
 })
@@ -137,14 +138,15 @@ const handleSubmit = (event: Event) => {
   const submitData = { ...form.value }
   
   // 如果是创建，不传入 id 和 isDeleted
-  // if (!props.system?.id) {
+  console.log('提交模块:', props.system)
+  if (!props.isEdit) {
     const { id, isDeleted, ...createData } = submitData
     emit('save', createData as CreatePSystemData)
-  // } else {
-  //   // 如果是编辑，不传入 isDeleted
-  //   const { isDeleted, ...updateData } = submitData
-  //   emit('save', updateData as UpdatePSystemData)
-  // }
+  } else {
+    // 如果是编辑，不传入 isDeleted
+    const { isDeleted, ...updateData } = submitData
+    emit('save', updateData as UpdatePSystemData)
+  }
   
   setIsOpen(false)
 }

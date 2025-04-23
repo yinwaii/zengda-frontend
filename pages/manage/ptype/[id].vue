@@ -118,7 +118,7 @@ const loadTemplateByPType = async (ptypeData: TreeNodeData[]): Promise<TreeNodeD
 }
 
 /**
- * 为模板节点加载子节点（产品系统、组件等）
+ * 为模板节点加载子节点（模块、组件等）
  * @param ptypeData 产品类型节点数据，其中可能包含模板节点
  * @returns 更新后的节点数组，包含完整的子树
  */

@@ -11,20 +11,20 @@ const sidebarData: any = [
 		title: '设计 / Design',
 		url: '/design',
 		items: [
-			{
-				title: '首页 / Home',
-				url: '/design',
-			},
-			{
-				title: '选件清单 / Bom',
-				url: '/design/bom',
-			},
+			// {
+			// 	title: '首页 / Home',
+			// 	url: '/design',
+			// },
+			// {
+			// 	title: '选件清单 / Bom',
+			// 	url: '/design/bom',
+			// },
 			{
 				title: '组件 / Component',
 				url: '/design/component',
 			},
 			{
-				title: '模块 / PSystem',
+				title: '模块 / Module',
 				url: '/design/psystem',
 			},
 			{
@@ -42,7 +42,7 @@ const sidebarData: any = [
 		url: '/manage',
 		items: [
 			{
-				title: '产品类型 / PType',
+				title: '产品类型 / Type',
 				url: '/manage/ptype',
 			},
 		],

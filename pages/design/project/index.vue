@@ -244,6 +244,7 @@ const onClick = (row: ZdProject) => {
 		<design-project-dialog
 			v-model:open="dialogVisible"
 			:project="editingProject"
+			:isEdit="editingProject?.id !== undefined"
 			@save="handleProjectSubmit"
 		/>
 	</div>

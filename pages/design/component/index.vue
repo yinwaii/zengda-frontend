@@ -25,7 +25,8 @@
 		<!-- 编辑对话框 -->
 		<design-component-dialog 
 			v-model:open="dialogVisible" 
-			:component="editingComponent"
+			:is-edit="editingComponent?.id !== undefined"
+			:data="editingComponent"
 			@save="handleComponentSubmit" 
 		/>
 	</div>
@@ -106,7 +107,8 @@ const handleRefresh = async () => {
 
 // 处理编辑操作
 const handleEdit = (component: ZdComponent) => {
-	editingComponent.value = { ...component }
+	console.log('编辑组件:', component)
+	editingComponent.value = { ...component, id: component.id }
 	dialogVisible.value = true
 }
 

@@ -149,7 +149,7 @@ const handleProjectCreate = async (data: any, type: string) => {
 }
 
 /**
- * 加载完整的项目数据树，包括关联的模板、产品系统和组件
+ * 加载完整的项目数据树，包括关联的模板、模块和组件
  */
 const loadProjectData = async () => {
   try {

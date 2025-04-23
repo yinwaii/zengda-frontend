@@ -15,7 +15,7 @@
 		<design-dynamic-entity-tree
 			v-else
 			:tree-data="psystemTreeData"
-			tree-title="产品系统详情"
+			tree-title="模块详情"
 			:default-expanded-keys="expandedKeys"
 			@node-click="handleNodeClick"
 			@node-toggle="handleNodeToggle"
@@ -49,7 +49,7 @@ const entityApis = useEntityApis()
 const entityTree = useEntityTree()
 const entityHandlers = useEntityHandlers()
 
-// 产品系统树数据
+// 模块树数据
 const psystemTreeData = ref<TreeNodeData[]>([])
 
 // 添加页面初始加载状态
@@ -75,19 +75,19 @@ const handleCreate = (data: any, nodeType: string) => {
 }
 
 /**
- * 加载特定产品系统数据
+ * 加载特定模块数据
  */
 const loadSpecificPSystem = async () => {
 	pageLoading.value = true
 	try {
-		console.log('开始加载产品系统数据...')
-		// 步骤1: 使用loadPSystemById获取产品系统基本数据
+		console.log('开始加载模块数据...')
+		// 步骤1: 使用loadPSystemById获取模块基本数据
 		const { treeData: psystemData } = await entityTree.loadPSystemById(psystemId)
 		
 		if (psystemData.length === 0) {
 			toast.toast({
 				title: "警告",
-				description: "无法找到指定产品系统",
+				description: "无法找到指定模块",
 				variant: "destructive",
 			})
 			pageLoading.value = false
@@ -182,20 +182,20 @@ const loadSpecificPSystem = async () => {
 			
 			toast.toast({
 				title: "成功",
-				description: "产品系统数据加载完成",
+				description: "模块数据加载完成",
 			})
 		} else {
 			toast.toast({
 				title: "警告",
-				description: "无法加载产品系统子元素",
+				description: "无法加载模块子元素",
 				variant: "destructive",
 			})
 		}
 	} catch (error) {
-		console.error('获取产品系统数据失败:', error)
+		console.error('获取模块数据失败:', error)
 		toast.toast({
 			title: "错误",
-			description: "获取产品系统数据失败",
+			description: "获取模块数据失败",
 			variant: "destructive",
 		})
 	} finally {

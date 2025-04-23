@@ -146,7 +146,7 @@ export const getTemplateTreeNodeStruct: TreeNodeFactory<any> = (template) => {
 }
 
 /**
- * 将产品系统数据转换为树节点结构
+ * 将模块数据转换为树节点结构
  */
 export const getPsystemTreeNodeStruct: TreeNodeFactory<any> = (system) => {
   // 生成复合ID
@@ -260,7 +260,7 @@ export const combineTreeNodeFactories = (factories: Record<string, TreeNodeFacto
       return factories[NODE_TYPES.TEMPLATE]?.(node) || node;
     }
 
-    // 产品系统数据特征检测
+    // 模块数据特征检测
     if (node.parentId !== undefined || node.system) {
       node.type = NODE_TYPES.PSYSTEM;
       node.id = generateCompositeId(NODE_TYPES.PSYSTEM, node.id);

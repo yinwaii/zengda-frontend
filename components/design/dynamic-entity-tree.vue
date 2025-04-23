@@ -21,7 +21,7 @@
           @clone="handleClone"
           @delete="handleDelete(currentItem)"
         />
-        <!-- 产品系统下拉菜单 -->
+        <!-- 模块下拉菜单 -->
         <PsystemDropdownMenu
           v-else-if="currentItem && currentItem.type === 'PSYSTEM'"
           :psystem="(currentItem.originalData as ZdPSystem)"

@@ -143,7 +143,7 @@ export const useEntityTree = () => {
   }
 
   /**
-   * 根据模板ID加载产品系统数据并挂载到模板节点下
+   * 根据模板ID加载模块数据并挂载到模板节点下
    * @param projectNodes 项目节点数组
    * @returns 更新后的项目节点数组
    */
@@ -158,7 +158,7 @@ export const useEntityTree = () => {
       const templateNodes = traverseNodesByTypes(projectNodes, [NODE_TYPES.TEMPLATE])
       console.log(`共找到 ${templateNodes.length} 个模板节点需要处理`)
 
-      // 第二步：处理每个模板节点，加载产品系统数据
+      // 第二步：处理每个模板节点，加载模块数据
       for (const templateNode of templateNodes) {
         try {
           // 增强检查，确保originalData存在且有效
@@ -181,37 +181,37 @@ export const useEntityTree = () => {
             continue
           }
 
-          // 获取模板关联的产品系统
+          // 获取模板关联的模块
           const response = await entityApis.template_psystem.getByTemplateId(templateId)
 
           if (response && response.list && response.list.length) {
             // 转换API响应中的ID为前端使用的复合ID
             const psystemsWithCompositeIds = convertApiResponseIds(response.list, NODE_TYPES.PSYSTEM)
 
-            // 将产品系统转换为树节点并添加到模板节点下
+            // 将模块转换为树节点并添加到模板节点下
             const psystemNodes = psystemsWithCompositeIds.map((psystem: Record<string, any>) =>
               psystemTreeNodeFactory(psystem)
             )
 
-            // 挂载产品系统节点到模板节点下
+            // 挂载模块节点到模板节点下
             templateNode.children = (templateNode.children || []).concat(psystemNodes)
           }
         } catch (err) {
-          console.error(`加载模板 ${templateNode.id} 的产品系统失败:`, err)
+          console.error(`加载模板 ${templateNode.id} 的模块失败:`, err)
         }
       }
 
-      console.log('产品系统数据加载完成')
+      console.log('模块数据加载完成')
       return projectNodes
     } catch (err) {
-      console.error('加载产品系统数据失败:', err)
-      error('加载产品系统数据失败')
+      console.error('加载模块数据失败:', err)
+      error('加载模块数据失败')
       return projectNodes
     }
   }
 
   /**
-   * 根据产品系统ID加载组件数据并挂载到相应的系统节点下
+   * 根据模块ID加载组件数据并挂载到相应的系统节点下
    * @param treeNodes 树节点数组
    * @returns 更新后的树节点数组
    */
@@ -549,9 +549,9 @@ export const useEntityTree = () => {
   }
 
   /**
-   * 递归查找指定ID的产品系统节点
+   * 递归查找指定ID的模块节点
    * @param node 起始节点
-   * @param psystemId 要查找的产品系统ID (原始数字ID)
+   * @param psystemId 要查找的模块ID (原始数字ID)
    * @returns 找到的系统节点或null
    */
   const findPSystemNode = (node: TreeNodeData, psystemId: number): TreeNodeData | null => {
@@ -703,11 +703,11 @@ export const useEntityTree = () => {
 
           if (loadSystems) {
             try {
-              // 步骤3: 为模板加载产品系统数据
+              // 步骤3: 为模板加载模块数据
               nodes = await loadPSystemByTemplate(nodes)
-              console.log('步骤3完成: 已加载产品系统数据')
+              console.log('步骤3完成: 已加载模块数据')
             } catch (err) {
-              console.error('加载产品系统数据失败:', err)
+              console.error('加载模块数据失败:', err)
             }
           }
 
@@ -896,18 +896,18 @@ export const useEntityTree = () => {
       const existingPSystemIds = collectExistingIds(nodes[0], NODE_TYPES.PSYSTEM)
       const existingComponentIds = collectExistingIds(nodes[0], NODE_TYPES.COMPONENT)
 
-      console.log(`初始状态: 已有 ${existingPSystemIds.size} 个产品系统节点, ${existingComponentIds.size} 个组件节点`)
+      console.log(`初始状态: 已有 ${existingPSystemIds.size} 个模块节点, ${existingComponentIds.size} 个组件节点`)
 
       if (loadSystems && existingPSystemIds.size === 0) {
         try {
-          // 步骤1: 加载产品系统数据
+          // 步骤1: 加载模块数据
           nodes = await loadPSystemByTemplate(nodes)
-          console.log('步骤1完成: 已加载产品系统数据')
+          console.log('步骤1完成: 已加载模块数据')
         } catch (err) {
-          console.error('加载产品系统数据失败:', err)
+          console.error('加载模块数据失败:', err)
         }
       } else if (existingPSystemIds.size > 0) {
-        console.log('跳过加载产品系统数据: 已存在产品系统节点')
+        console.log('跳过加载模块数据: 已存在模块节点')
       }
 
       if (loadComponents) {
@@ -972,19 +972,19 @@ export const useEntityTree = () => {
   }
 
   /**
-   * 根据ID加载特定的产品系统
-   * @param psystemId 产品系统ID
-   * @returns 产品系统节点树
+   * 根据ID加载特定的模块
+   * @param psystemId 模块ID
+   * @returns 模块节点树
    */
   const loadPSystemById = async (psystemId: number): Promise<{ treeData: TreeNodeData[], loading: boolean }> => {
     try {
       isLoading.value = true
-      console.log(`开始加载产品系统(ID: ${psystemId})`)
+      console.log(`开始加载模块(ID: ${psystemId})`)
 
-      // 获取产品系统数据
+      // 获取模块数据
       const psystem = await entityApis.psystem.get(psystemId)
       if (!psystem) {
-        error(`未找到ID为${psystemId}的产品系统`)
+        error(`未找到ID为${psystemId}的模块`)
         return { treeData: [], loading: false }
       }
 
@@ -995,11 +995,11 @@ export const useEntityTree = () => {
       }
       const psystemNode = psystemTreeNodeFactory(psystemWithCompositeId)
 
-      // 返回仅包含产品系统节点的树
+      // 返回仅包含模块节点的树
       return { treeData: [psystemNode], loading: false }
     } catch (err) {
-      console.error(`加载产品系统(ID: ${psystemId})失败:`, err)
-      error('加载产品系统数据失败')
+      console.error(`加载模块(ID: ${psystemId})失败:`, err)
+      error('加载模块数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -1007,7 +1007,7 @@ export const useEntityTree = () => {
   }
 
   /**
-   * 根据产品系统加载规格信息
+   * 根据模块加载规格信息
    * @param treeData 初始的树数据（包含PSystem节点）
    * @returns 更新后的树数据，PSystem节点下挂载了规格信息
    */
@@ -1019,7 +1019,7 @@ export const useEntityTree = () => {
 
     try {
       isLoading.value = true
-      console.log('开始加载产品系统相关的规格数据')
+      console.log('开始加载模块相关的规格数据')
 
       // 递归遍历树，为每个PSystem节点加载规格
       const processNode = async (node: TreeNodeData): Promise<void> => {
@@ -1030,7 +1030,7 @@ export const useEntityTree = () => {
           // 检查是否有规格ID
           if (psystem.specId && psystem.specId > 0) {
             try {
-              console.log(`为产品系统 ${psystem.id} 加载规格数据，规格ID：${psystem.specId}`)
+              console.log(`为模块 ${psystem.id} 加载规格数据，规格ID：${psystem.specId}`)
 
               // 获取规格数据
               const specification = await entityApis.specification.getAll(psystem.specId)
@@ -1043,10 +1043,10 @@ export const useEntityTree = () => {
                 // 添加到PSystem节点的子节点列表
                 node.children = node.children || []
                 node.children.unshift(specNode)
-                console.log(`已为产品系统 ${psystem.id} 添加规格节点（在子节点列表最前面）`)
+                console.log(`已为模块 ${psystem.id} 添加规格节点（在子节点列表最前面）`)
               }
             } catch (err) {
-              console.error(`加载产品系统 ${psystem.id} 的规格失败:`, err)
+              console.error(`加载模块 ${psystem.id} 的规格失败:`, err)
             }
           }
         }
@@ -1064,10 +1064,10 @@ export const useEntityTree = () => {
         await processNode(node)
       }
 
-      console.log('产品系统规格数据加载完成')
+      console.log('模块规格数据加载完成')
       return treeData
     } catch (err) {
-      console.error('加载产品系统规格数据失败:', err)
+      console.error('加载模块规格数据失败:', err)
       error('加载规格数据失败')
       return treeData
     } finally {

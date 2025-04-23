@@ -7,10 +7,10 @@
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
-      <DropdownMenuItem @click="handleClone">
+      <!-- <DropdownMenuItem @click="handleClone">
         <Copy class="mr-2 h-4 w-4" />
         克隆
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
       <DropdownMenuItem @click="handleAddBom">
         <Package class="mr-2 h-4 w-4" />
         添加BOM

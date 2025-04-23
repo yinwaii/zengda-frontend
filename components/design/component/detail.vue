@@ -41,7 +41,7 @@
 									<shadcn-select-value placeholder="请选择BOM" />
 								</shadcn-select-trigger>
 								<shadcn-select-content>
-									<shadcn-select-item v-for="bom in bomData" :key="bom.id" :value="bom.id">
+									<shadcn-select-item v-for="bom in bomOptions" :key="bom.id" :value="bom.id">
 										BOM {{ bom.id }}
 									</shadcn-select-item>
 								</shadcn-select-content>
@@ -128,7 +128,7 @@ import type { ZdParameter } from '~/models/entity/parameter'
 import type { ZdBom } from '~/models/entity/bom'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import { useEntityApis } from '~/composables/use-entity-apis'
-
+import { useToast } from '~/components/ui/toast'
 const props = defineProps<{
 	data: TreeNodeData,
 	component: ZdComponent,
@@ -145,15 +145,58 @@ const component = computed(() => {
   return props.data && props.data.originalData ? props.data.originalData : props.data || {}
 })
 
-// 获取关联的BOM数据
-const bomData = computed(() => {
-  if (props.bom) return props.bom
-  return props.data && props.data.bomData ? props.data.bomData : null
-})
+const entityApis = useEntityApis()
+const toast = useToast()
+const bomOptions = ref<ZdBom[]>([])
+// 加载BOM选项
+const loadBomOptions = async (componentId: number) => {
+	try {
+		const bomIds = await entityApis.bom.getByComponentId(componentId)
+		if (!bomIds || bomIds.length === 0) {
+			bomOptions.value = []
+			return
+		}
+
+		// 并行获取所有BOM的详细信息
+		const bomDetailsPromises = bomIds.map((bomId: any) => entityApis.bom.get(bomId))
+		const bomDetails = await Promise.all(bomDetailsPromises)
+
+		// 过滤掉可能的null值并更新bomOptions
+		bomOptions.value = bomDetails.filter(bom => bom !== null)
+
+		console.log('加载BOM选项:', {
+			componentId,
+			optionsCount: bomOptions.value.length,
+			options: bomOptions.value
+		})
+
+		// 获取组件详情以设置默认BOM
+		const component = await entityApis.component.get(componentId)
+		console.log('组件详情:', component)
+
+		if (component?.bomId) {
+			editForm.value.bomId = component.bomId
+			console.log('设置默认BOM:', component.bomId)
+		}
+	} catch (error) {
+		console.error('加载BOM选项失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '加载BOM选项失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// // 获取关联的BOM数据
+// const bomData = computed(() => {
+//   if (props.bom) return props.bom
+//   return props.data && props.data.bomData ? props.data.bomData : null
+// })
 
 // 检查是否有BOM数据
 const hasBom = computed(() => {
-  return !!component.value.bomId || !!bomData.value
+  return !!component.value.bomId || !!bomOptions.value
 })
 
 const emit = defineEmits<{
@@ -187,6 +230,10 @@ watch(() => component.value, (newComponent) => {
     }
   }
 }, { immediate: true })
+
+onMounted(() => {
+	loadBomOptions(toApiId(component.value.id) || 0)
+})
 
 const handleSubmit = (event: Event) => {
   if (event) event.preventDefault()

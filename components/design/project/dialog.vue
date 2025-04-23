@@ -113,6 +113,7 @@ import { ref, watch, onMounted } from 'vue'
 
 const props = defineProps<{
   open: boolean
+  isEdit?: boolean
   project?: ZdProject | null
 }>()
 
@@ -265,7 +266,7 @@ const handleSubmit = (event: Event) => {
   }
   
   // 创建新的项目对象，不包含 id 和 isDeleted
-  const newProject = {
+  const newProject: Partial<ZdProject> = {
     name: form.value.name,
     description: form.value.description,
     productTypeId: form.value.productTypeId,
@@ -282,6 +283,10 @@ const handleSubmit = (event: Event) => {
     date: form.value.date,
     valid: form.value.valid,
     price: form.value.price
+  }
+
+  if (props.isEdit) {
+    newProject.id = props.project?.id
   }
   
   // 使用 JSON 序列化再解析创建普通对象深拷贝，移除 Proxy
