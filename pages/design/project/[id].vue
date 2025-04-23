@@ -30,6 +30,70 @@
 	>
 		<template #detail-top="{ node }">
 			<div class="mb-4">
+				<!-- 组件配置卡片 -->
+				<shadcn-card v-if="node?.type === NODE_TYPES.COMPONENT && selectedConfigId" class="shadow-none mb-4">
+					<shadcn-card-header class="py-2">
+						<div class="flex items-center justify-between">
+							<h3 class="text-lg font-medium">组件配置</h3>
+						</div>
+					</shadcn-card-header>
+					<shadcn-card-content class="py-2">
+						<div class="flex flex-col gap-4">
+							<div class="flex items-center justify-between">
+								<Label>启用组件</Label>
+								<Switch v-model="componentEnabled" @update:modelValue="handleComponentConfigChange" />
+							</div>
+							<div class="flex items-center justify-between">
+								<Label>组件数量</Label>
+								<div class="flex items-center gap-2">
+									<Button 
+										variant="outline" 
+										size="icon"
+										@click="handleQuantityChange(-1)"
+										:disabled="componentQuantity <= 1"
+									>
+										<Minus class="h-4 w-4" />
+									</Button>
+									<Input 
+										type="number" 
+										v-model="componentQuantity" 
+										class="w-20 text-center"
+										min="1"
+										@change="handleComponentConfigChange"
+									/>
+									<Button 
+										variant="outline" 
+										size="icon"
+										@click="handleQuantityChange(1)"
+									>
+										<Plus class="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+							<div class="flex items-center justify-between">
+								<Label>BOM配置</Label>
+								<div class="flex items-center gap-2">
+									<shadcn-select v-model="selectedBomId" @update:modelValue="handleBomChange">
+										<shadcn-select-trigger class="w-[180px]">
+											<shadcn-select-value placeholder="请选择BOM" />
+										</shadcn-select-trigger>
+										<shadcn-select-content>
+											<shadcn-select-item v-for="bom in bomOptions" :key="bom.id" :value="bom.id">
+												{{ bom.name || `BOM ${bom.id}` }}
+											</shadcn-select-item>
+										</shadcn-select-content>
+									</shadcn-select>
+								</div>
+							</div>
+						</div>
+						<div class="mt-4 flex justify-end">
+							<Button size="sm" variant="outline" @click="handleSaveComponentConfig">
+								保存配置
+							</Button>
+						</div>
+					</shadcn-card-content>
+				</shadcn-card>
+
 				<!-- BOM选择器 -->
 				<shadcn-card v-if="node?.type === NODE_TYPES.COMPONENT && selectedConfigId" class="shadow-none mb-4">
 					<shadcn-card-header class="py-2">
@@ -135,9 +199,19 @@ import type { ZdConfiguration } from '~/models/entity/configuration'
 import { toApiId } from '~/utils/idConverter'
 import type { ZdProject } from '~/models/entity/project'
 import type { ZdParameter } from '~/models/entity/parameter'
-import { LucidePlus, LucidePencil, LucideTrash } from 'lucide-vue-next'
+import { LucidePlus, LucidePencil, LucideTrash, Minus, Plus } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { NODE_TYPES } from '~/models/entity/node-types'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Switch } from '@/components/ui/switch'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { Copy, Package, Settings } from 'lucide-vue-next'
 
 // 添加 keepalive 配置
 definePageMeta({
@@ -233,7 +307,12 @@ const argumentToDelete = ref<ZdParameterArgument | null>(null)
 // 在script setup部分添加
 const selectedBomId = ref<number | null>(null)
 const bomOptions = ref<any[]>([])
-const bomDebugInfo = ref(true)
+const bomDebugInfo = ref(false)
+
+// 添加组件配置相关状态
+const componentEnabled = ref(true)
+const componentQuantity = ref(1)
+const componentConfiguration = ref<any>(null)
 
 /**
  * 打开配置对话框
@@ -426,10 +505,11 @@ const handleNodeClick = (node: TreeNodeData) => {
 	console.log('节点点击:', node)
 	currentNode.value = node
 	
-	// 如果是组件节点，加载BOM选项
+	// 如果是组件节点，加载组件配置和BOM选项
 	if (node.type === NODE_TYPES.COMPONENT) {
 		const componentId = toApiId(node.id)
 		if (componentId) {
+			loadComponentConfiguration()
 			loadBomOptions(componentId)
 		}
 	}
@@ -823,18 +903,12 @@ const loadBomOptions = async (componentId: number) => {
 
 // 处理BOM变更
 const handleBomChange = async (value: any) => {
-	console.log(bomOptions.value)
+	console.log('BOM选择变更:', value)
 	const newBomId = value as number
 	if (!currentNode.value || !selectedConfigId.value || !newBomId) return
 	
-	// 只更新本地状态，不立即保存
+	// 只更新本地状态
 	selectedBomId.value = newBomId
-	console.log('BOM选择变更:', {
-		configId: selectedConfigId.value,
-		componentId: toApiId(currentNode.value.id),
-		newBomId,
-		optionsCount: bomOptions.value.length
-	})
 }
 
 // 添加确认BOM变更的函数
@@ -882,6 +956,125 @@ const confirmBomChange = async () => {
 		toast.toast({
 			title: '错误',
 			description: '更新BOM配置失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 加载组件配置
+const loadComponentConfiguration = async () => {
+	if (!selectedConfigId.value || !currentNode.value) return
+
+	try {
+		const componentId = toApiId(currentNode.value.id)
+		if (!componentId) return
+
+		// 1. 加载组件配置
+		const configList = await entityApis.component_configuration.get(selectedConfigId.value)
+		const config = configList.find((item: any) => item.tcomponentId === componentId)
+
+		if (config) {
+			componentConfiguration.value = config
+			componentEnabled.value = config.enabled
+			componentQuantity.value = config.quantity
+		} else {
+			// 创建新的组件配置
+			const newConfig = {
+				configId: selectedConfigId.value,
+				tcomponentId: componentId,
+				enabled: true,
+				quantity: 1
+			}
+			const createdConfig = await entityApis.component_configuration.create(
+				selectedConfigId.value,
+				newConfig
+			)
+			componentConfiguration.value = createdConfig
+			componentEnabled.value = true
+			componentQuantity.value = 1
+		}
+
+		// 2. 加载BOM配置
+		const bomConfig = await entityApis.bom_configuration.get(selectedConfigId.value, componentId)
+		console.log('当前BOM配置:', bomConfig)
+		
+		// 如果存在BOM配置且不为-1，则更新selectedBomId
+		if (bomConfig !== -1) {
+			selectedBomId.value = bomConfig
+		} else {
+			selectedBomId.value = null
+		}
+
+	} catch (error) {
+		console.error('加载组件配置失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '加载组件配置失败',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 处理组件配置变更
+const handleComponentConfigChange = () => {
+	if (componentConfiguration.value) {
+		componentConfiguration.value = {
+			...componentConfiguration.value,
+			enabled: componentEnabled.value,
+			quantity: componentQuantity.value
+		}
+	}
+}
+
+// 处理数量变更
+const handleQuantityChange = (delta: number) => {
+	const newValue = componentQuantity.value + delta
+	if (newValue >= 1) {
+		componentQuantity.value = newValue
+		handleComponentConfigChange()
+	}
+}
+
+// 保存组件配置
+const handleSaveComponentConfig = async () => {
+	if (!componentConfiguration.value || !selectedConfigId.value || !currentNode.value) return
+
+	try {
+		// 1. 保存组件配置
+		await entityApis.component_configuration.update(
+			selectedConfigId.value,
+			{
+				configId: selectedConfigId.value,
+				tcomponentId: toApiId(currentNode.value.id),
+				...componentConfiguration.value
+			}
+		)
+
+		// 2. 如果选择了BOM，保存BOM配置
+		if (selectedBomId.value) {
+			const componentId = toApiId(currentNode.value.id)
+			if (!componentId) return
+
+			// 获取当前BOM配置
+			const currentConfig = await entityApis.bom_configuration.get(selectedConfigId.value, componentId)
+			
+			// 根据是否存在配置决定创建或更新
+			if (currentConfig === -1) {
+				await entityApis.bom_configuration.create(selectedConfigId.value, componentId, selectedBomId.value)
+			} else {
+				await entityApis.bom_configuration.update(selectedConfigId.value, componentId, selectedBomId.value)
+			}
+		}
+
+		toast.toast({
+			title: '成功',
+			description: '组件配置已保存'
+		})
+	} catch (error) {
+		console.error('保存组件配置失败:', error)
+		toast.toast({
+			title: '错误',
+			description: '保存组件配置失败',
 			variant: 'destructive'
 		})
 	}

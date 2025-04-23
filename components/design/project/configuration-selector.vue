@@ -408,8 +408,8 @@ const openPriceDialog = () => {
 	// 默认选择当前配置
 	if (selectedConfig.value && !priceConfigId.value) {
 		priceConfigId.value = selectedConfig.value.id
-		loadPriceData()
 	}
+	loadPriceData()
 }
 
 // 格式化价格

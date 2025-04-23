@@ -19,6 +19,10 @@
         <Package class="mr-2 h-4 w-4" />
         添加组件
       </DropdownMenuItem>
+      <DropdownMenuItem @click="handleUploadSpec">
+        <FileUp class="mr-2 h-4 w-4" />
+        上传规格书
+      </DropdownMenuItem>
       <!-- <DropdownMenuItem @click="$emit('edit')" class="text-destructive">
         <LucidePencil class="mr-2 h-4 w-4" />
         编辑
@@ -39,7 +43,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import { Copy, Layers, Package, LucideTrash, Settings } from 'lucide-vue-next'
+import { Copy, Layers, Package, LucideTrash, Settings, FileUp } from 'lucide-vue-next'
 import type { ZdTemplate } from '~/models/entity/template'
 
 const props = defineProps<{
@@ -51,6 +55,7 @@ const emit = defineEmits<{
   (e: 'addPsystem', template: ZdTemplate): void
   (e: 'addComponent', template: ZdTemplate): void
   (e: 'delete', template: ZdTemplate): void
+  (e: 'uploadSpec', template: ZdTemplate): void
 }>()
 
 const handleClone = () => {
@@ -64,5 +69,21 @@ const handleAddPsystem = () => {
 
 const handleAddComponent = () => {
   emit('addComponent', props.template)
+}
+
+const handleUploadSpec = () => {
+  // 创建一个隐藏的文件输入框
+  const fileInput = document.createElement('input')
+  fileInput.type = 'file'
+  fileInput.accept = '.doc,.docx'
+  
+  fileInput.onchange = (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (file) {
+      emit('uploadSpec', props.template)
+    }
+  }
+  
+  fileInput.click()
 }
 </script> 
