@@ -73,7 +73,9 @@ const handleAddComponent = () => {
 
 const entityApis = useEntityApis()
 
-const handleUploadSpec = () => {
+const refresh = inject('refresh') as () => Promise<void>
+
+const handleUploadSpec = async () => {
   // 创建一个隐藏的文件输入框
   const fileInput = document.createElement('input')
   fileInput.type = 'file'
@@ -84,6 +86,7 @@ const handleUploadSpec = () => {
     if (file) {
       await entityApis.specification.modify_template(toApiId(props.template.id), file)
     }
+    await refresh()
   }
   
   fileInput.click()

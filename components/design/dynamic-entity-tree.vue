@@ -559,14 +559,15 @@ const findParentNode = (nodes: TreeNodeData[], targetId: string): TreeNodeData |
 
 <style scoped>
 .tree-container :deep(.tree-node) {
-  padding-left: 0.75rem;
+  padding-left: 0;
+  margin-left: 0.75rem;
   position: relative;
 }
 
 .tree-container :deep(.tree-node::before) {
   content: '';
   position: absolute;
-  left: 0.375rem;
+  left: -0.375rem;
   top: 0;
   bottom: 0;
   width: 1px;
@@ -584,8 +585,19 @@ const findParentNode = (nodes: TreeNodeData[], targetId: string): TreeNodeData |
 .tree-container :deep(.tree-node-content) {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
-  padding: 0.125rem 0;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  position: relative;
+}
+
+.tree-container :deep(.tree-node-content::before) {
+  content: '';
+  position: absolute;
+  left: -0.375rem;
+  top: 50%;
+  width: 0.375rem;
+  height: 1px;
+  background-color: var(--border-color);
 }
 
 .tree-container :deep(.tree-node-icon) {

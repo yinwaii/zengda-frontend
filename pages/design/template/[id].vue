@@ -73,23 +73,43 @@ const loadSpecificTemplate = async () => {
 			pageLoading.value = false
 			return
 		}
+
+		const treeDataWithPSystem = await entityTree.loadPSystemByTemplate(templateData)
+		templateTreeData.value = treeDataWithPSystem
+		console.log('treeDataWithPSystem:', treeDataWithPSystem)
+
+		const treeDataWithTemplateSpecification = await entityTree.loadSpecificationByTemplate(templateData)
+		templateTreeData.value = treeDataWithTemplateSpecification
+		console.log('treeDataWithTemplateSpecification:', treeDataWithTemplateSpecification)
+
+		const treeDataWithComponent = await entityTree.loadComponentByPSystem(templateData)
+		templateTreeData.value = treeDataWithComponent
+		console.log('treeDataWithComponent:', treeDataWithComponent)
+
+		const treeDataWithBom = await entityTree.loadBomByComponent(templateData)
+		templateTreeData.value = treeDataWithBom
+		console.log('treeDataWithBom:', treeDataWithBom)
+
+		const treeDataWithSpecification = await entityTree.loadSpecificationByPSystem(templateData)
+		templateTreeData.value = treeDataWithSpecification
+		console.log('treeDataWithSpecification:', treeDataWithSpecification)
+
 		
 		// 步骤2: 使用loadEntityChildren一次性加载所有子元素
 		// 由于loadEntityChildren内部会调用loadPSystemByTemplate和loadComponentByTemplate
 		// 所以不需要单独调用这些方法
-		console.log('加载模板所有子元素...')
-		const { treeData: completeData } = await entityTree.loadEntityChildren(templateData, {
-			loadSystems: true,
-			loadComponents: true,
-			loadFullComponents: true,
-			loadBoms: true,
-			loadSpecifications: true
-		})
+		// console.log('加载模板所有子元素...')
+		// const { treeData: completeData } = await entityTree.loadEntityChildren(templateData, {
+		// 	loadSystems: true,
+		// 	loadComponents: true,
+		// 	loadFullComponents: true,
+		// 	loadBoms: true,
+		// 	loadSpecifications: true
+		// })
 		
-		if (completeData.length > 0) {
-			templateTreeData.value = completeData
+		if (templateTreeData.value.length > 0) {
 			// 设置默认展开根节点
-			expandedKeys.value = [completeData[0].id]
+			expandedKeys.value = [templateTreeData.value[0].id]
 			
 			toast.toast({
 				title: "成功",

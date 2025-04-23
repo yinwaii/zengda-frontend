@@ -203,6 +203,7 @@ export const useEntityApis = (): any => {
 
     specification: {
       getAll: (id: number) => api.get<ZdSpecification>(`/specification/tree/${id}`),
+      get: (id: number) => api.get<ZdSpecification>(`/specification/${id}`),
       render: (configId: number, body: ZdSpecificationQuery) => api.post<string>('/specification/rendering', body, {
         params: { configId },
         headers: {

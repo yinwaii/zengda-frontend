@@ -1,0 +1,145 @@
+const loadSpecificationByTemplate = async (projectNodes: TreeNodeData[]): Promise<TreeNodeData[]> => {
+	// 处理空数组入参
+	if (!projectNodes || projectNodes.length === 0) {
+		return projectNodes || []
+	}
+
+	try {
+		// 遍历所有项目节点
+		for (const projectNode of projectNodes) {
+			if (!projectNode.children || projectNode.children.length === 0) continue
+
+			// 遍历项目下的模板节点
+			for (const templateNode of projectNode.children) {
+				if (!templateNode || templateNode.type !== NODE_TYPES.TEMPLATE) continue
+
+				// 从模板原始数据中获取规格ID
+				const template = templateNode.originalData as ZdTemplate
+				if (!template || !template.specId) continue
+
+				// 提取原始ID用于API调用
+				const specId = toApiId(template.specId)
+				if (specId === null) {
+					console.warn(`无效的规格ID: ${template.specId}`)
+					continue
+				}
+
+				try {
+					// 获取规格子树
+					const response = await entityApis.specification.getAll(specId)
+					if (!response) continue
+
+					// 转换API响应中的ID为前端使用的复合ID
+					const specWithCompositeId = convertApiResponseIds([response], NODE_TYPES.SPECIFICATION)[0]
+
+					// 创建规格节点
+					const specNode = specificationTreeNodeFactory(specWithCompositeId)
+
+					// 将规格节点添加为模板节点的第一个子节点
+					templateNode.children = [specNode].concat(templateNode.children || [])
+
+					// 获取规格子树中的所有规格节点ID
+					const specIds = extractSpecIds(specWithCompositeId)
+
+					// 遍历模板下的所有系统节点，检查是否需要添加规格节点
+					for (const psystemNode of (templateNode.children || [])) {
+						if (!psystemNode || psystemNode.type !== NODE_TYPES.PSYSTEM) continue
+
+						// 从系统原始数据中获取规格ID
+						const psystem = psystemNode.originalData as ZdPSystem
+						if (!psystem || !psystem.specId) continue
+
+						// 提取原始ID用于匹配
+						const psystemSpecId = toApiId(psystem.specId)
+						if (psystemSpecId === null) continue
+
+						// 检查系统的规格ID是否在规格子树中
+						if (specIds.includes(psystemSpecId)) {
+							// 查找匹配的规格节点
+							const matchedSpec = findSpecById(specWithCompositeId, psystemSpecId)
+							if (matchedSpec) {
+								// 创建规格节点的副本
+								const specNodeCopy = specificationTreeNodeFactory(matchedSpec)
+
+								// 将规格节点副本添加为系统节点的第一个子节点
+								psystemNode.children = [specNodeCopy].concat(psystemNode.children || [])
+							}
+						}
+					}
+				} catch (err) {
+					console.error(`加载模板 ${template.id} 的规格失败:`, err)
+				}
+			}
+		}
+
+		return projectNodes
+	} catch (err) {
+		console.error('加载规格数据失败:', err)
+		error('加载规格数据失败')
+		return projectNodes
+	}
+}
+
+const loadSpecificationByPSystem = async (treeData: TreeNodeData[]): Promise<TreeNodeData[]> => {
+	// 处理空数组入参
+	if (!treeData || treeData.length === 0) {
+		return treeData || []
+	}
+
+	try {
+		isLoading.value = true
+		console.log('开始加载模块相关的规格数据')
+
+		// 递归遍历树，为每个PSystem节点加载规格
+		const processNode = async (node: TreeNodeData): Promise<void> => {
+			// 检查是否为PSystem节点
+			if (node.type === NODE_TYPES.PSYSTEM && node.originalData) {
+				const psystem = node.originalData as Record<string, any>
+
+				// 检查是否有规格ID
+				if (psystem.specId && psystem.specId > 0) {
+					try {
+						console.log(`为模块 ${psystem.id} 加载规格数据，规格ID：${psystem.specId}`)
+
+						// 获取规格数据
+						const specification = await entityApis.specification.getAll(psystem.specId)
+
+						if (specification) {
+							// 转换为树节点结构
+							const specWithCompositeId = convertApiResponseIds([specification], NODE_TYPES.SPECIFICATION)[0]
+							const specNode = specificationTreeNodeFactory(specWithCompositeId)
+
+							// 添加到PSystem节点的子节点列表
+							node.children = node.children || []
+							node.children.unshift(specNode)
+							console.log(`已为模块 ${psystem.id} 添加规格节点（在子节点列表最前面）`)
+						}
+					} catch (err) {
+						console.error(`加载模块 ${psystem.id} 的规格失败:`, err)
+					}
+				}
+			}
+
+			// 递归处理子节点
+			if (node.children && node.children.length > 0) {
+				for (const child of node.children) {
+					await processNode(child)
+				}
+			}
+		}
+
+		// 为每个顶级节点处理
+		for (const node of treeData) {
+			await processNode(node)
+		}
+
+		console.log('模块规格数据加载完成')
+		return treeData
+	} catch (err) {
+		console.error('加载模块规格数据失败:', err)
+		error('加载规格数据失败')
+		return treeData
+	} finally {
+		isLoading.value = false
+	}
+}

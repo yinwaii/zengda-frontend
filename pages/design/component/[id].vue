@@ -105,18 +105,6 @@ const loadSpecificComponent = async () => {
       return
     }
     
-    // 获取组件详情
-    const component = await entityApis.component.get(componentId.value)
-    if (!component) {
-      toast.toast({
-        title: "警告", 
-        description: "无法获取组件详情",
-        variant: "destructive",
-      })
-      pageLoading.value = false
-      return
-    }
-    
     // 初始化树数据
     let currentTreeData = [...componentData]
     

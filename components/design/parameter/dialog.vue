@@ -34,7 +34,18 @@
             <!-- 数据类型 -->
             <div class="grid gap-2">
               <label for="dtype" class="text-sm font-medium">数据类型</label>
-              <shadcn-input id="dtype" v-model="formState.dtype" placeholder="请输入数据类型" />
+              <shadcn-select v-model="formState.dtype">
+                <shadcn-select-trigger>
+                  <shadcn-select-value placeholder="请选择数据类型" />
+                </shadcn-select-trigger>
+                <shadcn-select-content>
+                  <shadcn-select-group>
+                    <shadcn-select-item v-for="option in dataTypeOptions" :key="option.value" :value="option.value">
+                      {{ option.label }}
+                    </shadcn-select-item>
+                  </shadcn-select-group>
+                </shadcn-select-content>
+              </shadcn-select>
             </div>
             
             <!-- 选项设置 -->
@@ -49,6 +60,45 @@
               <div class="flex items-center space-x-2">
                 <shadcn-checkbox id="isReadonly" v-model:checked="formState.isReadonly" />
                 <label for="isReadonly" class="text-sm font-medium">是否只读</label>
+              </div>
+
+              <!-- 是否启用选项 -->
+              <div class="flex items-center space-x-2">
+                <shadcn-switch id="enableOptions" v-model:checked="enableOptions" />
+                <label for="enableOptions" class="text-sm font-medium">启用选项</label>
+              </div>
+            </div>
+
+            <!-- 选项列表 -->
+            <div v-if="enableOptions" class="space-y-4 mt-4">
+              <div class="flex justify-between items-center">
+                <h3 class="text-sm font-medium">选项列表</h3>
+                <shadcn-button type="button" variant="outline" size="sm" @click="addOption">
+                  <i class="i-lucide-plus mr-2" />添加选项
+                </shadcn-button>
+              </div>
+              
+              <div v-for="(option, index) in optionList" :key="index" class="flex space-x-2">
+                <shadcn-input 
+                  v-model="option.value" 
+                  placeholder="选项值"
+                  class="flex-1"
+                  @change="updateArgList"
+                />
+                <shadcn-input 
+                  v-model="option.label" 
+                  placeholder="选项标签"
+                  class="flex-1"
+                  @change="updateArgList"
+                />
+                <shadcn-button 
+                  type="button" 
+                  variant="destructive" 
+                  size="icon"
+                  @click="removeOption(index)"
+                >
+                  <i class="i-lucide-trash-2" />
+                </shadcn-button>
               </div>
             </div>
           </div>
@@ -72,6 +122,19 @@
 import type { ZdParameter } from '~/models/entity/parameter'
 import { ref, computed, watch } from 'vue'
 import { object } from 'zod';
+
+// 数据类型选项
+const dataTypeOptions = [
+  { value: 'int', label: '整数' },
+  { value: 'double', label: '小数' },
+  { value: 'string', label: '文本' },
+  { value: 'expression', label: '公式' }
+]
+
+// 获取数据类型的显示标签
+const getDataTypeLabel = (value: string) => {
+  return dataTypeOptions.find(option => option.value === value)?.label || value
+}
 
 const props = defineProps<{
   open: boolean
@@ -111,10 +174,63 @@ const setIsOpen = (value: boolean) => {
   emit('update:open', value)
 }
 
-// 处理表单提交
+// 选项列表
+const optionList = ref<Array<{value: string, label: string}>>([])
+
+// 是否启用选项
+const enableOptions = ref(false)
+
+// 监听选项开关变化
+watch(enableOptions, (newVal) => {
+  if (newVal) {
+    formState.value.showType = 'option'
+    if (!formState.value.argList) {
+      formState.value.argList = '[]'
+    }
+  } else {
+    formState.value.showType = ''
+    formState.value.argList = ''
+  }
+})
+
+// 初始化时检查是否有选项
+watch(() => props.parameter, (newVal) => {
+  if (newVal) {
+    enableOptions.value = newVal.showType === 'option'
+    if (newVal.argList) {
+      try {
+        optionList.value = JSON.parse(newVal.argList)
+      } catch (e) {
+        optionList.value = []
+      }
+    }
+  }
+}, { immediate: true })
+
+// 添加新选项
+const addOption = () => {
+  optionList.value.push({ value: '', label: '' })
+}
+
+// 删除选项
+const removeOption = (index: number) => {
+  optionList.value.splice(index, 1)
+}
+
+// 更新选项到formState
+const updateArgList = () => {
+  formState.value.argList = JSON.stringify(optionList.value)
+}
+
+// 修改提交处理
 const onSubmit = async () => {
   isSubmitting.value = true
   try {
+    // 如果启用了选项，更新argList
+    if (enableOptions.value) {
+      updateArgList()
+    }
+    
     // 准备提交数据
     const submitData: ZdParameter = {
       ...formState.value,

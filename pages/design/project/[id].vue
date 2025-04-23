@@ -94,38 +94,6 @@
 					</shadcn-card-content>
 				</shadcn-card>
 
-				<!-- BOM选择器 -->
-				<shadcn-card v-if="node?.type === NODE_TYPES.COMPONENT && selectedConfigId" class="shadow-none mb-4">
-					<shadcn-card-header class="py-2">
-						<div class="flex items-center justify-between">
-							<h3 class="text-lg font-medium">BOM配置</h3>
-						</div>
-					</shadcn-card-header>
-					<shadcn-card-content class="py-2">
-						<div class="flex items-center gap-2">
-							<shadcn-select v-model="selectedBomId" @update:modelValue="handleBomChange">
-								<shadcn-select-trigger>
-									<shadcn-select-value placeholder="请选择BOM" />
-								</shadcn-select-trigger>
-								<shadcn-select-content>
-									<shadcn-select-item v-for="bom in bomOptions" :key="bom.id" :value="bom.id">
-										{{ bom.name || `BOM ${bom.id}` }}
-									</shadcn-select-item>
-								</shadcn-select-content>
-							</shadcn-select>
-							<Button size="sm" variant="outline" @click="confirmBomChange">
-								确定
-							</Button>
-						</div>
-						<div v-if="bomDebugInfo" class="mt-2 text-xs text-muted-foreground">
-							<div>当前配置ID: {{ selectedConfigId }}</div>
-							<div>当前组件ID: {{ toApiId(currentNode?.id) }}</div>
-							<div>当前BOM ID: {{ selectedBomId }}</div>
-							<div>BOM选项数量: {{ bomOptions.length }}</div>
-						</div>
-					</shadcn-card-content>
-				</shadcn-card>
-
 				<shadcn-card v-if="node && selectedConfigId" class="shadow-none">
 					<shadcn-card-header class="py-2">
 						<div class="flex items-center justify-between">
@@ -359,133 +327,50 @@ const loadSpecificProject = async () => {
 			pageLoading.value = false
 			return
 		}
-		
-		// 获取项目详情
-		const project = await entityApis.project.get(projectId.value)
-		if (!project) {
-			toast.toast({
-				title: "警告", 
-				description: "无法获取项目详情",
-				variant: "destructive",
-			})
-			pageLoading.value = false
-			return
-		}
-		
-		console.log('项目数据加载成功:', project)
-		
-		// 确保项目有关联的模板
-		if (!project.templateId) {
-			console.warn('项目没有关联模板ID')
-			toast.toast({
-				title: "警告",
-				description: "项目未关联模板",
-				variant: "destructive", 
-			})
-			pageLoading.value = false
-			return
-		}
-		
-		console.log(`项目关联的模板ID: ${project.templateId}，开始加载模板数据`)
+		projectTreeData.value = projectData
 		
 		// 步骤1.5: 显式加载模板数据
-		const projectWithTemplate = await entityTree.loadTemplateByProject(projectData)
+		const projectWithTemplate = await entityTree.loadTemplateByProject(projectTreeData.value)
+		projectTreeData.value = projectWithTemplate
 		console.log('加载模板数据完成', projectWithTemplate)
-		
-		// 步骤2: 使用loadEntityChildren一次性加载所有子元素
-		// 这样避免多次修改反应式数据，减少递归更新的可能性
-		console.log('加载项目所有子元素...')
-		const { treeData: completeData } = await entityTree.loadEntityChildren(projectWithTemplate, {
-			loadSystems: true,
-			loadComponents: true,
-			loadFullComponents: true,
-			loadBoms: true,
-			loadSpecifications: true  // 确保规格书加载选项为true
-		})
-		
-		// 步骤3: 显式为项目中的每个模板节点加载规格书数据
-		if (completeData.length > 0) {
-			console.log('显式为每个模板节点加载规格书数据...')
-			// 再次调用loadSpecificationByTemplate，确保规格书数据被正确加载
-			const enhancedData = await entityTree.loadSpecificationByTemplate(completeData)
-			console.log('规格书加载完成，更新数据')
+
+		const projectWithPSystem = await entityTree.loadPSystemByTemplate(projectTreeData.value)
+		projectTreeData.value = projectWithPSystem
+		console.log('加载模块数据完成', projectWithPSystem)
+
+		const projectWithTemplateSpecification = await entityTree.loadSpecificationByTemplate(projectTreeData.value)
+		projectTreeData.value = projectWithTemplateSpecification
+		console.log('加载模板规格书数据完成', projectWithTemplateSpecification)
+
+		const projectWithComponent = await entityTree.loadComponentByPSystem(projectTreeData.value)
+		projectTreeData.value = projectWithComponent
+		console.log('加载组件数据完成', projectWithComponent)
+
+		const projectWithSpecification = await entityTree.loadSpecificationByPSystem(projectTreeData.value)
+		projectTreeData.value = projectWithSpecification
+		console.log('加载模块规格书数据完成', projectWithSpecification)
+
+		const projectWithBom = await entityTree.loadBomByComponent(projectTreeData.value)
+		projectTreeData.value = projectWithBom
+		console.log('加载BOM数据完成', projectWithBom)
 			
-			// 使用enhancedData替换completeData
-			completeData.splice(0, completeData.length, ...enhancedData)
-			
-			// // 步骤4: 显式加载配置节点数据
-			// console.log('显式加载配置节点数据...')
-			// const dataWithConfig = await entityTree.loadConfigurationByProject(completeData)
-			// console.log('配置节点加载完成，更新数据')
-			
-			// 使用dataWithConfig替换completeData
-			// completeData.splice(0, completeData.length, ...dataWithConfig)
-		}
-		
-		if (completeData.length > 0) {
-			console.log('完整项目数据加载成功:', completeData)
-			
-			// 检查规格书节点是否已加载
-			const checkSpecNodes = (node: TreeNodeData) => {
-				let specFound = false;
-				if (node.type === NODE_TYPES.SPECIFICATION) {
-					console.log('找到规格书节点:', node);
-					specFound = true;
-				}
-				
-				if (node.children?.length) {
-					for (const child of node.children) {
-						if (checkSpecNodes(child)) {
-							specFound = true;
-						}
-					}
-				}
-				return specFound;
-			};
-			
-			for (const rootNode of completeData) {
-				const hasSpecNode = checkSpecNodes(rootNode);
-				console.log(`根节点[${rootNode.id}]下${hasSpecNode ? '包含' : '不包含'}规格书节点`);
-				
-				// 检查模板节点
-				if (rootNode.children?.length) {
-					for (const templateNode of rootNode.children) {
-						if (templateNode.type === NODE_TYPES.TEMPLATE) {
-							console.log(`模板节点[${templateNode.id}]具有规格书ID:`, 
-								templateNode.originalData?.specId);
-							console.log(`模板节点[${templateNode.id}]下子节点:`, 
-								templateNode.children?.map(n => ({id: n.id, type: n.type})));
-						}
-					}
-				}
-			}
-			
-			// 一次性更新树数据
-			projectTreeData.value = completeData
+		// 	// 一次性更新树数据
+		// 	projectTreeData.value = completeData
 			
 			// 设置默认展开根节点和模板节点
-			const expandKeys = [completeData[0].id]
+			const expandKeys = [projectTreeData.value[0].id]
 			// 如果有子节点，将第一层子节点也设为展开
-			if (completeData[0].children && completeData[0].children.length > 0) {
-				expandKeys.push(completeData[0].children[0].id)
+			if (projectTreeData.value[0].children && projectTreeData.value[0].children.length > 0) {
+				expandKeys.push(projectTreeData.value[0].children[0].id)
 				console.log('设置展开节点:', expandKeys)
 			}
 			expandedKeys.value = expandKeys
-
-// 加载项目配置
 			await loadProjectConfiguration()
 			
 			toast.toast({
 				title: "成功",
 				description: "项目数据加载完成",
 			})
-		} else {
-			toast.toast({
-				title: "警告",
-				description: "无法加载项目子元素",
-				variant: "destructive",
-			})
-		}
 	} catch (error) {
 		console.error('获取项目数据失败:', error)
 		toast.toast({

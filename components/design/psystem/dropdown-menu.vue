@@ -75,12 +75,14 @@ const handleAddSubPSystem = () => {
   emit('addSubPSystem', props.psystem)
 }
 
-const handleUploadSpec = () => {
+const refresh = inject('refresh') as () => Promise<void>
+
+const handleUploadSpec = async () => {
   const input = document.createElement('input')
   input.type = 'file'
   input.accept = '.docx'
   
-  input.onchange = (event: Event) => {
+  input.onchange = async (event: Event) => {
     const target = event.target as HTMLInputElement
     const file = target.files?.[0]
     if (file) {
@@ -103,6 +105,7 @@ const handleUploadSpec = () => {
                 title: '成功',
                 description: '规格书上传成功'
               })
+              await refresh()
             }
           } catch (error: any) {
             console.error('上传规格书失败:', error)

@@ -56,6 +56,19 @@ const editingParameter = ref<ZdParameter | undefined>(undefined)
 const { toast } = useToast()
 const apis = useEntityApis()
 
+// 数据类型选项
+const dataTypeOptions = [
+	{ value: 'int', label: '整数' },
+	{ value: 'double', label: '小数' },
+	{ value: 'string', label: '文本' },
+	{ value: 'expression', label: '公式' }
+]
+
+// 获取数据类型的显示标签
+const getDataTypeLabel = (value: string) => {
+	return dataTypeOptions.find(option => option.value === value)?.label || value
+}
+
 // 从复合ID中提取类型和ID
 const parseNodeId = (nodeId: string | number) => {
 	if (typeof nodeId === 'number') {
@@ -152,7 +165,23 @@ const columns = ref<ColumnDef<ZdParameter>[]>([
 	{
 		accessorKey: 'dtype',
 		header: '类型',
-		cell: ({ row }) => row.original.dtype || '-',
+		cell: ({ row }) => getDataTypeLabel(row.original.dtype || ''),
+	},
+	{
+		accessorKey: 'showType',
+		header: '选项',
+		cell: ({ row }) => {
+			const showType = row.original.showType
+			const hasOptions = showType === 'option'
+			return hasOptions ? (
+				<div class="flex items-center">
+					<shadcn-badge variant="outline" class="bg-primary/10">
+						<i class="i-lucide-list mr-1" />
+						选项
+					</shadcn-badge>
+				</div>
+			) : '-'
+		},
 	},
 	{
 		id: 'actions',
