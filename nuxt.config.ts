@@ -43,7 +43,8 @@ export default defineNuxtConfig({
   },
   experimental: {
     decorators: true,
-    renderJsonPayloads: true
+    renderJsonPayloads: true,
+    payloadExtraction: false
   },
   imports: {
     dirs: ['models/**']
@@ -82,14 +83,19 @@ export default defineNuxtConfig({
     devStorage: {
       db: {
         driver: 'fs',
-        base: './.nuxt/db' // 添加base选项指定存储路径
+        base: './.nuxt/db'
       }
     },
     // 配置静态资源
     publicAssets: [{
       dir: resolve(__dirname, 'public'),
       baseURL: '/'
-    }]
+    }],
+    // 添加 MIME 类型配置
+    routeRules: {
+      '/**/*.css': { headers: { 'content-type': 'text/css' } },
+      '/**/*.js': { headers: { 'content-type': 'application/javascript' } }
+    }
   },
   vite: {
     optimizeDeps: {
@@ -118,7 +124,8 @@ export default defineNuxtConfig({
           drop_console: true,
           drop_debugger: true
         }
-      }
+      },
+      cssMinify: true
     },
     // 减少网络请求
     server: {
@@ -127,7 +134,7 @@ export default defineNuxtConfig({
       },
       middlewareMode: false,
       fs: {
-        strict: true
+        strict: false
       }
     },
     css: {

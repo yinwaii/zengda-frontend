@@ -24,7 +24,7 @@ async function fetchWithRawData<T>(url: string, options: any = {}): Promise<T> {
 		const response = await fetch(url, {
 			...options,
 			mode: 'cors', // 尝试使用cors模式
-			credentials: 'include',
+			// credentials: 'include',
 			headers: {
 				...options.headers,
 				'Accept': '*/*'
