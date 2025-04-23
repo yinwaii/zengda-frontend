@@ -206,3 +206,42 @@ export const useApis = (baseUrl?: string) => {
 		}
 	};
 }; 
+
+export const useFormApis = (baseUrl?: string) => {
+	const config = useRuntimeConfig()
+	const apiBase = baseUrl || (config.public.apiBase as string) || ''
+
+	return {
+		post: <T>(url: string, body?: any, option?: any) => {
+			return fetchWithResponse<T>(url, {
+				method: 'post',
+				body,
+				...option
+			}, apiBase);
+		},
+
+		put: <T>(url: string, body?: any, option?: any) => {
+			return fetchWithResponse<T>(url, {
+				method: 'put',
+				body,
+				...option
+			}, apiBase);
+		},
+
+		patch: <T>(url: string, body?: any, option?: any) => {
+			return fetchWithResponse<T>(url, {
+				method: 'patch',
+				body,
+				...option
+			}, apiBase);
+		},
+
+		delete: <T>(url: string, body?: any, option?: any) => {
+			return fetchWithResponse<T>(url, {
+				method: 'delete',
+				body,
+				...option
+			}, apiBase);
+		}
+	};
+}; 

@@ -7,6 +7,7 @@ export const useEntityApis = (): any => {
   const apiBase = config.public.apiBase as string || ''
   const dufsServer = config.public.dufsServer as string || ''
   const systemApi = useApis(dufsServer)
+  const formApi = useFormApis()
 
   return {
     // User APIs
@@ -208,18 +209,13 @@ export const useEntityApis = (): any => {
           'Content-Type': 'application/json'
         }
       }),
-      upload: (tag: string, file: File, specification: ZdSpecificationMeta) => api.post<object>('/specification', { file, specification }, {
-        query: { tag },
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
+      upload: (tag: string, file: File, specification: ZdSpecificationMeta) => formApi.post<object>('/specification', { file, specification }, {
+        query: { tag }
       }),
-      update: (tag: string, file: File, specification: ZdSpecificationMeta) => api.put<object>('/specification', { file, specification }, {
-        query: { tag },
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      })
+      update: (tag: string, file: File, specification: ZdSpecificationMeta) => formApi.put<object>('/specification', { file, specification }, {
+        query: { tag }
+      }),
+      modify_psystem: (psystemId: number, formData: FormData) => formApi.put<object>(`/pSystem/${psystemId}/spec`, formData)
     },
 
     system: {

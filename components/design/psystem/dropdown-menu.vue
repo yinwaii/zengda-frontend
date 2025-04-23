@@ -45,10 +45,14 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Copy, Package, LucideTrash, Settings, FileUp } from 'lucide-vue-next'
 import type { ZdPSystem } from '~/models/entity/psystem'
+import { useToast } from '@/components/ui/toast'
 
 const props = defineProps<{
   psystem: ZdPSystem
 }>()
+
+const toast = useToast()
+const entityApis = useEntityApis()
 
 const emit = defineEmits<{
   (e: 'clone', psystem: ZdPSystem): void
@@ -72,18 +76,66 @@ const handleAddSubPSystem = () => {
 }
 
 const handleUploadSpec = () => {
-  // 创建一个隐藏的文件输入框
-  const fileInput = document.createElement('input')
-  fileInput.type = 'file'
-  fileInput.accept = '.doc,.docx'
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.docx'
   
-  fileInput.onchange = (e) => {
-    const file = (e.target as HTMLInputElement).files?.[0]
+  input.onchange = (event: Event) => {
+    const target = event.target as HTMLInputElement
+    const file = target.files?.[0]
     if (file) {
-      emit('uploadSpec', props.psystem)
+      try {
+        // 使用FileReader验证文件内容
+        const reader = new FileReader()
+        reader.onload = async () => {
+          try {
+            // 确保文件内容被正确读取
+            if (reader.result) {
+              console.log('文件内容已读取，大小:', (reader.result as ArrayBuffer).byteLength, '字节')
+              
+              // 创建新的Blob，确保包含完整的文件内容
+              const blob = new Blob([reader.result], { type: file.type })
+              const formData = new FormData()
+              formData.append('file', blob, file.name)
+
+              await entityApis.specification.modify_psystem(toApiId(props.psystem.id), formData)
+              toast.toast({
+                title: '成功',
+                description: '规格书上传成功'
+              })
+            }
+          } catch (error: any) {
+            console.error('上传规格书失败:', error)
+            toast.toast({
+              title: '错误',
+              description: '上传规格书失败',
+              variant: 'destructive'
+            })
+          }
+        }
+
+        reader.onerror = () => {
+          console.error('读取文件失败:', reader.error)
+          toast.toast({
+            title: '错误',
+            description: '读取文件失败',
+            variant: 'destructive'
+          })
+        }
+
+        // 以ArrayBuffer形式读取文件
+        reader.readAsArrayBuffer(file)
+      } catch (error) {
+        console.error('处理文件失败:', error)
+        toast.toast({
+          title: '错误',
+          description: '处理文件失败',
+          variant: 'destructive'
+        })
+      }
     }
   }
   
-  fileInput.click()
+  input.click()
 }
 </script> 
