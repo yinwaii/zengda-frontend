@@ -110,7 +110,8 @@ const loadSpecificTemplate = async () => {
 		if (templateTreeData.value.length > 0) {
 			// 设置默认展开根节点
 			expandedKeys.value = [templateTreeData.value[0].id]
-			
+			handleNodeClick(templateTreeData.value[0])
+
 			toast.toast({
 				title: "成功",
 				description: "模板数据加载完成",

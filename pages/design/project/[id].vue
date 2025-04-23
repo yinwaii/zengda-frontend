@@ -358,7 +358,9 @@ const loadSpecificProject = async () => {
 		// 	projectTreeData.value = completeData
 			
 			// 设置默认展开根节点和模板节点
-			const expandKeys = [projectTreeData.value[0].id]
+		const expandKeys = [projectTreeData.value[0].id]
+
+		handleNodeClick(projectTreeData.value[0])
 			// 如果有子节点，将第一层子节点也设为展开
 			if (projectTreeData.value[0].children && projectTreeData.value[0].children.length > 0) {
 				expandKeys.push(projectTreeData.value[0].children[0].id)

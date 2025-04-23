@@ -125,6 +125,8 @@ const loadSpecificPSystem = async () => {
 		const psystemWithSpecification = await entityTree.loadSpecificationByPSystem(psystemTreeData.value)
 		console.log('psystemWithSpecification:', psystemWithSpecification)
 		psystemTreeData.value = psystemWithSpecification
+
+		handleNodeClick(psystemTreeData.value[0])
 	} catch (error) {
 		console.error('获取模块数据失败:', error)
 		toast.toast({

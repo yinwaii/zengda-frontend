@@ -35,6 +35,7 @@ import { ref, h, onMounted, watch } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import { useEntityApis } from '~/composables/use-entity-apis'
 import { toApiId } from '~/utils/idConverter'
+import { LucidePencil, LucideTrash, LucideCopy } from 'lucide-vue-next'
 
 const props = defineProps<{
 	nodeId: string | number // 复合ID，格式为 "type:id"
@@ -168,32 +169,32 @@ const columns = ref<ColumnDef<ZdParameter>[]>([
 		cell: ({ row }) => getDataTypeLabel(row.original.dtype || ''),
 	},
 	{
-		accessorKey: 'showType',
-		header: '选项',
-		cell: ({ row }) => {
-			const showType = row.original.showType
-			const hasOptions = showType === 'option'
-			return hasOptions ? (
-				<div class="flex items-center">
-					<shadcn-badge variant="outline" class="bg-primary/10">
-						<i class="i-lucide-list mr-1" />
-						选项
-					</shadcn-badge>
-				</div>
-			) : '-'
-		},
-	},
-	{
 		id: 'actions',
 		enableHiding: false,
 		cell: ({ row }) => {
 			const parameter = row.original
-			return <div class="flex justify-end">
-				<design-parameter-actions
-					parameter={parameter}
-					onEdit={() => handleEdit(parameter)}
-					onDelete={() => handleDelete(parameter)}
-				/>
+			return <div class="flex items-center gap-2">
+				<shadcn-button
+					variant="ghost"
+					size="icon"
+					onClick={() => handleEdit(parameter)}
+				>
+					<LucidePencil class="h-4 w-4" />
+				</shadcn-button>
+				<shadcn-button
+					variant="ghost"
+					size="icon"
+					onClick={() => handleDelete(parameter)}
+				>
+					<LucideTrash class="h-4 w-4" />
+				</shadcn-button>
+				<shadcn-button
+					variant="ghost"
+					size="icon"
+					onClick={() => handleCopy(parameter)}
+				>
+					<LucideCopy class="h-4 w-4" />
+				</shadcn-button>
 			</div>
 		},
 	},
@@ -310,6 +311,31 @@ const handleParameterSubmit = async (parameter: ZdParameter) => {
 		toast({
 			title: '保存失败',
 			description: '无法保存参数，请稍后重试',
+			variant: 'destructive'
+		})
+	}
+}
+
+// 处理复制操作
+const handleCopy = async (parameter: ZdParameter) => {
+	try {
+		const { type, id } = parseNodeId(props.nodeId)
+		let copyText
+		if (String(type).toUpperCase() === 'TEMPLATE') {
+			copyText = `{{main_${parameter.name}}}`
+		} else {
+			copyText = `{{${String(type).toLowerCase()}_${id}_${parameter.name}}}`
+		}
+		await navigator.clipboard.writeText(copyText)
+		toast({
+			title: '复制成功',
+			description: '参数引用已复制到剪贴板'
+		})
+	} catch (error) {
+		console.error('复制失败:', error)
+		toast({
+			title: '复制失败',
+			description: '无法复制到剪贴板',
 			variant: 'destructive'
 		})
 	}

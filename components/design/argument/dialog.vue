@@ -19,9 +19,10 @@
 							<shadcn-select-value :placeholder="'选择类型'" />
 						</shadcn-select-trigger>
 						<shadcn-select-content>
-							<shadcn-select-item value="string">字符串</shadcn-select-item>
-							<shadcn-select-item value="number">数字</shadcn-select-item>
-							<shadcn-select-item value="boolean">布尔值</shadcn-select-item>
+							<shadcn-select-item value="int">整数</shadcn-select-item>
+							<shadcn-select-item value="double">小数</shadcn-select-item>
+							<shadcn-select-item value="string">文本</shadcn-select-item>
+							<shadcn-select-item value="boolean">是/否</shadcn-select-item>
 						</shadcn-select-content>
 					</shadcn-select>
 				</div>

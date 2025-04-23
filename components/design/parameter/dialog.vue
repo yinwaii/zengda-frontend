@@ -128,6 +128,7 @@ const dataTypeOptions = [
   { value: 'int', label: '整数' },
   { value: 'double', label: '小数' },
   { value: 'string', label: '文本' },
+  { value: 'boolean', label: '是/否' },
   { value: 'expression', label: '公式' }
 ]
 
