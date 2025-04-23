@@ -128,10 +128,14 @@ export default defineNuxtConfig({
       middlewareMode: false,
       fs: {
         strict: true
-      },
-      headers: {
-        'Content-Type': 'text/css'
       }
+    },
+    css: {
+      modules: {
+        localsConvention: 'camelCase',
+        scopeBehaviour: 'local'
+      },
+      devSourcemap: true
     }
   },
   // 性能优化配置
