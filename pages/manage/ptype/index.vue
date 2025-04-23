@@ -40,10 +40,11 @@ import type { ZdPType } from '~/models/entity/ptype'
 
 definePageMeta({
 	name: 'manage-ptype-index',
-	keepalive: {
-		max: 10,
-		include: ['manage-ptype-index']
-	},
+	keepalive: false,
+	// keepalive: {
+	// 	max: 10,
+	// 	include: ['manage-ptype-index']
+	// },
 	middleware: [() => {}]
 })
 

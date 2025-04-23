@@ -42,10 +42,11 @@ import { formatDate } from '~/utils/date'
 
 definePageMeta({
 	name: 'design-bom-index',
-	keepalive: {
-		max: 10,
-		include: ['design-bom-index']
-	},
+	keepalive: false,
+//	keepalive: {
+//		max: 10,
+//		include: ['design-bom-index']
+//	},
 	middleware: [() => {}]
 })
 

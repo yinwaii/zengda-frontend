@@ -39,10 +39,11 @@ import type { ZdComponent } from '~/models/entity/component'
 
 definePageMeta({
 	name: 'design-component-index',
-	keepalive: {
-		max: 10,
-		include: ['design-component-index']
-	},
+	keepalive: false,
+	// keepalive: {
+	// 	max: 10,
+	// 	include: ['design-component-index']
+	// },
 	middleware: [() => {}]
 })
 

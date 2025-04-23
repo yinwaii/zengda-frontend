@@ -233,7 +233,7 @@ const argumentToDelete = ref<ZdParameterArgument | null>(null)
 // 在script setup部分添加
 const selectedBomId = ref<number | null>(null)
 const bomOptions = ref<any[]>([])
-const bomDebugInfo = ref(false)
+const bomDebugInfo = ref(true)
 
 /**
  * 打开配置对话框
@@ -784,8 +784,19 @@ const handleArgumentSubmit = async (argument: ZdParameterArgument) => {
 // 加载BOM选项
 const loadBomOptions = async (componentId: number) => {
 	try {
-		const boms = await entityApis.bom.getByComponentId(componentId)
-		bomOptions.value = boms || []
+		const bomIds = await entityApis.bom.getByComponentId(componentId)
+		if (!bomIds || bomIds.length === 0) {
+			bomOptions.value = []
+			return
+		}
+
+		// 并行获取所有BOM的详细信息
+		const bomDetailsPromises = bomIds.map((bomId: any) => entityApis.bom.get(bomId))
+		const bomDetails = await Promise.all(bomDetailsPromises)
+		
+		// 过滤掉可能的null值并更新bomOptions
+		bomOptions.value = bomDetails.filter(bom => bom !== null)
+		
 		console.log('加载BOM选项:', {
 			componentId,
 			optionsCount: bomOptions.value.length,
@@ -812,6 +823,7 @@ const loadBomOptions = async (componentId: number) => {
 
 // 处理BOM变更
 const handleBomChange = async (value: any) => {
+	console.log(bomOptions.value)
 	const newBomId = value as number
 	if (!currentNode.value || !selectedConfigId.value || !newBomId) return
 	

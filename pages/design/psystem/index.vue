@@ -7,10 +7,11 @@ import type { ZdPSystem } from '~/models/entity/psystem'
 
 definePageMeta({
 	name: 'design-project-psystem-total',
-	keepalive: {
-		max: 10, // 设置最大缓存数量
-		include: ['design-project-psystem-total']
-	}
+	keepalive: false,
+	// keepalive: {
+	// 	max: 10, // 设置最大缓存数量
+	// 	include: ['design-project-psystem-total']
+	// }
 })
 
 // 定义产品系统的列信息

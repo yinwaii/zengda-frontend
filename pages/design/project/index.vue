@@ -8,10 +8,11 @@ import { useToast } from '@/components/ui/toast'
 
 definePageMeta({
 	name: 'design-project-project-total',
-	keepalive: {
-		max: 10, // 设置最大缓存数量
-		include: ['design-project-project-total']
-	}
+	keepalive: false,
+	// keepalive: {
+	// 	max: 10, // 设置最大缓存数量
+	// 	include: ['design-project-project-total']
+	// }
 })
 
 const dataTableRef = useTemplateRef<any>('dataTable')

@@ -41,10 +41,11 @@ import type { ZdTemplate } from '~/models/entity/template'
 // 页面元数据
 definePageMeta({
   name: 'manage-ptype-detail',
-  keepalive: {
-    max: 10,
-    include: ['manage-ptype-detail']
-  },
+  keepalive: false,
+  // keepalive: {
+  //   max: 10,
+  //   include: ['manage-ptype-detail']
+  // },
   middleware: [() => {}]
 })
 
