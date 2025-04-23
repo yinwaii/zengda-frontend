@@ -79,11 +79,9 @@ export const useEntityApis = (): any => {
     },
     bom_configuration: {
       get: (configId: number, componentId: number) => api.get<ZdBomConfiguration>(`/configuration/bom/`, {componentId, configId}),
-      create: (param: ZdBomConfiguration) => api.post<ZdBomConfiguration>('/configuration/bom', param),
-      update: (param: ZdBomConfiguration) => api.put<ZdBomConfiguration>('/configuration/bom', param),
-      delete: (param: ZdBomConfiguration) => api.delete<ZdBomConfiguration>('/configuration/bom', {}, {
-        body: param
-      }),
+      create: (configId: number, componentId: number, bomId: number) => api.post<ZdBomConfiguration>('/configuration/bom', {configId, tcomponentId: componentId, bomId}),
+      update: (configId: number, componentId: number, bomId: number) => api.put<ZdBomConfiguration>('/configuration/bom', {configId, tcomponentId: componentId, bomId}),
+      delete: (configId: number, componentId: number, bomId: number) => api.delete<ZdBomConfiguration>('/configuration/bom', {configId, tcomponentId: componentId, bomId}),
     },
     component_configuration: {
       get: (configId: number) => api.get<Array<ZdComponentConfiguration>>(`/configuration/${configId}/component`),

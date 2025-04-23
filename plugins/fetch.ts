@@ -10,7 +10,7 @@ export default defineNuxtPlugin(() => {
 
   // 配置全局 $fetch
   globalThis.$fetch = $fetch.create({
-    // credentials: 'include',
+    credentials: 'include',
     onRequest({ options }) {
       const token = userStore.token
       if (token) {

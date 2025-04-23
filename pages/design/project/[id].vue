@@ -864,13 +864,7 @@ const confirmBomChange = async () => {
 		
 		// 2. 如果配置不存在（返回-1），则使用组件的默认BOM创建配置
 		if (currentConfig === -1) {
-			const component = await entityApis.component.get(componentId)
-			console.log('组件详情:', component)
-			
-			if (!component?.bomId) {
-				throw new Error('组件没有默认BOM')
-			}
-			await entityApis.bom_configuration.create(selectedConfigId.value, componentId, component.bomId)
+			await entityApis.bom_configuration.create(selectedConfigId.value, componentId, selectedBomId.value)
 			toast.toast({
 				title: '成功',
 				description: 'BOM配置已初始化'
