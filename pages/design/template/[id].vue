@@ -28,8 +28,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useToast } from '@/components/ui/toast'
-import { useEntityTree } from '@/composables/useEntityTree'
-import { useEntityHandlers } from '@/composables/useEntityHandlers'
+import { useEntityTree } from '~/composables/use-entity-tree'
+import { useEntityHandlers } from '~/composables/use-entity-handlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import { NODE_TYPES } from '~/models/entity/node-types'
 

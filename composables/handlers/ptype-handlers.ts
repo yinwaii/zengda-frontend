@@ -1,6 +1,6 @@
 import { useToast } from '@/components/ui/toast'
 import type { ZdPType } from '~/models/entity/ptype'
-import { useEntityHandlers } from '../useEntityHandlers'
+import { useEntityHandlers } from '../use-entity-handlers'
 
 // 获取prepareEntityData函数
 const { prepareEntityData } = useEntityHandlers()

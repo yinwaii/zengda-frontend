@@ -127,7 +127,7 @@ import TreeNode from '~/components/abstract/tree/TreeNode.vue'
 import { NODE_TYPES } from '~/models/entity/node-types'
 import type { ZodObjectOrWrapped } from '~/components/ui/auto-form/utils'
 import { useRoute } from 'vue-router'
-import { useEntityTree } from '~/composables/useEntityTree'
+import { useEntityTree } from '~/composables/use-entity-tree'
 
 // 获取当前路由，用于自动获取项目ID
 const route = useRoute()

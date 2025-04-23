@@ -215,7 +215,12 @@ export const useEntityApis = (): any => {
       update: (tag: string, file: File, specification: ZdSpecificationMeta) => formApi.put<object>('/specification', { file, specification }, {
         query: { tag }
       }),
-      modify_psystem: (psystemId: number, formData: FormData) => formApi.put<object>(`/pSystem/${psystemId}/spec`, formData)
+      modify_psystem: (psystemId: number, formData: FormData) => formApi.put<object>(`/pSystem/${psystemId}/spec`, formData),
+      modify_template: (templateId: number, file: File) => {
+        const formData = new FormData()
+        formData.append('file', file)
+        formApi.put<object>(`/template/${templateId}/spec`, formData)
+      }
     },
 
     system: {
