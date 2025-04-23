@@ -1,4 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { resolve } from 'path'
+import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   app: {
@@ -19,9 +21,11 @@ export default defineNuxtConfig({
     pageTransition: {
       name: 'page',
       mode: 'out-in',
-      // 由于类型问题，我们需要更改实现方式
-      // 在页面组件中直接设置 definePageMeta({ pageTransition: false })
-    }
+    },
+    // 配置静态资源路径
+    baseURL: '/',
+    buildAssetsDir: '/_nuxt/',
+    cdnURL: '',
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -32,9 +36,9 @@ export default defineNuxtConfig({
     shim: false,
   },
   runtimeConfig: {
-    dufsServer: process.env.DUFS_SERVER || 'http://localhost:5000',
     public: {
       apiBase: process.env.API_BASE || '',
+      dufsServer: process.env.DUFS_SERVER || ''
     }
   },
   experimental: {
@@ -80,7 +84,12 @@ export default defineNuxtConfig({
         driver: 'fs',
         base: './.nuxt/db' // 添加base选项指定存储路径
       }
-    }
+    },
+    // 配置静态资源
+    publicAssets: [{
+      dir: resolve(__dirname, 'public'),
+      baseURL: '/'
+    }]
   },
   vite: {
     optimizeDeps: {
@@ -115,6 +124,13 @@ export default defineNuxtConfig({
     server: {
       hmr: {
         protocol: 'ws'
+      },
+      middlewareMode: false,
+      fs: {
+        strict: true
+      },
+      headers: {
+        'Content-Type': 'text/css'
       }
     }
   },

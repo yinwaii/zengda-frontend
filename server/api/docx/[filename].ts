@@ -1,7 +1,7 @@
 export default defineEventHandler(async (event) => {
   const filename = getRouterParam(event, 'filename')
   const config = useRuntimeConfig()
-  const dufsServer = config.dufsServer || 'http://localhost:5000'
+  const dufsServer = config.public.dufsServer as string || ''
   
   try {
     // 从dufs服务器获取文件

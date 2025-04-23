@@ -63,7 +63,7 @@ export default defineEventHandler(async (event) => {
     if (!finalFileUrl.startsWith('http://') && !finalFileUrl.startsWith('https://')) {
       // 从环境变量或配置获取文件服务器地址
       const config = useRuntimeConfig()
-      const dufsServer = config.dufsServer || process.env.DUFS_SERVER || 'http://localhost:5000'
+      const dufsServer = config.public.dufsServer as string || ''
       finalFileUrl = `${dufsServer}/${finalFileUrl}`
     }
     

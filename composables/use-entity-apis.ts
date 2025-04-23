@@ -5,7 +5,7 @@ export const useEntityApis = (): any => {
   const api = useApis()
   const config = useRuntimeConfig()
   const apiBase = config.public.apiBase as string || ''
-  const dufsServer = config.dufsServer || process.env.DUFS_SERVER || 'http://localhost:5000'
+  const dufsServer = config.public.dufsServer as string || ''
   const systemApi = useApis(dufsServer)
 
   return {
