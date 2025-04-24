@@ -16,7 +16,8 @@ const editDialogOpen = ref(false)
 const { toast } = useToast()
 
 function copy(id: string) {
-  navigator.clipboard.writeText(id)
+  copyToClipboard(id)
+  // navigator.clipboard.writeText(id)
 }
 
 const handleSave = (updatedMenu: Menu) => {

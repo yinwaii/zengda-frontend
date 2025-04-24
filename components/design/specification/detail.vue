@@ -168,6 +168,7 @@
 import { ref } from 'vue'
 import { LucideSettings, LucideDownload, LucideUpload, LucideFile, LucideCopy, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
+import { copyToClipboard } from '~/utils/copyToClickboard'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdParameter } from '~/models/entity/parameter'
 import { 
@@ -313,7 +314,8 @@ const handleCopyTag = async () => {
   if (!props.specification.fileTag) return
   
   try {
-    await navigator.clipboard.writeText(`{{+${props.specification.fileTag}}}`)
+    await copyToClipboard(`{{+${props.specification.fileTag}}}`)
+    // await navigator.clipboard.writeText(`{{+${props.specification.fileTag}}}`)
     toast({
       title: '复制成功',
       description: '文件标签已复制到剪贴板',

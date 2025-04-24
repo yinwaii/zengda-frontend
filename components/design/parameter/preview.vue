@@ -326,7 +326,8 @@ const handleCopy = async (parameter: ZdParameter) => {
 		} else {
 			copyText = `{{${String(type).toLowerCase()}_${id}_${parameter.name}}}`
 		}
-		await navigator.clipboard.writeText(copyText)
+		await copyToClipboard(copyText)
+		// await navigator.clipboard.writeText(copyText)
 		toast({
 			title: '复制成功',
 			description: '参数引用已复制到剪贴板'

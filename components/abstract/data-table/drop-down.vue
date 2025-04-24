@@ -14,7 +14,8 @@ defineEmits<{
 }>()
 
 function copy(id: string) {
-	navigator.clipboard.writeText(id)
+	copyToClipboard(id)
+	// navigator.clipboard.writeText(id)
 }
 </script>
 
