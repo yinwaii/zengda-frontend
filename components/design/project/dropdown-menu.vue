@@ -15,10 +15,10 @@
         <Layers class="mr-2 h-4 w-4" />
         添加模块
       </DropdownMenuItem>
-      <DropdownMenuItem @click="$emit('delete', props.project)" class="text-destructive">
+      <!-- <DropdownMenuItem @click="$emit('delete', props.project)" class="text-destructive">
         <LucideTrash class="mr-2 h-4 w-4" />
         删除
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
     </DropdownMenuContent>
   </DropdownMenu>
 </template>

@@ -17,7 +17,7 @@
             <shadcn-label for="description" class="text-right">描述</shadcn-label>
             <shadcn-textarea id="description" v-model="form.description" class="col-span-3" />
           </div>
-          <div class="grid grid-cols-4 items-center gap-4">
+          <!-- <div class="grid grid-cols-4 items-center gap-4">
             <shadcn-label for="parentId" class="text-right">父系统</shadcn-label>
             <shadcn-select v-model="form.parentId" class="col-span-3">
               <shadcn-select-trigger>
@@ -37,11 +37,11 @@
                 </shadcn-select-group>
               </shadcn-select-content>
             </shadcn-select>
-          </div>
-          <div class="grid grid-cols-4 items-center gap-4">
+          </div> -->
+          <!-- <div class="grid grid-cols-4 items-center gap-4">
             <shadcn-label for="docsUrl" class="text-right">文档链接</shadcn-label>
             <shadcn-input id="docsUrl" :value="form.docsUrl || ''" @update:model-value="form.docsUrl = typeof $event === 'number' ? String($event) : $event" class="col-span-3" />
-          </div>
+          </div> -->
           <div class="grid grid-cols-4 items-center gap-4">
             <shadcn-label for="isShow" class="text-right">是否可见</shadcn-label>
             <shadcn-checkbox id="isShow" v-model="form.isShow" class="col-span-3" />
@@ -138,7 +138,7 @@ const handleSubmit = (event: Event) => {
   const submitData = { ...form.value }
   
   // 如果是创建，不传入 id 和 isDeleted
-  console.log('提交模块:', props.system)
+  // console.log('提交模块:', props, props.system)
   if (!props.isEdit) {
     const { id, isDeleted, ...createData } = submitData
     emit('save', createData as CreatePSystemData)

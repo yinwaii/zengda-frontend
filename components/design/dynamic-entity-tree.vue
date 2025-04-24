@@ -536,7 +536,7 @@ const handleDelete = async (node: TreeNodeData) => {
     })
   }
   // if (node.type === NODE_TYPES.SPECIFICATION && parentNode?.type === NODE_TYPES.COMPONENT) {
-  // await refresh()
+  await refresh()
 }
 
 // 使用DFS查找父节点

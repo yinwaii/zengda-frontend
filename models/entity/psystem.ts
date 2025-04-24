@@ -12,7 +12,7 @@ export interface ZdPSystem extends BasicProperty, TimeStamp {
 
 export const ZdPSystemColumns = getColumns<ZdPSystem>([
 	{ accessorKey: 'isDeleted', header: packHeader<ZdPSystem>('是否被删除') },
-	{ accessorKey: 'docsUrl', header: packHeader<ZdPSystem>('文档链接') },
+	// { accessorKey: 'docsUrl', header: packHeader<ZdPSystem>('文档链接') },
 	{ accessorKey: 'parentId', header: packHeader<ZdPSystem>('父ID') },
 	{ accessorKey: 'children', header: packHeader<ZdPSystem>('子系统') },
 	{ accessorKey: 'parameters', header: packHeader<ZdPSystem>('参数') },
@@ -29,7 +29,7 @@ export const ZdPSystemFormZod = z.object({
 
 export const ZdPSystemFormConfig = {
 	isDeleted: { label: '是否被删除' },
-	docsUrl: { label: '文档链接' },
+	// docsUrl: { label: '文档链接' },
 	parentId: { label: '父ID' },
 	specId: { label: '规格ID' },
 	// children: { label: '子系统' },

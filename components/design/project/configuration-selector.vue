@@ -25,10 +25,10 @@
 						</shadcn-select-item>
 					</shadcn-select-content>
 				</shadcn-select>
-				<shadcn-button size="sm" variant="outline" @click="handleEditConfig" :disabled="!selectedConfig">
+				<!-- <shadcn-button size="sm" variant="outline" @click="handleEditConfig" :disabled="!selectedConfig">
 					<LucidePencil class="h-4 w-4 mr-1" />
 					编辑
-				</shadcn-button>
+				</shadcn-button> -->
 				<shadcn-button size="sm" variant="destructive" @click="handleDeleteConfig" :disabled="!selectedConfig">
 					<LucideTrash class="h-4 w-4 mr-1" />
 					删除
@@ -226,9 +226,11 @@ const loadConfigurations = async () => {
 }
 
 // 处理新增配置
-const handleAddConfig = () => {
-	editingConfig.value = undefined // 确保不是编辑模式
-	showConfigDialog.value = true
+const handleAddConfig = async () => {
+	const newConfigId = await entityApis.configuration.createDefault(toApiId(props.project.id) || 0)
+	selectedConfigId.value = newConfigId
+	// editingConfig.value = undefined // 确保不是编辑模式
+	// showConfigDialog.value = true
 }
 
 // 处理编辑配置

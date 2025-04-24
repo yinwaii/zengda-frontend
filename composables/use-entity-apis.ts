@@ -127,7 +127,8 @@ export const useEntityApis = (): any => {
       getByTemplateId: (templateId: number, projectId: number) => api.get<VOList<ZdConfiguration>>('/configuration/', { tid: templateId, pid: projectId }),
       create: (data: ZdConfiguration) => api.post<ZdConfiguration>('/configuration/', data),
       update: (data: ZdConfiguration) => api.put<ZdConfiguration>('/configuration', data),
-      delete: (id: number) => api.delete<ZdConfiguration>(`/configuration/${id}`)
+      delete: (id: number) => api.delete<ZdConfiguration>(`/configuration/${id}`),
+      createDefault: (projectId: number) => api.get<number>(`/configuration/default/project/${projectId}`)
     },
 
     // Template APIs

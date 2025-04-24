@@ -26,10 +26,10 @@
               <shadcn-label for="description">描述</shadcn-label>
               <shadcn-textarea id="description" v-model="editForm.description" />
             </div>
-            <div class="space-y-2">
+            <!-- <div class="space-y-2">
               <shadcn-label for="docsUrl">文档链接</shadcn-label>
               <shadcn-input id="docsUrl" v-model="docsUrlInput" />
-            </div>
+            </div> -->
             <div class="space-y-2">
               <shadcn-label for="isShow">是否显示</shadcn-label>
               <shadcn-checkbox id="isShow" v-model="editForm.isShow" />
@@ -50,7 +50,7 @@
               <dt class="text-sm font-medium text-muted-foreground">ID</dt>
               <dd class="mt-1">{{ system?.id }}</dd>
             </div>
-            <div class="space-y-2 p-4 border rounded-lg">
+            <!-- <div class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">文档链接</dt>
               <dd class="mt-1">
                 <a v-if="system?.docsUrl" :href="system.docsUrl" target="_blank" class="text-blue-500 hover:underline">
@@ -58,7 +58,7 @@
                 </a>
                 <span v-else>无</span>
               </dd>
-            </div>
+            </div> -->
             <div class="space-y-2 p-4 border rounded-lg">
               <dt class="text-sm font-medium text-muted-foreground">是否显示</dt>
               <dd class="mt-1">

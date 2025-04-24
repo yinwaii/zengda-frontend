@@ -27,10 +27,10 @@
         <LucidePencil class="mr-2 h-4 w-4" />
         编辑
       </DropdownMenuItem> -->
-      <DropdownMenuItem @click="$emit('delete', props.template)" class="text-destructive">
+      <!-- <DropdownMenuItem @click="$emit('delete', props.template)" class="text-destructive">
         <LucideTrash class="mr-2 h-4 w-4" />
         删除
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
     </DropdownMenuContent>
   </DropdownMenu>
 </template>

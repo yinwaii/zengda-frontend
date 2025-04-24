@@ -19,8 +19,8 @@ const ZdPSystemColumns = [
     { accessorKey: 'id', header: '序号', meta: { width: '80px' } },
     { accessorKey: 'name', header: '名称', meta: { width: '200px' } },
     { accessorKey: 'description', header: '描述' },
-    { accessorKey: 'parentId', header: '父系统ID', meta: { width: '120px' } },
-    { accessorKey: 'docsUrl', header: '文档链接', meta: { width: '200px' } },
+    // { accessorKey: 'parentId', header: '父系统ID', meta: { width: '120px' } },
+    // { accessorKey: 'docsUrl', header: '文档链接', meta: { width: '200px' } },
     { accessorKey: 'specId', header: '规格ID', meta: { width: '120px' } },
     { accessorKey: 'isShow', header: '是否可见', 
         cell: ({ row }: { row: any }) => {

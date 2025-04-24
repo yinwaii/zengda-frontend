@@ -51,6 +51,7 @@
     "@types/xlsx": "^0.0.35",
     "lucide-nuxt": "^1.2.2",
     "nuxt": "^3.16.0",
+    "nuxt-particles": "^0.3.0",
     "pinia": "^3.0.1",
     "sass-embedded": "^1.85.1",
     "shadcn-nuxt": "^1.0.2",

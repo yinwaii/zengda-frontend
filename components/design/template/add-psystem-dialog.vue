@@ -41,8 +41,8 @@
 	<!-- PSYSTEM 创建对话框 -->
 	<psystem-dialog
 		:open="showCreateDialog"
-		:psystem="psystem"
-		@submit="handlePsystemCreated"
+		:system="createdPsystem"
+		@save="handlePsystemCreated"
 	/>
 </template>
 
@@ -72,7 +72,13 @@ const refresh = inject('refresh') as () => Promise<void>
 const psystems = ref<ZdPSystem[]>([])
 const selectedPsystemId = ref<number | null>(null)
 const showCreateDialog = ref(false)
-const psystem = ref<ZdPSystem>()
+const createdPsystem = ref<any>({
+	name: '',
+	description: '',
+	parentId: 0,
+	docsUrl: null,
+	specId: null,
+})
 
 // 加载 PSYSTEM 列表
 const loadPsystems = async () => {
@@ -93,18 +99,29 @@ const loadPsystems = async () => {
 
 // 打开创建对话框
 const openCreateDialog = () => {
+	createdPsystem.value = {
+		name: '',
+		description: '',
+		parentId: 0,
+		docsUrl: null,
+		specId: null,
+		isShow: true,
+	}
 	showCreateDialog.value = true
 }
 
 // 处理 PSYSTEM 创建完成
-const handlePsystemCreated = async (newPsystem: ZdPSystem) => {
-	psystem.value = newPsystem
-	await entityApis.template.create(psystem.value)
+const handlePsystemCreated = async (newPsystem: Partial<ZdPSystem>) => {
+	console.log('newPsystem:', newPsystem)
+	createdPsystem.value = newPsystem
+	await entityApis.psystem.create(createdPsystem.value)
 	// 重新加载 PSYSTEM 列表
 	await loadPsystems()
 	// 自动选择新创建的 PSYSTEM
-	selectedPsystemId.value = newPsystem.id
+	console.log('newPsystem.id:', newPsystem.id)
+	selectedPsystemId.value = newPsystem.id || null
 	showCreateDialog.value = false
+	console.log('selectedPsystemId:', selectedPsystemId.value)
 }
 
 // 处理提交
