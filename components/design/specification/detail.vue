@@ -8,6 +8,11 @@
             <p v-if="specification.fileTag" class="text-sm text-muted-foreground mt-1">标签: {{ specification.fileTag }}</p>
           </div>
           <div class="flex items-center gap-2">
+            <shadcn-button variant="outline" @click="isExpanded = !isExpanded">
+              <LucideChevronDown v-if="!isExpanded" class="h-4 w-4" />
+              <LucideChevronUp v-else class="h-4 w-4" />
+              {{ isExpanded ? '收起' : '展开' }}
+            </shadcn-button>
             <shadcn-button size="sm" @click="handleDownload" v-if="specification.url">
               <LucideDownload class="h-4 w-4" />
             </shadcn-button>
@@ -23,7 +28,7 @@
           </div>
         </div>
       </shadcn-card-header>
-      <shadcn-card-content>
+      <shadcn-card-content v-show="isExpanded">
         <template v-if="isEditing">
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div class="space-y-2">
@@ -161,7 +166,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { LucideSettings, LucideDownload, LucideUpload, LucideFile, LucideCopy } from 'lucide-vue-next'
+import { LucideSettings, LucideDownload, LucideUpload, LucideFile, LucideCopy, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdSpecification } from '~/models/entity/specification'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -194,6 +199,7 @@ const isUploading = ref(false)
 const selectedFile = ref<File | null>(null)
 const entityApis = useEntityApis()
 const { toast } = useToast()
+const isExpanded = ref(false)
 
 const editForm = ref<Partial<ZdSpecification>>({
   name: props.specification.name,

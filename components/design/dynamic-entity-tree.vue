@@ -113,7 +113,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, h, toRaw, watch } from 'vue'
+import { ref, computed, h, toRaw, watch, onMounted } from 'vue'
 import { LucideFile, LucideFolder, LucideBox, LucideSettings, LucideCode, LucidePlus, LucideTag, LucideSettings2, LucideLayoutTemplate, LucidePackage, LucideComponent, LucideFileSpreadsheet, LucideBoxes } from 'lucide-vue-next'
 import AbstractTree from '~/components/abstract/tree/Tree.vue'
 import TreeNode from '~/components/abstract/tree/TreeNode.vue'
@@ -538,6 +538,14 @@ const handleDelete = async (node: TreeNodeData) => {
   // if (node.type === NODE_TYPES.SPECIFICATION && parentNode?.type === NODE_TYPES.COMPONENT) {
   await refresh()
 }
+
+// 添加 onMounted 钩子来设置默认选中的根节点
+onMounted(() => {
+  if (props.treeData && props.treeData.length > 0) {
+    currentItem.value = props.treeData[0]
+    currentItemId.value = props.treeData[0].id
+  }
+})
 
 // 使用DFS查找父节点
 const findParentNode = (nodes: TreeNodeData[], targetId: string): TreeNodeData | null => {

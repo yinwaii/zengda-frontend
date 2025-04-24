@@ -4,10 +4,15 @@
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-2xl font-bold">物料清单</h2>
-						<p class="text-sm text-muted-foreground mt-1">编号: {{ bom.number }} - 版本: {{ bom.version }}</p>
+						<h2 class="text-2xl font-bold">{{ bom?.note }}</h2>
+						<p class="text-sm text-muted-foreground mt-1">{{ bom?.id || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
+						<shadcn-button variant="outline" @click="isExpanded = !isExpanded">
+							<LucideChevronDown v-if="!isExpanded" class="h-4 w-4" />
+							<LucideChevronUp v-else class="h-4 w-4" />
+							{{ isExpanded ? '收起' : '展开' }}
+						</shadcn-button>
 						<shadcn-button @click="$emit('edit')">
 							<LucidePencil class="mr-2 h-4 w-4" />
 							编辑
@@ -15,7 +20,7 @@
 					</div>
 				</div>
 			</shadcn-card-header>
-			<shadcn-card-content>
+			<shadcn-card-content v-show="isExpanded">
 				<template v-if="isEditing">
 					<form @submit.prevent="handleSubmit" class="space-y-4">
 						<div class="space-y-2">
@@ -185,7 +190,7 @@
 <script setup lang="ts">
 import { ref, computed, h } from 'vue'
 import { resolveComponent, toRaw } from 'vue'
-import { LucidePencil, LucidePlus } from 'lucide-vue-next'
+import { LucidePencil, LucidePlus, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import type { ZdBom, ZdBomChild } from '~/models/entity/bom'
 import type { ZdParameter } from '~/models/entity/parameter'
 import { formatDate } from '~/utils/date'
@@ -393,4 +398,6 @@ const handleSubmit = (event: Event) => {
 	console.log('发送修改后的BOM数据:', plainData)
 	emit('save', plainData)
 }
+
+const isExpanded = ref(false)
 </script> 

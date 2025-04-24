@@ -8,6 +8,11 @@
             <p class="text-sm text-muted-foreground mt-1">{{ system?.description || '暂无描述' }}</p>
           </div>
           <div class="flex items-center gap-2">
+            <shadcn-button variant="outline" @click="isExpanded = !isExpanded">
+              <LucideChevronDown v-if="!isExpanded" class="h-4 w-4" />
+              <LucideChevronUp v-else class="h-4 w-4" />
+              {{ isExpanded ? '收起' : '展开' }}
+            </shadcn-button>
             <shadcn-button @click="$emit('edit')">
               <LucidePencil class="mr-2 h-4 w-4" />
               编辑
@@ -15,7 +20,7 @@
           </div>
         </div>
       </shadcn-card-header>
-      <shadcn-card-content>
+      <shadcn-card-content v-show="isExpanded">
         <template v-if="isEditing">
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div class="space-y-2">
@@ -88,7 +93,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { LucidePencil } from 'lucide-vue-next'
+import { LucidePencil, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import { formatDate } from '~/utils/date'
 import type { ZdPSystem } from '~/models/entity/psystem'
 import type { ZdParameter } from '~/models/entity/parameter'
@@ -129,6 +134,8 @@ const docsUrlInput = computed({
     editForm.value.docsUrl = value || null
   }
 })
+
+const isExpanded = ref(false)
 
 // 监听 props.system 变化，更新 editForm
 watch(() => props.system, (newSystem) => {

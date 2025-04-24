@@ -4,10 +4,15 @@
 			<shadcn-card-header>
 				<div class="flex items-center justify-between">
 					<div>
-						<h2 class="text-2xl font-bold">{{ component.name }}</h2>
-						<p class="text-sm text-muted-foreground mt-1">{{ component.description || '暂无描述' }}</p>
+						<h2 class="text-2xl font-bold">{{ component?.name }}</h2>
+						<p class="text-sm text-muted-foreground mt-1">{{ component?.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
+						<shadcn-button variant="outline" @click="isExpanded = !isExpanded">
+							<LucideChevronDown v-if="!isExpanded" class="h-4 w-4" />
+							<LucideChevronUp v-else class="h-4 w-4" />
+							{{ isExpanded ? '收起' : '展开' }}
+						</shadcn-button>
 						<shadcn-button @click="isEditing = true">
 							<LucidePencil class="mr-2 h-4 w-4" />
 							编辑
@@ -15,7 +20,7 @@
 					</div>
 				</div>
 			</shadcn-card-header>
-			<shadcn-card-content>
+			<shadcn-card-content v-show="isExpanded">
 				<template v-if="isEditing">
 					<form @submit.prevent="handleSubmit" class="space-y-4">
 						<div class="space-y-2">
@@ -120,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { LucidePencil } from 'lucide-vue-next'
+import { LucidePencil, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import { toRaw, ref, computed, watch } from 'vue'
 import { formatDate } from '~/utils/date'
 import type { ZdComponent } from '~/models/entity/component'
@@ -204,6 +209,7 @@ const emit = defineEmits<{
 }>()
 
 const isEditing = ref(false)
+const isExpanded = ref(false)
 
 const editForm = ref<Partial<ZdComponent>>({
 	name: component.value.name,

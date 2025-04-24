@@ -8,6 +8,11 @@
 						<p class="text-sm text-muted-foreground mt-1">{{ project.description || '暂无描述' }}</p>
 					</div>
 					<div class="flex items-center gap-2">
+						<shadcn-button variant="outline" @click="isExpanded = !isExpanded">
+							<LucideChevronDown v-if="!isExpanded" class="h-4 w-4" />
+							<LucideChevronUp v-else class="h-4 w-4" />
+							{{ isExpanded ? '收起' : '展开' }}
+						</shadcn-button>
 						<shadcn-button @click="$emit('edit')">
 							<LucidePencil class="mr-2 h-4 w-4" />
 							编辑
@@ -15,7 +20,7 @@
 					</div>
 				</div>
 			</shadcn-card-header>
-			<shadcn-card-content>
+			<shadcn-card-content v-show="isExpanded">
 				<template v-if="isEditing">
 					<form @submit.prevent="handleSubmit" class="space-y-4">
 						<div class="space-y-2">
@@ -314,7 +319,7 @@
 </template>
 
 <script setup lang="ts">
-import { LucidePencil, LucidePlus, LucideTrash, LucideCalculator, LucideFileText } from 'lucide-vue-next'
+import { LucidePencil, LucidePlus, LucideTrash, LucideCalculator, LucideFileText, LucideChevronDown, LucideChevronUp } from 'lucide-vue-next'
 import { toRaw, computed, ref, watch, onMounted } from 'vue'
 import { formatDate } from '~/utils/date'
 import type { ZdProject } from '~/models/entity/project'
@@ -1202,4 +1207,7 @@ watch(selectedConfigId, (newValue, oldValue) => {
 		loadNodeArguments()
 	}
 }, { immediate: true })
+
+// 折叠状态
+const isExpanded = ref(false)
 </script> 
