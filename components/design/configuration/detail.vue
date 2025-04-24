@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6">
+  <div class="space-y-6" v-show="configuration">
     <shadcn-card>
       <shadcn-card-header>
         <div class="flex items-center justify-between">

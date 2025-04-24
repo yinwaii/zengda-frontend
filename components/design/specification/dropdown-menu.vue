@@ -7,22 +7,22 @@
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent>
-      <DropdownMenuItem @click="handleClone">
+      <!-- <DropdownMenuItem @click="handleClone">
         <Copy class="mr-2 h-4 w-4" />
         克隆
-      </DropdownMenuItem>
-      <DropdownMenuItem @click="handleAddPtype">
+      </DropdownMenuItem> -->
+      <!-- <DropdownMenuItem @click="handleAddPtype">
         <Boxes class="mr-2 h-4 w-4" />
         添加产品类型
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
       <!-- <DropdownMenuItem @click="$emit('edit')" class="text-destructive">
         <LucidePencil class="mr-2 h-4 w-4" />
         编辑
       </DropdownMenuItem> -->
-      <DropdownMenuItem @click="$emit('delete', props.specification)" class="text-destructive">
+      <!-- <DropdownMenuItem @click="$emit('delete', props.specification)" class="text-destructive">
         <LucideTrash class="mr-2 h-4 w-4" />
         删除
-      </DropdownMenuItem>
+      </DropdownMenuItem> -->
     </DropdownMenuContent>
   </DropdownMenu>
 </template>

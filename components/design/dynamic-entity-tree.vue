@@ -501,7 +501,9 @@ const handleDelete = async (node: TreeNodeData) => {
     })
   }
   if (node.type === NODE_TYPES.PSYSTEM && parentNode?.type === NODE_TYPES.TEMPLATE) {
-    entityApis.template_psystem.delete(toApiId(node.id) ?? 0)
+    console.log('删除PSYSTEM', node, parentNode)
+    console.log(toApiId(node.id) ?? 0)
+    entityApis.template_psystem.delete(toApiId(parentNode.id) ?? 0, toApiId(node.id) ?? 0)
     toast({
       title: '删除成功',
       description: 'PSYSTEM已成功删除',
@@ -534,7 +536,7 @@ const handleDelete = async (node: TreeNodeData) => {
     })
   }
   // if (node.type === NODE_TYPES.SPECIFICATION && parentNode?.type === NODE_TYPES.COMPONENT) {
-  await refresh()
+  // await refresh()
 }
 
 // 使用DFS查找父节点

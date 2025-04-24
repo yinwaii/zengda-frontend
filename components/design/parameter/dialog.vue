@@ -25,12 +25,6 @@
               <shadcn-textarea id="description" v-model="formState.description" placeholder="请输入参数描述" />
             </div>
             
-            <!-- 值 -->
-            <div class="grid gap-2">
-              <label for="value" class="text-sm font-medium">值</label>
-              <shadcn-input id="value" v-model="formState.value" placeholder="请输入参数值" />
-            </div>
-            
             <!-- 数据类型 -->
             <div class="grid gap-2">
               <label for="dtype" class="text-sm font-medium">数据类型</label>
@@ -47,6 +41,18 @@
                 </shadcn-select-content>
               </shadcn-select>
             </div>
+
+            <!-- 是否启用选项 -->
+            <div class="flex items-center space-x-2">
+              <shadcn-switch id="enableOptions" v-model:checked="enableOptions" />
+              <label for="enableOptions" class="text-sm font-medium">启用选项</label>
+            </div>
+            
+            <!-- 值 -->
+            <div class="grid gap-2">
+              <label for="value" class="text-sm font-medium">值</label>
+              <shadcn-input id="value" v-model="formState.value" placeholder="请输入参数值" />
+            </div>
             
             <!-- 选项设置 -->
             <div class="flex space-x-6 pt-2">
@@ -60,12 +66,6 @@
               <div class="flex items-center space-x-2">
                 <shadcn-checkbox id="isReadonly" v-model:checked="formState.isReadonly" />
                 <label for="isReadonly" class="text-sm font-medium">是否只读</label>
-              </div>
-
-              <!-- 是否启用选项 -->
-              <div class="flex items-center space-x-2">
-                <shadcn-switch id="enableOptions" v-model:checked="enableOptions" />
-                <label for="enableOptions" class="text-sm font-medium">启用选项</label>
               </div>
             </div>
 

@@ -987,6 +987,7 @@ export const useEntityTree = () => {
         // if (!psystemNode.children || psystemNode.children.length === 0) continue
         const psystem = psystemNode.originalData as Record<string, any>
         if (!psystem || !psystem.specId) continue
+        console.log('psystem', psystem)
         const specification = await entityApis.specification.get(toApiId(psystem.specId) || 0)
         if (!specification) continue
         const specificationWithCompositeId = convertApiResponseIds([specification], NODE_TYPES.SPECIFICATION)[0]
