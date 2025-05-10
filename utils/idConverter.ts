@@ -87,13 +87,13 @@ export const toFrontendId = (id: number | string | undefined | null, type: strin
 		const parts = id.split(':')
 		// 如果已经有正确的前缀，直接返回
 		if (parts[0] === type) {
-			console.log(`ID已经有正确前缀: ${id}`)
+			// console.log(`ID已经有正确前缀: ${id}`)
 			return id
 		}
 
 		// 如果有不同前缀，可能需要提取原始ID部分
 		const extractedId = parts[parts.length - 1]
-		console.log(`从复合ID提取原始部分: ${id} -> ${extractedId}`)
+		// console.log(`从复合ID提取原始部分: ${id} -> ${extractedId}`)
 
 		// 尝试转换为数字并验证
 		const numId = Number(extractedId)
@@ -105,7 +105,7 @@ export const toFrontendId = (id: number | string | undefined | null, type: strin
 	// 确保id是数字格式
 	const numId = typeof id === 'number' ? id : Number(id)
 	if (isNaN(numId)) {
-		console.warn(`警告: 无法将ID "${id}" 转换为数字`);
+		// console.warn(`警告: 无法将ID "${id}" 转换为数字`);
 		return null;
 	}
 
@@ -139,7 +139,7 @@ export const convertApiResponseIds = (
 				// 确保提取的部分是有效数字
 				const numId = Number(extractedId)
 				if (isNaN(numId)) {
-					console.warn(`警告: 无法从复合ID "${result[idField]}" 提取有效数字`);
+					// console.warn(`警告: 无法从复合ID "${result[idField]}" 提取有效数字`);
 					return result;
 				}
 
@@ -148,9 +148,9 @@ export const convertApiResponseIds = (
 
 				// 如果前缀已经正确，保留原值，否则生成新的复合ID
 				if (parts[0] === type) {
-					console.log(`保留现有复合ID: ${result[idField]}`);
+					// console.log(`保留现有复合ID: ${result[idField]}`);
 				} else {
-					console.log(`重新生成复合ID: ${result[idField]} -> ${type}:${numId}`);
+					// console.log(`重新生成复合ID: ${result[idField]} -> ${type}:${numId}`);
 					result[idField] = generateCompositeId(type, numId);
 				}
 			} else {

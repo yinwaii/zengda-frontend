@@ -6,15 +6,6 @@ import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
 import type { ZdTemplate as ZdTemplateType } from '~/models/entity/template'
 
-definePageMeta({
-	name: 'design-project-template-total',
-	keepalive: false,
-	// keepalive: {
-	// 	max: 10, // 设置最大缓存数量
-	// 	include: ['design-project-template-total']
-	// }
-})
-
 const dataTableRef = useTemplateRef<any>('dataTable')
 const { template: templateApi } = useEntityApis()
 const data = ref<ZdTemplateType[]>([])

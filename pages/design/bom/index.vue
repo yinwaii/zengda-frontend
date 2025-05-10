@@ -36,24 +36,14 @@
 import { navigateTo } from '#app'
 import { h, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useToast } from '~/components/ui/toast'
-import { useConfirm } from '~/components/ui/confirm'
+// import { useConfirm } from '~/components/ui/confirm'
 import type { ZdBom } from '~/models/entity/bom'
 import { formatDate } from '~/utils/date'
-
-definePageMeta({
-	name: 'design-bom-index',
-	keepalive: false,
-//	keepalive: {
-//		max: 10,
-//		include: ['design-bom-index']
-//	},
-	middleware: [() => {}]
-})
 
 const dataTableRef = useTemplateRef<any>('dataTable')
 const entityApis = useEntityApis()
 const { toast } = useToast()
-const { confirm } = useConfirm()
+// const { confirm } = useConfirm()
 
 // 对话框控制
 const dialogVisible = ref(false)
@@ -170,29 +160,21 @@ const handleDelete = async (row: any) => {
 		return
 	}
 	
-	// 确认删除
-	const ok = await confirm({
-		title: "确认删除",
-		description: `确定要删除物料清单 ${row.number || row.id} 吗？此操作不可恢复。`,
-	})
-	
-	if (ok) {
-		try {
-			// data方法实际上是用于删除操作
-			await entityApis.bom.data(row.id)
-			toast({
-				title: "成功",
-				description: "物料清单已删除",
-			})
-			await handleRefresh()
-		} catch (error) {
-			console.error('删除BOM失败:', error)
-			toast({
-				title: "错误",
-				description: "删除物料清单失败",
-				variant: "destructive",
-			})
-		}
+	try {
+		// data方法实际上是用于删除操作
+		await entityApis.bom.data(row.id)
+		toast({
+			title: "成功",
+			description: "物料清单已删除",
+		})
+		await handleRefresh()
+	} catch (error) {
+		console.error('删除BOM失败:', error)
+		toast({
+			title: "错误",
+			description: "删除物料清单失败",
+			variant: "destructive",
+		})
 	}
 }
 

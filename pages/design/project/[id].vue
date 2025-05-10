@@ -181,15 +181,6 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Copy, Package, Settings } from 'lucide-vue-next'
 
-// 添加 keepalive 配置
-definePageMeta({
-	name: 'project-detail',
-	// 禁用缓存，减少内存占用
-	keepalive: false,
-	// 禁用页面过渡动画
-	pageTransition: false,
-	layout: 'default'
-})
 
 // 通过路由获取项目ID
 const route = useRoute()

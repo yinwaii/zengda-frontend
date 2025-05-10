@@ -29,7 +29,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt', '@nuxtjs/color-mode', 'nuxt-particles'],
+  modules: ['@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt', '@nuxtjs/color-mode'],
   typescript: {
     strict: true,
     typeCheck: true,
@@ -99,13 +99,7 @@ export default defineNuxtConfig({
   },
   vite: {
     optimizeDeps: {
-      include: ['tinymce/tinymce'],
-      exclude: ['tinymce/plugins/*'],
-      force: true,
-      esbuildOptions: {
-        target: 'esnext',
-        treeShaking: true
-      }
+      // 删除 tinymce 相关配置
     },
     build: {
       rollupOptions: {
@@ -160,16 +154,6 @@ export default defineNuxtConfig({
     }
   },
   
-  // 确保路由相关插件优先加载
-  plugins: [
-    // 路由修复插件应该首先加载
-    { src: '~/plugins/router-fix.ts', mode: 'client' },
-    // 添加懒加载插件
-    { src: '~/plugins/lazy-load.ts', mode: 'client' },
-    // 添加内存监控插件
-    { src: '~/plugins/memory-monitor.ts', mode: 'client' }
-  ],
-  
   // 添加路由相关的构建优化
   build: {
     transpile: [
@@ -177,37 +161,4 @@ export default defineNuxtConfig({
       // 其他需要转译的依赖...
     ],
   },
-  
-  // 添加全局钩子来处理函数序列化问题
-  hooks: {
-    'build:before': async () => {
-      // 创建静态资源目录
-      const { copy } = await import('fs-extra')
-      const { resolve } = await import('path')
-      
-      // 源路径和目标路径
-      const tinymcePath = resolve('./node_modules/tinymce')
-      const targetPath = resolve('./public/plugins/tinymce')
-      
-      try {
-        // 复制TinyMCE资源到public目录
-        await copy(tinymcePath, targetPath, {
-          filter: (src: string) => {
-            // 排除不需要的文件
-            return !src.includes('node_modules') && 
-                  !src.includes('.git') && 
-                  !src.endsWith('.ts') &&
-                  !src.endsWith('.map')
-          }
-        })
-        console.log('✅ TinyMCE资源已复制到public/plugins/tinymce')
-      } catch (error) {
-        console.error('❌ 复制TinyMCE资源失败:', error)
-      }
-    },
-    // 添加构建后处理钩子
-    'build:done': () => {
-      console.log('✅ 构建完成，已优化资源加载')
-    }
-  }
 })

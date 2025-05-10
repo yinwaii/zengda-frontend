@@ -33,15 +33,6 @@ import type { TreeNodeData } from '~/components/abstract/tree/types'
 import { NODE_TYPES } from '~/models/entity/node-types'
 import type { ZdComponent } from '~/models/entity/component'
 
-// 添加 keepalive 配置
-definePageMeta({
-	name: 'psystem-detail',
-	// 禁用缓存，减少内存占用
-	keepalive: false,
-	// 禁用页面过渡动画
-	pageTransition: false
-})
-
 const { id } = useRoute().params
 const psystemId = Number(id)
 const toast = useToast()

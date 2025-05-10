@@ -157,12 +157,4 @@ onMounted(async () => {
 })
 
 provide('refresh', loadSpecificComponent)
-
-// 页面元数据
-definePageMeta({
-  layout: 'default',
-  middleware: [() => {}],
-  name: 'design-component-detail',
-  keepalive: false
-})
 </script> 

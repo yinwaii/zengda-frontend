@@ -1,7 +1,4 @@
 <script setup lang="ts">
-const iframeHeight = '800px'
-const description = 'A simple sidebar with navigation grouped by section.'
-
 // 导入SidebarData类型
 // import type { SidebarData } from '@/models/sidebar'
 
@@ -9,16 +6,8 @@ const description = 'A simple sidebar with navigation grouped by section.'
 const sidebarData: any = [
 	{
 		title: '设计 / Design',
-		url: '/design',
+		url: '/design/project',
 		items: [
-			// {
-			// 	title: '首页 / Home',
-			// 	url: '/design',
-			// },
-			// {
-			// 	title: '选件清单 / Bom',
-			// 	url: '/design/bom',
-			// },
 			{
 				title: '组件 / Component',
 				url: '/design/component',

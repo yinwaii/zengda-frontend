@@ -13,7 +13,4 @@ import { useRouter } from 'vue-router'
 
 const router = useRouter()
 
-definePageMeta({
-  layout: 'default'
-})
 </script>

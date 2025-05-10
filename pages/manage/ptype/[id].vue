@@ -38,17 +38,6 @@ import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdPType } from '~/models/entity/ptype'
 import type { ZdTemplate } from '~/models/entity/template'
 
-// 页面元数据
-definePageMeta({
-  name: 'manage-ptype-detail',
-  keepalive: false,
-  // keepalive: {
-  //   max: 10,
-  //   include: ['manage-ptype-detail']
-  // },
-  middleware: [() => {}]
-})
-
 const route = useRoute()
 const id = ref(route.params.id)
 const ptypeId = computed(() => Number(id.value))

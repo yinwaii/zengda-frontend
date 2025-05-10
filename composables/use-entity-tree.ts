@@ -5,14 +5,6 @@ import { convertApiResponseIds, toApiId } from '~/utils/idConverter'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdProject } from '~/models/entity/project'
 import type { ZdTemplate } from '~/models/entity/template'
-import type { ZdPSystem } from '~/models/entity/psystem'
-import type { ZdComponent } from '~/models/entity/component'
-import type { ZdTComponent } from '~/models/entity/tcompoment'
-import type { ZdBom } from '~/models/entity/bom'
-import type { ZdSpecification } from '~/models/entity/specification'
-import type { ZdConfiguration } from '~/models/entity/configuration'
-import type { VOPaged, VOList } from '~/models/entity'
-import type { ExtendedZdTComponent } from '~/types/extended'
 
 /**
  * 实体树加载逻辑的Composable

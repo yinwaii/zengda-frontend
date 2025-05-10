@@ -5,15 +5,6 @@ import { TimeStampColumnVisibility } from '~/models/column'
 import { useToast } from '@/components/ui/toast'
 import type { ZdPSystem } from '~/models/entity/psystem'
 
-definePageMeta({
-	name: 'design-project-psystem-total',
-	keepalive: false,
-	// keepalive: {
-	// 	max: 10, // 设置最大缓存数量
-	// 	include: ['design-project-psystem-total']
-	// }
-})
-
 // 定义模块的列信息
 const ZdPSystemColumns = [
     { accessorKey: 'id', header: '序号', meta: { width: '80px' } },

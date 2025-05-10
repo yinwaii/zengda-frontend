@@ -225,7 +225,7 @@ export const combineTreeNodeFactories = (factories: Record<string, TreeNodeFacto
     if (node.type && factories[node.type]) {
       // 如果已有type但没有复合ID，预先设置一个
       if (!node.id.toString().includes(':') && node.id !== undefined) {
-        console.log(`为节点${node.id}设置复合ID`)
+        // console.log(`为节点${node.id}设置复合ID`)
         // 做一个深拷贝，避免修改原始数据
         const nodeWithCompositeId = { ...node }
         nodeWithCompositeId.id = generateCompositeId(node.type, node.id)

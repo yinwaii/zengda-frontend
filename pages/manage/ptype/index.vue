@@ -38,15 +38,6 @@ import { useToast } from '@/components/ui/toast'
 import { useTableState } from '@/composables/use-table-state'
 import type { ZdPType } from '~/models/entity/ptype'
 
-definePageMeta({
-	name: 'manage-ptype-index',
-	keepalive: false,
-	// keepalive: {
-	// 	max: 10,
-	// 	include: ['manage-ptype-index']
-	// },
-	middleware: [() => {}]
-})
 
 // 添加格式化日期函数
 const formatDate = (date: Date): string => {

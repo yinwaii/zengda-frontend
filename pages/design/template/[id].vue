@@ -33,11 +33,6 @@ import { useEntityHandlers } from '~/composables/use-entity-handlers'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import { NODE_TYPES } from '~/models/entity/node-types'
 
-// 保留原有的 keepalive 配置
-definePageMeta({
-	name: 'template-detail',
-	keepalive: false
-})
 
 const { id } = useRoute().params
 const templateId = Number(id)

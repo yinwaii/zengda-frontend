@@ -38,16 +38,6 @@ import { h, ref } from 'vue'
 import { useToast } from '@/components/ui/toast'
 import type { ZdComponent } from '~/models/entity/component'
 
-definePageMeta({
-	name: 'design-component-index',
-	keepalive: false,
-	// keepalive: {
-	// 	max: 10,
-	// 	include: ['design-component-index']
-	// },
-	middleware: [() => {}]
-})
-
 const dataTableRef = useTemplateRef<any>('dataTable')
 const entityApis = useEntityApis()
 const data = ref<ZdComponent[]>([])

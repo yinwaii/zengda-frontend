@@ -4,10 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "node scripts/copy-tinymce.js && nuxt dev",
+    "dev": "nuxt dev --host 0.0.0.0",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare && node scripts/copy-tinymce.js",
+    "postinstall": "nuxt prepare",
     "clean": "rm -rf .nuxt node_modules/.vite",
     "clean:cache": "node scripts/clean-memory.js",
     "start": "npm run clean:cache && nuxt start"
@@ -51,7 +51,6 @@
     "@types/xlsx": "^0.0.35",
     "lucide-nuxt": "^1.2.2",
     "nuxt": "^3.16.0",
-    "nuxt-particles": "^0.3.0",
     "pinia": "^3.0.1",
     "sass-embedded": "^1.85.1",
     "shadcn-nuxt": "^1.0.2",

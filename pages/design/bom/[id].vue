@@ -36,14 +36,6 @@ import { NODE_TYPES } from '~/models/entity/node-types'
 import type { TreeNodeData } from '~/components/abstract/tree/types'
 import type { ZdBomChild } from '~/models/entity/bom'
 
-// 添加 keepalive 配置
-definePageMeta({
-  name: 'design-bom-detail',
-  keepalive: false,
-  pageTransition: false,
-  layout: 'default'
-})
-
 // 通过路由获取BOM ID
 const route = useRoute()
 const router = useRouter()
