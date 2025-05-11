@@ -98,14 +98,6 @@ export default defineNuxtConfig({
   },
   vite: {
     build: {
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            'recharts': ['recharts'],
-            'docx': ['docx', 'docx-preview']
-          }
-        }
-      },
       chunkSizeWarningLimit: 1000,
       cssCodeSplit: true,
       minify: 'terser',
