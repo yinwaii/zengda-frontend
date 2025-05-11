@@ -97,9 +97,6 @@ export default defineNuxtConfig({
     }
   },
   vite: {
-    optimizeDeps: {
-      // 删除 tinymce 相关配置
-    },
     build: {
       rollupOptions: {
         output: {

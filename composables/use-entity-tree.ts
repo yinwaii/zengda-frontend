@@ -12,7 +12,6 @@ import type { ZdTemplate } from '~/models/entity/template'
  */
 export const useEntityTree = () => {
   const entityApis = useEntityApis()
-  const { success, error } = useMessage()
 
   // 加载状态
   const isLoading = ref(false)
@@ -66,7 +65,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载项目数据失败:', err)
-      error('加载项目数据失败')
       return []
     }
   }
@@ -129,7 +127,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载模板数据失败:', err)
-      error('加载模板数据失败')
       return projectNodes
     }
   }
@@ -197,7 +194,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载模块数据失败:', err)
-      error('加载模块数据失败')
       return projectNodes
     }
   }
@@ -254,7 +250,6 @@ export const useEntityTree = () => {
       return treeNodes
     } catch (err) {
       console.error('加载组件数据失败:', err)
-      error('加载组件数据失败')
       return treeNodes
     }
   }
@@ -320,7 +315,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载组件详情数据失败:', err)
-      error('加载组件详情数据失败')
       return projectNodes
     }
   }
@@ -398,7 +392,6 @@ export const useEntityTree = () => {
       return treeNodes;
     } catch (err) {
       console.error('加载BOM数据失败:', err);
-      error('加载BOM数据失败');
       return treeNodes;
     }
   };
@@ -435,7 +428,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载规格数据失败:', err)
-      error('加载规格数据失败')
       return projectNodes
     }
   }
@@ -602,7 +594,6 @@ export const useEntityTree = () => {
       return projectNodes
     } catch (err) {
       console.error('加载配置数据失败:', err)
-      error('加载配置数据失败')
       return projectNodes
     }
   }
@@ -643,7 +634,6 @@ export const useEntityTree = () => {
 
       // 如果没有获取到项目数据，显示提示并返回
       if (!nodes || nodes.length === 0) {
-        error('未找到项目数据')
         return { treeData: [], loading: false }
       }
 
@@ -706,12 +696,9 @@ export const useEntityTree = () => {
           console.error('加载模板数据失败:', err)
         }
       }
-
-      success('加载数据成功')
       return { treeData: nodes, loading: false }
     } catch (err) {
       console.error('加载实体树数据失败:', err)
-      error('加载数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -731,7 +718,6 @@ export const useEntityTree = () => {
       // 获取模板数据
       const template = await entityApis.template.get(templateId)
       if (!template) {
-        error(`未找到ID为${templateId}的模板`)
         return { treeData: [], loading: false }
       }
 
@@ -746,7 +732,6 @@ export const useEntityTree = () => {
       return { treeData: [templateNode], loading: false }
     } catch (err) {
       console.error(`加载模板(ID: ${templateId})失败:`, err)
-      error('加载模板数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -766,7 +751,6 @@ export const useEntityTree = () => {
       // 获取项目数据
       const project = await entityApis.project.get(projectId)
       if (!project) {
-        error(`未找到ID为${projectId}的项目`)
         return { treeData: [], loading: false }
       }
 
@@ -781,7 +765,6 @@ export const useEntityTree = () => {
       return { treeData: [projectNode], loading: false }
     } catch (err) {
       console.error(`加载项目(ID: ${projectId})失败:`, err)
-      error('加载项目数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -911,12 +894,9 @@ export const useEntityTree = () => {
 
       // 解包临时root节点的子元素
       const resultData = nodes[0].children || []
-
-      success('加载实体子元素成功')
       return { treeData: resultData, loading: false }
     } catch (err) {
       console.error('加载实体子元素失败:', err)
-      error('加载数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -936,7 +916,6 @@ export const useEntityTree = () => {
       // 获取模块数据
       const psystem = await entityApis.psystem.get(psystemId)
       if (!psystem) {
-        error(`未找到ID为${psystemId}的模块`)
         return { treeData: [], loading: false }
       }
 
@@ -951,7 +930,6 @@ export const useEntityTree = () => {
       return { treeData: [psystemNode], loading: false }
     } catch (err) {
       console.error(`加载模块(ID: ${psystemId})失败:`, err)
-      error('加载模块数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false
@@ -991,7 +969,6 @@ export const useEntityTree = () => {
       return treeData 
     } catch (err) {
       console.error('加载模块规格数据失败:', err)
-      error('加载规格数据失败')
       return treeData
     } finally {
       isLoading.value = false
@@ -1011,7 +988,6 @@ export const useEntityTree = () => {
       // 获取组件数据
       const component = await entityApis.component.get(componentId)
       if (!component) {
-        error(`未找到ID为${componentId}的组件`)
         return { treeData: [], loading: false }
       }
 
@@ -1026,7 +1002,6 @@ export const useEntityTree = () => {
       return { treeData: [componentNode], loading: false }
     } catch (err) {
       console.error(`加载组件(ID: ${componentId})失败:`, err)
-      error('加载组件数据失败')
       return { treeData: [], loading: false }
     } finally {
       isLoading.value = false

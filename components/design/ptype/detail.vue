@@ -169,8 +169,6 @@ const loadRelatedTemplates = async () => {
 const handleSubmit = () => {
   // 确保所需字段有值
   if (!editForm.value.name || !editForm.value.code || !editForm.value.model) {
-    const { error } = useMessage()
-    error('请填写必填字段')
     return
   }
   

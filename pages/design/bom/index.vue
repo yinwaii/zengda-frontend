@@ -36,14 +36,12 @@
 import { navigateTo } from '#app'
 import { h, ref, onMounted, onBeforeUnmount } from 'vue'
 import { useToast } from '~/components/ui/toast'
-// import { useConfirm } from '~/components/ui/confirm'
 import type { ZdBom } from '~/models/entity/bom'
 import { formatDate } from '~/utils/date'
 
 const dataTableRef = useTemplateRef<any>('dataTable')
 const entityApis = useEntityApis()
 const { toast } = useToast()
-// const { confirm } = useConfirm()
 
 // 对话框控制
 const dialogVisible = ref(false)

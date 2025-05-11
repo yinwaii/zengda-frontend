@@ -100,8 +100,6 @@ watch(
 const handleSubmit = () => {
   // 验证表单
   if (!form.value.name || !form.value.code || !form.value.model) {
-    const { error } = useMessage()
-    error('请填写必填字段')
     return
   }
 
