@@ -14,7 +14,7 @@
     <!-- Login Section -->
     <div class="login-section w-full sm:w-1/2 flex items-center justify-center bg-white bg-opacity-95 backdrop-blur-sm">
       <Transition name="fade" appear>
-        <login />
+        <personal-login-form />
       </Transition>
     </div>
   </div>
