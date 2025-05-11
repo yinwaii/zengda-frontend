@@ -20,6 +20,12 @@
   </div>
 </template>
 
+<script lang="ts" setup>
+definePageMeta({
+  layout: 'personal'
+})
+</script>
+
 <style scoped>
 .login-container {
   margin: 0;
