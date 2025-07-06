@@ -86,7 +86,7 @@ const sidebarData: any = [
 	<shadcn-sidebar-provider>
 		<layout-sidebar :data="sidebarData" />
 		<shadcn-sidebar-inset>
-			<layout-breadcrumb />
+			<!-- <layout-breadcrumb /> -->
 			<slot></slot>
 			<!-- <div class="flex flex-1 flex-col gap-4 p-4">
 				<div class="grid auto-rows-min gap-4 md:grid-cols-3">

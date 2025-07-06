@@ -222,21 +222,17 @@ const onClick = (row: ZdProject) => {
 }
 </script>
 <template>
-	<div>
+	<div class="p-6 h-full">
 		<div class="flex justify-between items-center mb-4">
 			<h2 class="text-xl font-bold">项目列表</h2>
 			<shadcn-button @click="handleAddProject">新建项目</shadcn-button>
 		</div>
-		
+
 		<abstract-data-table ref="dataTable" :data="data" :columns="projectColumns" v-model:selected-rows="selectedRows"
 			:on-row-click="onClick"></abstract-data-table>
-			
+
 		<!-- 编辑对话框 -->
-		<design-project-dialog
-			v-model:open="dialogVisible"
-			:project="editingProject"
-			:isEdit="editingProject?.id !== undefined"
-			@save="handleProjectSubmit"
-		/>
+		<design-project-dialog v-model:open="dialogVisible" :project="editingProject"
+			:isEdit="editingProject?.id !== undefined" @save="handleProjectSubmit" />
 	</div>
 </template>

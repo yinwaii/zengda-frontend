@@ -24,7 +24,7 @@
 			<!-- Remember Me and Forgot Password -->
 			<div class="flex justify-between items-center">
 				<div class="flex items-center">
-					<input type="checkbox" id="remember" class="h-4 w-4 text-blue-600 rounded" />
+					<input type="checkbox" id="remember" class="h-4 w-4 text-blue-600 rounded" v-model="remember" />
 					<label for="remember" class="ml-2 text-sm text-gray-700">记住我</label>
 				</div>
 				<nuxt-link @click="forgetPassword" class="text-sm text-blue-600 hover:underline">
@@ -59,8 +59,12 @@ interface RuleForm {
 	password: string;
 }
 
+const router = useRouter();
+const userStore = useUserStore();
+const { toast } = useToast();
+const remember = ref(false)
 const form = reactive<RuleForm>({
-	username: '',
+	username: userStore.getPreviousUsername() || '',
 	password: '',
 });
 
@@ -68,10 +72,6 @@ const errors = reactive({
 	username: '',
 	password: '',
 });
-
-const router = useRouter();
-const userStore = useUserStore();
-const { toast } = useToast();
 
 const validateForm = () => {
 	errors.username = '';
@@ -97,7 +97,7 @@ const validateForm = () => {
 const submitForm = async () => {
 	if (validateForm()) {
 		try {
-			await userStore.login(form.username.trim(), form.password);
+			await userStore.login(form.username.trim(), form.password, remember.value);
 			router.push('/');
 		}
 		catch (error: any) {

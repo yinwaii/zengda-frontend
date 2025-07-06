@@ -5,16 +5,19 @@ import { useEntityApis } from '~/composables/use-entity-apis'
 export const useUserStore = defineStore('userStore', () => {
 	const token = ref('')
 	const expireTime = ref('')
+	const previousUsername = ref('')
 	const isAuthenticated = ref(false)
 	const entityApis = useEntityApis();
 
-	const login = async (username: string, password: string) => {
+	const login = async (username: string, password: string, save: boolean = false) => {
 		try {
 			const result = await entityApis.user.login(username, password)
 			// 保存到 store 和 sessionStorage
 			token.value = result.token
 			expireTime.value = String(result.expireTime)
 			isAuthenticated.value = true
+			if (save)
+				previousUsername.value = username
 
 			// 保存到 cookie
 			const cookie = useCookie('Admin-Token', {
@@ -44,13 +47,19 @@ export const useUserStore = defineStore('userStore', () => {
 		return isAuthenticated.value && token.value && expireTime.value
 	}
 
+	const getPreviousUsername = () => {
+		return previousUsername.value
+	}
+
 	return {
 		token,
+		previousUsername,
 		expireTime,
 		isAuthenticated,
 		login,
 		logout,
-		checkAuth
+		checkAuth,
+		getPreviousUsername
 	}
 }, {
 	persist: {

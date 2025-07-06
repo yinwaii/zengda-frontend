@@ -3,7 +3,7 @@
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="onNewPSystem">新建功能</el-button>
 		</div>
-		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe :height="'50vh'"
+		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
 			@row-click="onClick">
 			<el-table-column prop="id" label="ID" width="60" />
 			<el-table-column prop="name" label="功能名称" />

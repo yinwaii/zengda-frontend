@@ -1,75 +1,84 @@
-# Nuxt Minimal Starter
+# 前端文档
+### 技术架构
+- 高级框架：nuxt3 负责自动导入依赖配置、网页渲染加速
+- 前端框架：vue3 负责页面交互、数据绑定
+- 组件库（新）：elementplus 按钮、表单、表格等原型
+- 组件库（旧）：shadcn/vue 按钮、表单、表格等原型
+- 与后端通信：ofetch(nuxt自带的)
+- 编程语言：typescript javascript升级版
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+### 项目结构
+- 页面管理：pages/ 其中pages/design为老版页面 pages/new为新版页面
+- 组件管理：components/ 其中components/design为老版组件 components/xxx.vue为新版组件
+- API接口：composables/use-entity-apis.ts 负责与后端通信
+- 数据类型：models/entity/* 负责定义数据类型
+- 整体布局：layouts/
+- 项目配置：nuxt.config.ts
+- 依赖配置：package.json 管理外部库、运行脚本等
 
-## Setup
+### 新版开发进度
+- [x] 全局组件、模块、模板、项目表格，可增删改查
+- [x] BOM表物料搜索，可增删改查
+- [x] 参数表，可增删改查
+- [ ] 模块、模板与所包含低级组件、模块的关系管理
+- [ ] 规格书上传、绑定
+- [ ] 报价结果查询、规格书生成
 
-Make sure to install dependencies:
+### 开发环境
+- 安装node：https://www.runoob.com/nodejs/nodejs-install-setup.html
+- 下载项目：git clone https://github.com/yinwaii/zengda-frontend.git
+- 在vscode中打开文件夹
+- 点击上方终端-新建终端
+- 安装依赖的外部库：npm install
+- 启动：npm run dev
 
-```bash
-# npm
-npm install
+### 部署环境
+- 拷贝项目：scp -r zengda-frontend/ ubuntu@111.229.109.11:~
+- 连接服务器：ssh ubuntu@111.229.109.11
+- 在服务器上打开文件夹：cd ~/zengda-frontend/
+- 安装依赖的外部库：npm install
+- 编译代码&性能优化分析：npm run build
+- 启动：npm run start &
 
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### 相关问题
+1. 登陆页面没有记住用户名
+A：已解决，目前可以记住用户名
+2. 模块及项目列表显示问题
+Q：左边菜单与右边主页面内容没有留空，系统管理下4个页面也有类似问题
+A：已解决
+3. 列表每页显示行数设置
+Q：参考常规论坛列表显示方式，自定义设置每页显示行数，跳转到某一页、第一页、最后一页等
+A：新版已解决
+4. 无法刷新页面，跳转页面
+Q：按F5刷新页面后就会回到登录页面，点击导航按钮也会回到登录页面
+A：目前测试中未发现刷新界面后回到登录界面问题，导航按钮有问题已屏蔽，后续新版将重新上线
+5. 模块中新建组件功能无效
+Q：点击新建组件后页面无法关闭，也无法保存
+A：抱歉，该bug尚未修复。
+6. 模块中添加组件没有筛选功能
+Q：只有一个下拉框，组件太多，很难选择，模板中添加模块也有类似问题
+A：新版后续将提供相关功能
+7. 模块编辑按钮无效
+A：excel原图中已是编辑状态，填充表单后点击保存即可更新
+8. 模块详情页面修改后没有保存按钮
+A：需要点击修改左侧的“展开”按钮
+9. 组件中属性含义不清
+Q：“是否显示”和“是否必须”的含义是什么？实际没有看出区别
+A：开发前期不确定组件属性具体需求，后续使用中将联系后端调整相关字段
+10. 勾选显示字段后无法保存
+A：目前尚未实现相关功能，新版将通过浏览器缓存提供相关功能
+11. 如何删除模板、模块、组件？
+A：删除模板内的模块、组件：在树状结构点击相关节点，再点击：操作-删除；
+	删除整个模块、模板、组件：在表格界面点击最右侧三个点的图标，提供编辑、删除等选项。
+	建议使用新版界面。
+12. 无法添加BOM物料
+Q：编辑物料项搜不到任何物料，也缺少物料属性筛选，要物料困难
+A：旧版选择对应物料后点击搜索后，下划页面才能选择添加。建议使用新版，已改善易用性。
+13. 组件、模块列表无法排序、筛选
+Q：模板和项目列表可以排序，但不能筛选
+A：新版将实现排序、筛选功能
+14. 新建项目时模板没有跟随产品类型筛选
+Q：选择不同的产品类型，项目模板都是所有都可选，另外页面太紧凑，建议加宽一些
+A：当前产品类型需要和后端沟通，未来将随新版一同发布，新版将显著改善易用性。
+15. 欢迎页面缺失
+A：已修复

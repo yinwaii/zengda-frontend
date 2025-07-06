@@ -223,20 +223,16 @@ const onClick = (row: ZdPSystem) => {
 }
 </script>
 <template>
-	<div>
+	<div class="p-6 h-full">
 		<div class="flex justify-between items-center mb-4">
 			<h2 class="text-xl font-bold">模块列表</h2>
 			<shadcn-button @click="handleAddPSystem">新建模块</shadcn-button>
 		</div>
-		
+
 		<abstract-data-table ref="dataTable" :data="data" :columns="psystemColumns" v-model:selected-rows="selectedRows"
 			:on-row-click="onClick"></abstract-data-table>
-			
+
 		<!-- 编辑对话框 -->
-		<design-psystem-dialog
-			v-model:open="dialogVisible"
-			:system="editingPSystem"
-			@save="handlePSystemSubmit"
-		/>
+		<design-psystem-dialog v-model:open="dialogVisible" :system="editingPSystem" @save="handlePSystemSubmit" />
 	</div>
 </template> 
