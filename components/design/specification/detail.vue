@@ -19,7 +19,7 @@
             <shadcn-button size="sm" @click="handleUpload" v-if="specification.id">
               <LucideUpload class="h-4 w-4" />
             </shadcn-button>
-            <shadcn-button size="sm" @click="handleCopyTag" v-if="specification.fileTag">
+            <shadcn-button size="sm" @click="handleCopyTag">
               <LucideCopy class="h-4 w-4" />
             </shadcn-button>
             <shadcn-button size="sm" @click="$emit('edit')">
@@ -102,7 +102,7 @@
 
     <shadcn-separator />
 
-    <design-parameter-preview :nodeId="specification.id" type="specification" />
+    <design-parameter-preview v-if="!route.path.startsWith('/design/project/')" :nodeId="specification.id" type="specification" />
     
     <!-- 上传对话框 -->
     <Dialog v-model:open="showUploadDialog">
@@ -201,6 +201,7 @@ const selectedFile = ref<File | null>(null)
 const entityApis = useEntityApis()
 const { toast } = useToast()
 const isExpanded = ref(false)
+const route = useRoute()
 
 const editForm = ref<Partial<ZdSpecification>>({
   name: props.specification.name,

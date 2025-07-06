@@ -148,7 +148,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="bom.id" type="bom" />
+		<design-parameter-preview v-if="!route.path.startsWith('/design/project/')" :nodeId="bom.id" type="bom" />
 	</div>
 	
 	<!-- 物料项查看/编辑对话框 -->
@@ -220,6 +220,8 @@ const editForm = ref<Partial<ZdBom>>({
 	componentId: props.bom.componentId,
 	note: props.bom.note,
 })
+
+const route = useRoute()
 
 // 物料项对话框状态
 const itemDialogOpen = ref(false)

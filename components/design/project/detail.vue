@@ -214,7 +214,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="project.id" type="project" />
+		<!-- <design-parameter-preview :nodeId="project.id" type="project" /> -->
 	</div>
 
 	<!-- 配置对话框 -->

@@ -86,6 +86,9 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 		if (response.code !== 200) {
 			const errorMessage = response.err?.join(', ') ?? response.message ?? '请求失败'
 			useGlobalAlert().show(errorMessage)
+			if (errorMessage === 'token已过期') {
+				navigateTo('/personal/login')
+			}
 			throw new Error(errorMessage);
 		}
 

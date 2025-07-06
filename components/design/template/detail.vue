@@ -94,7 +94,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="template.id || 0" type="template" />
+		<design-parameter-preview v-if="!route.path.startsWith('/design/project/')" :nodeId="template.id || 0" type="template" />
 	</div>
 </template>
 
@@ -116,6 +116,8 @@ const emit = defineEmits<{
 	cancel: []
 	save: [form: Partial<ZdTemplate>]
 }>()
+
+const route = useRoute()
 
 const editForm = ref<Partial<ZdTemplate>>({
 	name: props.template.name,

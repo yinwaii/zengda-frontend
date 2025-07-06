@@ -87,7 +87,7 @@
 
     <shadcn-separator />
 
-    <design-parameter-preview :nodeId="system?.id || 0" type="psystem" />
+    <design-parameter-preview v-if="!route.path.startsWith('/design/project/')" :nodeId="system?.id || 0" type="psystem" />
   </div>
 </template>
 
@@ -115,6 +115,8 @@ const emit = defineEmits<{
     isShow?: boolean
   }]
 }>()
+
+const route = useRoute()
 
 const editForm = ref<{
   name?: string

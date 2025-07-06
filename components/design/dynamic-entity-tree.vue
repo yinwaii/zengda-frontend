@@ -75,13 +75,9 @@
 
     <!-- 右侧详情区域 -->
     <div v-if="currentItem" class="flex-1 flex flex-col h-full">
-      <!-- detail-top slot -->
-      <div class="px-6 py-4">
-        <slot name="detail-top" :node="currentItem"></slot>
-      </div>
       
       <!-- detail 组件 -->
-      <div class="flex-1 overflow-auto px-6">
+      <div class="overflow-auto px-6">
         <component 
           :is="getDetailComponent(currentItem.type)" 
           :key="currentItemId"
@@ -91,6 +87,11 @@
           @cancel="cancelEditing"
           @save="(data: any) => currentItem && emit('save', data, currentItem.type || 'default')"
         />
+      </div>
+
+      <!-- detail-top slot -->
+      <div class="px-6">
+        <slot name="detail-top" :node="currentItem"></slot>
       </div>
     </div>
     

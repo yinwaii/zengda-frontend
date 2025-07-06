@@ -120,7 +120,7 @@
 
 		<shadcn-separator />
 
-		<design-parameter-preview :nodeId="component.id" type="component" />
+		<design-parameter-preview v-if="!route.path.startsWith('/design/project/')" :nodeId="component.id" type="component" />
 	</div>
 </template>
 
@@ -142,7 +142,7 @@ const props = defineProps<{
 }>()
 
 // api获取bom列表
-const bomIds = ref<number[]>([ 1, 2, 3])
+const route = useRoute()
 
 // 计算组件数据，优先使用component，如果不存在则从data中提取
 const component = computed(() => {

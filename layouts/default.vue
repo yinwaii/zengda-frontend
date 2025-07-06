@@ -23,41 +23,62 @@ const sidebarData: any = [
 			{
 				title: '项目 / Project',
 				url: '/design/project',
-			},
+			}
 		],
 	},
 	{
-		title: '管理 / Management',
-		url: '/manage',
+		title: '设计（重构）/ New',
 		items: [
 			{
-				title: '产品类型 / Type',
-				url: '/manage/ptype',
-			},
-		],
-	},
-	{
-		title: '系统管理 / System',
-		url: '/system',
-		items: [
-			{
-				title: '用户管理 / User',
-				url: '/system/user',
+				title: '物料组件',
+				url: '/new/component',
 			},
 			{
-				title: '角色管理 / Role',
-				url: '/system/role',
+				title: '功能模块',
+				url: '/new/psystem',
 			},
 			{
-				title: '菜单管理 / Menu',
-				url: '/system/menu',
+				title: '产品模板',
+				url: '/new/template',
 			},
 			{
-				title: '部门管理 / Department',
-				url: '/system/dept',
+				title: '报价项目',
+				url: '/new/project',
 			},
-		],
-	},
+		]
+	}
+	// {
+	// 	title: '管理 / Management',
+	// 	url: '/manage',
+	// 	items: [
+	// 		{
+	// 			title: '产品类型 / Type',
+	// 			url: '/manage/ptype',
+	// 		},
+	// 	],
+	// },
+	// {
+	// 	title: '系统管理 / System',
+	// 	url: '/system',
+	// 	items: [
+	// 		{
+	// 			title: '用户管理 / User',
+	// 			url: '/system/user',
+	// 		},
+	// 		{
+	// 			title: '角色管理 / Role',
+	// 			url: '/system/role',
+	// 		},
+	// 		{
+	// 			title: '菜单管理 / Menu',
+	// 			url: '/system/menu',
+	// 		},
+	// 		{
+	// 			title: '部门管理 / Department',
+	// 			url: '/system/dept',
+	// 		},
+	// 	],
+	// },
 ]
 </script>
 
