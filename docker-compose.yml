@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   zengda-frontend:
     build:
@@ -21,11 +23,15 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    # deploy:
-    #   resources:
-    #     limits:
-    #       memory: 1G
-    #       cpus: '0.5'
-    #     reservations:
-    #       memory: 512M
-    #       cpus: '0.25'
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+
+networks:
+  zengda-network:
+    driver: bridge 
