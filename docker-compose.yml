@@ -12,7 +12,8 @@ services:
       - NODE_ENV=production
       - PORT=3010
     restart: unless-stopped
-    networks: host
+    networks: 
+      - host
     volumes:
       # 如果需要持久化数据，可以添加卷挂载
       # - ./logs:/nuxt3/logs
