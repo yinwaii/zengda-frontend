@@ -1,0 +1,31 @@
+services:
+  zengda-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: yinwai/zengda-frontend
+    ports:
+      - "3010:3010"
+    environment:
+      - NODE_ENV=production
+      - PORT=3010
+    restart: unless-stopped
+    networks: host
+    volumes:
+      # 如果需要持久化数据，可以添加卷挂载
+      # - ./logs:/nuxt3/logs
+      # - ./uploads:/nuxt3/uploads
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3010/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 1G
+    #       cpus: '0.5'
+    #     reservations:
+    #       memory: 512M
+    #       cpus: '0.25'
