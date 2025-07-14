@@ -225,6 +225,12 @@ export const useEntityApis = (): any => {
       }
     },
 
+    paramMapping: {
+      getAll: (specId: number) => api.get<Array<ZdSpecTagMap>>(`/specification/paramMapping/${specId}`),
+      update: (specMap: ZdSpecTagMap) => api.put<ZdSpecTagMap>(`/specification/paramMapping/${specMap.specId}`, specMap),
+      delete: (specId: number, specParamName: string) => api.delete<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, specParamName)
+    },
+
     system: {
       hash: (filename: string, hash: string) => systemApi.getRaw<ArrayBuffer>(`/${filename}`, { hash }, {
         responseType: 'arrayBuffer'

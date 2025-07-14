@@ -14,10 +14,10 @@ services:
     restart: unless-stopped
     networks: 
       - host
-    volumes:
-      # 如果需要持久化数据，可以添加卷挂载
-      # - ./logs:/nuxt3/logs
-      # - ./uploads:/nuxt3/uploads
+    # volumes:
+    #   # 如果需要持久化数据，可以添加卷挂载
+    #   - ./logs:/nuxt3/logs
+    #   - ./uploads:/nuxt3/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3010/"]
       interval: 30s

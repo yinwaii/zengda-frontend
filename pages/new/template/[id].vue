@@ -16,10 +16,10 @@
 
 		<el-tabs type="border-card">
 			<el-tab-pane label="物料组件">
-				<component-table />
+				<template-component-table v-if="zdtemplate?.id" :template-id="zdtemplate.id" />
 			</el-tab-pane>
 			<el-tab-pane label="功能模块">
-				<psystem-table />
+				<template-psystem-table v-if="zdtemplate?.id" :template-id="zdtemplate.id" />
 			</el-tab-pane>
 			<el-tab-pane label="参数配置">
 				<parameter-table v-if="zdtemplate?.id" :obj-type="'template'" :obj-id="zdtemplate.id" />

@@ -5,7 +5,7 @@
 			<div class="flex items-start justify-between">
 				<div class="flex-1">
 					<h1 class="text-3xl font-bold text-gray-900 mb-3 leading-tight">
-						{{ zdtemplate?.name || '模板详情' }}
+						{{ zdtemplate?.name || '项目详情' }}
 					</h1>
 					<p class="text-base text-gray-600 leading-relaxed max-w-3xl">
 						{{ zdtemplate?.description || '暂无描述' }}
@@ -15,12 +15,6 @@
 		</div>
 
 		<el-tabs type="border-card">
-			<el-tab-pane label="物料组件">
-				<component-table />
-			</el-tab-pane>
-			<el-tab-pane label="功能模块">
-				<psystem-table />
-			</el-tab-pane>
 			<el-tab-pane label="参数配置">
 				<parameter-table v-if="zdtemplate?.id" :obj-type="'template'" :obj-id="zdtemplate.id" />
 			</el-tab-pane>

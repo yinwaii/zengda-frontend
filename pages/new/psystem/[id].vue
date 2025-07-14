@@ -16,13 +16,13 @@
 
 		<el-tabs type="border-card">
 			<el-tab-pane label="物料组件">
-				<component-table />
+				<psystem-component-table v-if="zdpsystem?.id" :psystem-id="zdpsystem.id" />
 			</el-tab-pane>
 			<el-tab-pane label="参数配置">
 				<parameter-table v-if="zdpsystem?.id" :obj-type="'psystem'" :obj-id="zdpsystem.id" />
 			</el-tab-pane>
 			<el-tab-pane label="规格书配置">
-
+				<specification-from-psystem v-if="zdpsystem?.id" :psystem-id="zdpsystem.id" />
 			</el-tab-pane>
 			<!-- <el-tab-pane label="报价预览">
 
