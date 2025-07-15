@@ -49,19 +49,29 @@ const handleEdit = (row: ZdParameter) => {
 }
 
 const handleDelete = async (row: ZdParameter) => {
-	await entityApis.parameter.delete(row.id)
-	await handleRefresh()
+	try {
+		await entityApis.parameter.delete(row.id)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 
 const handleSubmit = async (parameter: Partial<ZdParameter>) => {
-	if (dialogParameter.value === null) {
-		parameter.objectId = props.objId
-		parameter.objectType = props.objType
+	try {
+		if (dialogParameter.value === null) {
+			parameter.objectId = props.objId
+			parameter.objectType = props.objType
 		await entityApis.parameter.create(parameter)
 	} else {
 		await entityApis.parameter.update(parameter)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 
 </script>

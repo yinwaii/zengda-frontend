@@ -46,20 +46,30 @@ const onNewPSystem = () => {
 	psystemDialogVisible.value = true
 }
 const onSubmit = async (psystem: Partial<ZdPSystem>) => {
-	if (psystemId.value === null) {
-		await entityApis.psystem.create(psystem)
-	} else {
-		await entityApis.psystem.update(psystem)
+	try {
+		if (psystemId.value === null) {
+			await entityApis.psystem.create(psystem)
+		} else {
+			await entityApis.psystem.update(psystem)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditPSystem = (psystem: ZdPSystem) => {
 	psystemId.value = psystem.id
 	psystemDialogVisible.value = true
 }
 const onDeletePSystem = async (psystem: ZdPSystem) => {
-	await entityApis.psystem.delete(psystem.id)
-	await handleRefresh()
+	try {
+		await entityApis.psystem.delete(psystem.id)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 const handleRefresh = async () => {
 	psystems.value = (await entityApis.psystem.getAll())

@@ -52,19 +52,29 @@ const onNewComponent = () => {
 	dialogVisible.value = true
 }
 const onSubmit = async (component: Partial<ZdComponent>) => {
-	if (componentId.value === null) {
-		await entityApis.component.create(component)
-	} else {
-		await entityApis.component.update(component)
+	try {
+		if (componentId.value === null) {
+			await entityApis.component.create(component)
+		} else {
+			await entityApis.component.update(component)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditComponent = (component: ZdComponent) => {
 	componentId.value = component.id
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (component: ZdComponent) => {
-	await entityApis.component.delete(component.id)
-	await handleRefresh()
+	try {
+		await entityApis.component.delete(component.id)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 </script>

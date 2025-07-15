@@ -57,23 +57,33 @@ const onNewComponent = () => {
 	dialogVisible.value = true
 }
 const onSubmit = async (component: Partial<ZdComponent>) => {
-	if (componentId.value === null) {
-		const res = await entityApis.component.create(component)
-		console.log(res)
+	try {
+		if (componentId.value === null) {
+			const res = await entityApis.component.create(component)
+			console.log(res)
 		components_list.value.push(res.id)
 		await entityApis.psystem_component.update(props.psystemId, components_list.value)
 	} else {
 		await entityApis.component.update(component)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditComponent = (component: ZdComponent) => {
 	componentId.value = component.id
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (component: ZdComponent) => {
-	components_list.value = components_list.value.filter((id: number) => id !== component.id)
-	await entityApis.psystem_component.update(props.psystemId, components_list.value)
-	await handleRefresh()
+	try {
+		components_list.value = components_list.value.filter((id: number) => id !== component.id)
+		await entityApis.psystem_component.update(props.psystemId, components_list.value)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 </script>

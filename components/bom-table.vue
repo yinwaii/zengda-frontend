@@ -39,9 +39,10 @@ const handleRefresh = async () => {
 }
 
 const handleAddItem = async (item: ZdItem) => {
-	if (bom.value && item.itemId) {
-		const currItem = bom.value.items.find(curr => curr.itemId === item.itemId)
-		if (currItem) {
+	try {
+		if (bom.value && item.itemId) {
+			const currItem = bom.value.items.find(curr => curr.itemId === item.itemId)
+			if (currItem) {
 			currItem.itemNumber += 1
 		}
 		else {
@@ -53,15 +54,24 @@ const handleAddItem = async (item: ZdItem) => {
 				...item
 			})
 		}
-		await entityApis.bom.update(bom.value)
+			await entityApis.bom.update(bom.value)
+		}
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
+	ElMessage.success('操作成功')
 }
 
 const handleDeleteItem = async (item: ZdItem) => {
-	if (bom.value && item.itemId) {
-		bom.value.items = bom.value.items.filter(curr => curr.itemId !== item.itemId)
-		await entityApis.bom.update(bom.value)
+	try {
+		if (bom.value && item.itemId) {
+			bom.value.items = bom.value.items.filter(curr => curr.itemId !== item.itemId)
+			await entityApis.bom.update(bom.value)
+		}
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
+	ElMessage.success('操作成功')
 }
 const handleUpdateBom = async () => {
 	await entityApis.bom.update(bom.value)

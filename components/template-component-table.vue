@@ -59,9 +59,10 @@ const onNewComponent = () => {
 	dialogVisible.value = true
 }
 const onSubmit = async (component: Partial<ZdComponent>) => {
-	if (componentId.value === null) {
-		const res = await entityApis.component.create(component)
-		const tcomponent = await entityApis.template_component.create({
+	try {
+		if (componentId.value === null) {
+			const res = await entityApis.component.create(component)
+			const tcomponent = await entityApis.template_component.create({
 			psystemId: 1,
 			templateId: props.templateId,
 			componentId: res.id
@@ -69,18 +70,27 @@ const onSubmit = async (component: Partial<ZdComponent>) => {
 		tcomponents.value.push(tcomponent)
 	} else {
 		await entityApis.component.update(component)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditComponent = (component: ZdComponent) => {
 	componentId.value = component.id
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (component: ZdComponent) => {
-	const tcomponent = tcomponents.value.find((item: ZdTComponent) => item.componentId === component.id)
-	if (tcomponent) {
-		await entityApis.template_component.delete(tcomponent.id)
+	try {
+		const tcomponent = tcomponents.value.find((item: ZdTComponent) => item.componentId === component.id)
+		if (tcomponent) {
+			await entityApis.template_component.delete(tcomponent.id)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 </script>

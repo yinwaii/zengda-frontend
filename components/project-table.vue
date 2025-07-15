@@ -47,20 +47,30 @@ const onNewProject = () => {
 	projectDialogVisible.value = true
 }
 const onSubmit = async (project: Partial<ZdProject>) => {
-	if (projectId.value === null) {
-		await entityApis.project.create(project)
-	} else {
-		await entityApis.project.update(project)
+	try {
+		if (projectId.value === null) {
+			await entityApis.project.create(project)
+		} else {
+			await entityApis.project.update(project)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditProject = (project: ZdProject) => {
 	projectId.value = project.id
 	projectDialogVisible.value = true
 }
 const onDeleteProject = async (project: ZdProject) => {
-	await entityApis.project.delete(project.id)
-	await handleRefresh()
+	try {
+		await entityApis.project.delete(project.id)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 const handleRefresh = async () => {
 	projects.value = (await entityApis.project.getByPage(0, 100)).content

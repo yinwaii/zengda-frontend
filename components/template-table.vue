@@ -46,20 +46,30 @@ const onNewTemplate = () => {
 	templateDialogVisible.value = true
 }
 const onSubmit = async (template: Partial<ZdTemplate>) => {
-	if (templateId.value === null) {
-		await entityApis.template.create(template)
-	} else {
-		await entityApis.template.update(template)
+	try {
+		if (templateId.value === null) {
+			await entityApis.template.create(template)
+		} else {
+			await entityApis.template.update(template)
+		}
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
 	}
-	await handleRefresh()
+	ElMessage.success('操作成功')
 }
 const onEditTemplate = (template: ZdTemplate) => {
 	templateId.value = template.id
 	templateDialogVisible.value = true
 }
 const onDeleteTemplate = async (template: ZdTemplate) => {
-	await entityApis.template.delete(template.id)
-	await handleRefresh()
+	try {
+		await entityApis.template.delete(template.id)
+		await handleRefresh()
+	} catch (error) {
+		ElMessage.error('操作失败')
+	}
+	ElMessage.success('操作成功')
 }
 const handleRefresh = async () => {
 	templates.value = (await entityApis.template.getByPage(0, 100)).content
