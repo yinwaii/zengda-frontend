@@ -29,11 +29,17 @@ onMounted(async () => {
 })
 
 const onRefresh = async () => {
+	console.log(specDocument.value,docxContainer.value)
   if (specDocument.value && docxContainer.value) {
     // 渲染 Word 文档
     await renderAsync(specDocument.value, docxContainer.value)
   }
 }
+watch(dialogTableVisible, async () => {
+  if (dialogTableVisible.value) {
+    await onRefresh()
+  }
+})
 </script>
 <style scoped>
 .docx-scroll-container {

@@ -1,7 +1,9 @@
 <template>
 	<div class="w-full">
+		<component-table-dialog v-model="componentTableDialogVisible" @submit="onSelectComponents" />
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="onNewComponent">新建组件</el-button>
+			<el-button type="primary" @click="onAddComponent">添加组件</el-button>
 		</div>
 		<el-table :data="components.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
 			@row-click="onClick">
@@ -37,6 +39,7 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const dialogVisible = ref(false)
 const componentId = ref<number | null>(null)
+const componentTableDialogVisible = ref(false)
 onMounted(async () => {
 	await handleRefresh()
 })
@@ -92,5 +95,18 @@ const onDeleteComponent = async (component: ZdComponent) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+}
+const onSelectComponents = async (components: ZdComponent[]) => {
+	componentTableDialogVisible.value = false
+	const newComponents = components.map((component: ZdComponent) => component.id).filter((id: number) => !tcomponents.value.some((item: ZdTComponent) => item.componentId === id))
+	await Promise.all(newComponents.map(async (id: number) => (await entityApis.template_component.create({
+		psystemId: 1,
+		templateId: props.templateId,
+		componentId: id
+	}))))
+	await handleRefresh()
+}
+const onAddComponent = () => {
+	componentTableDialogVisible.value = true
 }
 </script>

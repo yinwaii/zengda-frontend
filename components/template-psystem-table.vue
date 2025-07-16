@@ -1,12 +1,14 @@
 <template>
 	<div class="w-full">
+		<psystem-table-dialog v-model="psystemDialogVisible" @submit="onSelectPSystems" />
 		<div class="flex items-center gap-2">
-			<el-button type="primary" @click="onNewPSystem">新建组件</el-button>
+			<el-button type="primary" @click="onNewPSystem">新建模块</el-button>
+			<el-button type="primary" @click="onAddPSystem">添加模块</el-button>
 		</div>
 		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe @row-click="onClick">
 			<el-table-column prop="id" label="ID" width="60" />
-			<el-table-column prop="name" label="功能名称" />
-			<el-table-column prop="description" label="功能描述" />
+			<el-table-column prop="name" label="模块名称" />
+			<el-table-column prop="description" label="模块描述" />
 			<el-table-column prop="updatedTime" label="更新时间" />
 			<el-table-column prop="updatedBy" label="更新人" />
 			<el-table-column label="操作">
@@ -33,6 +35,7 @@ const psystems = ref<ZdPSystem[]>([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const dialogVisible = ref(false)
+const psystemDialogVisible = ref(false)
 const psystemId = ref<number | null>(null)
 onMounted(async () => {
 	await handleRefresh()
@@ -47,6 +50,11 @@ const onClick = (row: any, column: any, event: Event) => {
 		return
 	}
 	navigateTo(`/new/psystem/${row.id}`, { replace: true })
+}
+const onSelectPSystems = async(psystems: ZdPSystem[]) => {
+	psystemDialogVisible.value = false
+	await Promise.all(psystems.map(async (psystem: ZdPSystem) => (await entityApis.template_psystem.create(props.templateId, psystem.id))))
+	await handleRefresh()
 }
 const onNewPSystem = () => {
 	psystemId.value = null
@@ -78,5 +86,8 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+}
+const onAddPSystem = () => {
+	psystemDialogVisible.value = true
 }
 </script>

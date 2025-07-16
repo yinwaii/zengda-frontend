@@ -25,7 +25,7 @@
 				<parameter-table v-if="zdtemplate?.id" :obj-type="'template'" :obj-id="zdtemplate.id" />
 			</el-tab-pane>
 			<el-tab-pane label="规格书配置">
-
+				<specification-from-template v-if="zdtemplate?.id" :template-id="zdtemplate.id" />
 			</el-tab-pane>
 			<!-- <el-tab-pane label="报价预览">
 
