@@ -13,7 +13,11 @@
 				</div>
 			</div>
 		</div>
-		<configuration-select v-if="zdproject?.id" v-model="configId" :project-id="zdproject.id" :template-id="zdproject.templateId" />
+		<div class="flex justify p-2">
+			<el-text>选择报价单：</el-text>
+			<configuration-select v-if="zdproject?.id" v-model="configId" :project-id="zdproject.id"
+				:template-id="zdproject.templateId" />
+		</div>
 		<el-tabs type="border-card">
 			<el-tab-pane label="报价填写">
 			</el-tab-pane>
@@ -21,7 +25,7 @@
 				<specification-render v-if="configId" :specification-id="configId" :config-id="configId" />
 			</el-tab-pane>
 			<el-tab-pane label="报价预览">
-
+				<configuration-price v-if="configId" :config-id="configId" />
 			</el-tab-pane>
 		</el-tabs>
 	</div>

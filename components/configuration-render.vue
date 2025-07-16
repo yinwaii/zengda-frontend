@@ -1,6 +1,9 @@
 <template>
 	<div class="w-full">
-		<el-button type="primary" @click="onDownload">下载规格书</el-button>
+		<div class="flex p-3">
+			<el-button type="primary" @click="onDownload">下载规格书</el-button>
+			<el-button type="primary" @click="onRefresh">加载规格书</el-button>
+		</div>
 		<div ref="docxContainer" class="docx-scroll-container"></div>
 	</div>
 </template>
@@ -50,7 +53,17 @@ const cleanSpecConfig = (obj: any): any => {
 	}
 	return obj
 }
-const onDownload = () => {
+const onRefresh = async () => {
+	const cleanedSpecConfig = cleanSpecConfig(specification.value)
+	renderUrl.value = await entityApis.specification.render(props.configId, cleanedSpecConfig)
+	if (renderUrl.value && docxContainer.value) {
+		renderedFile.value = await entityApis.system.download(renderUrl.value)
+		console.log(renderedFile.value)
+		await renderAsync(renderedFile.value, docxContainer.value)
+	}
+}
+const onDownload = async () => {
+	await onRefresh()
 	if (renderedFile.value) {
 		// 创建下载链接
 		const url = window.URL.createObjectURL(renderedFile.value)
@@ -63,13 +76,9 @@ const onDownload = () => {
 		window.URL.revokeObjectURL(url)
 	}
 }
+
 watch(() => props.configId, async () => {
-	specification.value = await entityApis.specification.getAll(props.specificationId)
-	renderUrl.value = await entityApis.specification.render(props.configId, specification.value)
-	if (renderUrl.value && docxContainer.value) {
-		renderedFile.value = await entityApis.system.download(renderUrl.value)
-		await renderAsync(renderedFile.value, docxContainer.value)
-	}
+	await onRefresh()
 })
 onMounted(async () => {
 	specification.value = await entityApis.specification.getAll(props.specificationId)
