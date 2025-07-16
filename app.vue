@@ -19,28 +19,18 @@
         </template>
       </Suspense>
     </NuxtLayout>
-    <Toaster />
-    <GlobalAlert
-      v-model="showAlert"
-      :title="alertTitle"
-      :message="alertMessage"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { Toaster } from '~/components/ui/toast'
-import GlobalAlert from '@/components/ui/alert-dialog/global-alert.vue'
-import { useGlobalAlert } from '@/composables/use-global-alert'
 
 // const layout = 'shadcn'
 
 // 路由加载状态
 const isRouteLoading = ref(false)
 const router = useRouter()
-const { showAlert, alertTitle, alertMessage } = useGlobalAlert()
 
 // 注册路由事件
 onMounted(() => {

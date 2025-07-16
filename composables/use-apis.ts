@@ -1,5 +1,4 @@
 import type { SearchParameters } from 'ofetch';
-import { useGlobalAlert } from './use-global-alert'
 
 export interface ResOptions<T> {
 	data: T;
@@ -85,7 +84,7 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 
 		if (response.code !== 200) {
 			const errorMessage = response.err?.join(', ') ?? response.message ?? '请求失败'
-			useGlobalAlert().show(errorMessage)
+			ElMessage.error(errorMessage)
 			if (errorMessage === 'token已过期') {
 				navigateTo('/personal/login')
 			}
@@ -94,7 +93,7 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 
 		if (response.success === false) {
 			const errorMessage = response.message ?? '操作失败'
-			useGlobalAlert().show(errorMessage)
+			ElMessage.error(errorMessage)
 			throw new Error(errorMessage)
 		}
 
@@ -106,7 +105,7 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 		// 区分超时错误和其他错误
 		if (error.name === 'AbortError') {
 			const errorMessage = `请求超时: ${url}`
-			useGlobalAlert().show(errorMessage)
+			ElMessage.error(errorMessage)
 			console.error('请求超时:', url)
 			throw new Error(`请求超时: ${url}`)
 		}

@@ -49,10 +49,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useSessionStorage } from '@vueuse/core';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '~/stores/user';
-import { useToast } from '~/components/ui/toast/use-toast';
 
 interface RuleForm {
 	username: string;
@@ -61,7 +59,6 @@ interface RuleForm {
 
 const router = useRouter();
 const userStore = useUserStore();
-const { toast } = useToast();
 const remember = ref(false)
 const form = reactive<RuleForm>({
 	username: userStore.getPreviousUsername() || '',
@@ -103,18 +100,18 @@ const submitForm = async () => {
 		catch (error: any) {
 			console.error('登录失败:', error);
 			// 使用 Toast 显示错误信息
-			toast({
-				variant: "destructive",
+			ElNotification({
+				type: "error",
 				title: "登录失败",
-				description: error.message || '请检查用户名和密码是否正确',
+				message: error.message || '请检查用户名和密码是否正确',
 			});
 		}
 	} else {
 		// 表单验证失败时也显示 Toast
-		toast({
-			variant: "destructive",
+		ElNotification({
+			type: "error",
 			title: "表单验证失败",
-			description: "请检查输入信息是否正确",
+			message: "请检查输入信息是否正确",
 		});
 	}
 };
