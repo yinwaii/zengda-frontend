@@ -3,6 +3,14 @@
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="onNewPSystem">新建功能</el-button>
 		</div>
+		<div class="flex items-center gap-2 p-2">
+			<el-text>搜索：</el-text>
+			<el-input v-model="search" placeholder="搜索" @change="handleRefresh" style="width: 200px" />
+			<el-button type="primary" @click="handleRefresh">搜索</el-button>
+			<el-text>更新人：</el-text>
+			<el-input v-model="updatedBy" placeholder="更新人" @change="handleRefresh" style="width: 200px" />
+			<el-button type="primary" @click="handleRefresh">筛选</el-button>
+		</div>
 		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
 			@row-click="onClick">
 			<el-table-column prop="id" label="ID" width="60" />
@@ -32,6 +40,8 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const psystemDialogVisible = ref(false)
 const psystemId = ref<number | null>(null)
+const search = ref('')
+const updatedBy = ref('')
 onMounted(async () => {
 	await handleRefresh()
 })
@@ -73,5 +83,11 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 }
 const handleRefresh = async () => {
 	psystems.value = (await entityApis.psystem.getAll())
+	if (search.value) {
+		psystems.value = psystems.value.filter(psystem => psystem.name.includes(search.value) || psystem.description?.includes(search.value))
+	}
+	if (updatedBy.value) {
+		psystems.value = psystems.value.filter(psystem => psystem.updatedBy?.includes(updatedBy.value))
+	}
 }
 </script>

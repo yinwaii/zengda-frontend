@@ -3,6 +3,14 @@
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="onNewProject">新建项目</el-button>
 		</div>
+		<div class="flex items-center gap-2 p-2">
+			<el-text>搜索：</el-text>
+			<el-input v-model="search" placeholder="搜索" @change="handleRefresh" style="width: 200px" />
+			<el-button type="primary" @click="handleRefresh">搜索</el-button>
+			<el-text>更新人：</el-text>
+			<el-input v-model="updatedBy" placeholder="更新人" @change="handleRefresh" style="width: 200px" />
+			<el-button type="primary" @click="handleRefresh">筛选</el-button>
+		</div>
 		<el-table :data="projects.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
 			@row-click="onClick">
 			<el-table-column prop="id" label="ID" width="60" />
@@ -33,6 +41,8 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const projectDialogVisible = ref(false)
 const projectId = ref<number | null>(null)
+const search = ref('')
+const updatedBy = ref('')
 onMounted(async () => {
 	projects.value = (await entityApis.project.getByPage(0, 100)).content
 })
@@ -74,5 +84,11 @@ const onDeleteProject = async (project: ZdProject) => {
 }
 const handleRefresh = async () => {
 	projects.value = (await entityApis.project.getByPage(0, 100)).content
+	if (search.value) {
+		projects.value = projects.value.filter(project => project.name.includes(search.value) || project.description?.includes(search.value))
+	}
+	if (updatedBy.value) {
+		projects.value = projects.value.filter(project => project.updatedBy?.includes(updatedBy.value))
+	}
 }
 </script>
