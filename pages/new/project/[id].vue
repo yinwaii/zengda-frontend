@@ -5,21 +5,20 @@
 			<div class="flex items-start justify-between">
 				<div class="flex-1">
 					<h1 class="text-3xl font-bold text-gray-900 mb-3 leading-tight">
-						{{ zdtemplate?.name || '项目详情' }}
+						{{ zdproject?.name || '项目详情' }}
 					</h1>
 					<p class="text-base text-gray-600 leading-relaxed max-w-3xl">
-						{{ zdtemplate?.description || '暂无描述' }}
+						{{ zdproject?.description || '暂无描述' }}
 					</p>
 				</div>
 			</div>
 		</div>
-
+		<configuration-select v-if="zdproject?.id" v-model="configId" :project-id="zdproject.id" :template-id="zdproject.templateId" />
 		<el-tabs type="border-card">
-			<el-tab-pane label="参数配置">
-				<parameter-table v-if="zdtemplate?.id" :obj-type="'template'" :obj-id="zdtemplate.id" />
+			<el-tab-pane label="报价填写">
 			</el-tab-pane>
 			<el-tab-pane label="规格书生成">
-
+				<specification-render v-if="configId" :specification-id="configId" :config-id="configId" />
 			</el-tab-pane>
 			<el-tab-pane label="报价预览">
 
@@ -29,12 +28,12 @@
 </template>
 
 <script setup lang="ts">
-
 const { id } = useRoute().params
-const zdtemplate = ref<ZdTemplate>()
+const zdproject = ref<ZdProject>()
 const entityApis = useEntityApis()
+const configId = ref<number>()
 onMounted(async () => {
-	zdtemplate.value = await entityApis.template.get(id)
+	zdproject.value = await entityApis.project.get(id)
 })
 
 </script>

@@ -35,7 +35,7 @@ const onRefresh = async () => {
     await renderAsync(specDocument.value, docxContainer.value)
   }
 }
-watch(dialogTableVisible, async () => {
+watch(() =>dialogTableVisible, async () => {
   if (dialogTableVisible.value) {
     await onRefresh()
   }
