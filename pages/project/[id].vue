@@ -14,12 +14,16 @@
 			</div>
 		</div>
 		<div class="flex justify p-2">
-			<el-text>选择报价单：</el-text>
-			<configuration-select v-if="zdproject?.id" v-model="configId" :project-id="zdproject.id"
-				:template-id="zdproject.templateId" />
+			<el-space wrap>
+				<el-text>选择报价单：</el-text>
+				<configuration-select v-if="zdproject?.id" v-model="configId" :project-id="zdproject.id"
+					:template-id="zdproject.templateId" />
+				<el-button type="primary" @click="onNewConfiguration">新建报价单</el-button>
+			</el-space>
 		</div>
 		<el-tabs type="border-card">
 			<el-tab-pane label="报价填写">
+				<configuration-argument v-if="configId && zdproject?.templateId" :config-id="configId" :template-id="zdproject.templateId" />
 			</el-tab-pane>
 			<el-tab-pane label="规格书生成">
 				<specification-render v-if="configId" :specification-id="configId" :config-id="configId" />
@@ -39,5 +43,9 @@ const configId = ref<number>()
 onMounted(async () => {
 	zdproject.value = await entityApis.project.get(id)
 })
+
+const onNewConfiguration = () => {
+	
+}
 
 </script>

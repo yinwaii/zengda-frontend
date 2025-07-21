@@ -49,7 +49,7 @@ const onClick = (row: any, column: any, event: Event) => {
 	if ((event.target as HTMLElement).closest('button')) {
 		return
 	}
-	navigateTo(`/new/component/${row.id}`, { replace: true })
+	navigateTo(`/component/${row.id}`, { replace: true })
 }
 const onNewComponent = () => {
 	componentId.value = null

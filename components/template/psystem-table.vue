@@ -49,7 +49,7 @@ const onClick = (row: any, column: any, event: Event) => {
 	if ((event.target as HTMLElement).closest('button')) {
 		return
 	}
-	navigateTo(`/new/psystem/${row.id}`, { replace: true })
+	navigateTo(`/psystem/${row.id}`, { replace: true })
 }
 const onSelectPSystems = async(psystems: ZdPSystem[]) => {
 	psystemDialogVisible.value = false
