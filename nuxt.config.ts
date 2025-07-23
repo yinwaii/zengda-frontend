@@ -28,7 +28,7 @@ export default defineNuxtConfig({
   },
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  modules: ['@element-plus/nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@vueuse/nuxt', '@nuxtjs/tailwindcss', 'shadcn-nuxt', 'lucide-nuxt', '@nuxtjs/color-mode'],
+  modules: ['@element-plus/nuxt', '@pinia/nuxt', 'pinia-plugin-persistedstate/nuxt', '@nuxtjs/tailwindcss', '@nuxtjs/color-mode'],
   typescript: {
     strict: true,
     typeCheck: true,
@@ -46,14 +46,7 @@ export default defineNuxtConfig({
     payloadExtraction: false
   },
   imports: {
-    dirs: ['models/**']
-  },
-  shadcn: {
-    prefix: 'shadcn',
-    componentDir: './components/ui',
-  },
-  lucide: {
-    prefix: "lucide",
+    dirs: ['models/*']
   },
   pinia: {
     storesDirs: ['./stores']

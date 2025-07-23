@@ -2,7 +2,7 @@ export default defineNuxtRouteMiddleware((to) => {
   const userStore = useUserStore()
 
   // 不需要登录的路由
-  const publicRoutes = ['/personal/login', '/personal/register', '/welcome']
+  const publicRoutes = ['/login', '/register', '/welcome']
 
   // 如果访问的是公开路由，直接放行
   if (publicRoutes.includes(to.path)) {
@@ -13,6 +13,6 @@ export default defineNuxtRouteMiddleware((to) => {
   if (!userStore.checkAuth()) {
     // 未登录则重定向到登录页
     // console.log('未登录')
-    return navigateTo('/personal/login')
+    return navigateTo('/login')
   }
 })

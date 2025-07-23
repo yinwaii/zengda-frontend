@@ -86,7 +86,7 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 			const errorMessage = response.err?.join(', ') ?? response.message ?? '请求失败'
 			ElMessage.error(errorMessage)
 			if (errorMessage === 'token已过期') {
-				navigateTo('/personal/login')
+				navigateTo('/login')
 			}
 			throw new Error(errorMessage);
 		}

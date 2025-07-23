@@ -121,6 +121,6 @@ const forgetPassword = () => {
 };
 
 const register = () => {
-	router.push('/personal/register');
+	router.push('/register');
 };
 </script>
