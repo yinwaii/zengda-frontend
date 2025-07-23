@@ -1,5 +1,5 @@
 <template>
-	<el-dialog v-model="dialogTableVisible" title="规格书预览" width="800" :close-on-click-modal="true">
+	<el-dialog v-loading="loading" v-model="dialogTableVisible" title="规格书预览" width="800" :close-on-click-modal="true">
 		<div ref="docxContainer" class="docx-scroll-container"></div>
 	</el-dialog>
 </template>
@@ -17,13 +17,14 @@ const specification = ref<ZdSpecification>()
 const entityApis = useEntityApis()
 const specDocument = ref<Blob>()
 const docxContainer = ref<HTMLElement | null>(null)
-
+const loading = ref<boolean>(false)
 onMounted(async () => {
   console.log('onMounted')
   await onRefresh()
 })
 
 const onRefresh = async () => {
+	loading.value = true
   if (!specDocument.value) {
     specification.value = await entityApis.specification.getAll(props.specificationId)
     if (specification.value) {
@@ -37,6 +38,7 @@ const onRefresh = async () => {
     // 渲染 Word 文档
     await renderAsync(specDocument.value, docxContainer.value)
   }
+	loading.value = false
 }
 watch(() => dialogTableVisible.value, async () => {
   await onRefresh()

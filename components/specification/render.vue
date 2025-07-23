@@ -1,5 +1,5 @@
 <template>
-	<div class="w-full">
+	<div class="w-full" v-loading="loading">
 		<el-button type="primary" @click="onDownload">下载规格书</el-button>
 		<el-empty v-if="errorMsg" :description="errorMsg" />
 		<div ref="docxContainer" class="docx-scroll-container"></div>
@@ -18,6 +18,7 @@ const renderedFile = ref<Blob>()
 const docxContainer = ref<HTMLElement | null>(null)
 const template = ref<ZdTemplate>()
 const errorMsg = ref<string>()
+const loading = ref<boolean>(false)
 // 清理specConfig中的null值
 const cleanSpecConfig = (obj: any): any => {
 	if (obj === null || obj === undefined) {
@@ -67,6 +68,7 @@ const onDownload = () => {
 	}
 }
 const onRefresh = async () => {
+	loading.value = true
 	try {
 		template.value = await entityApis.template.get(props.templateId)
 		specification.value = await entityApis.specification.getAll(template.value?.specId)
@@ -79,6 +81,8 @@ const onRefresh = async () => {
 	}
 	catch (error) {
 		errorMsg.value = error as string
+	} finally {
+		loading.value = false
 	}
 }
 watch(() => props.configId, async () => {
