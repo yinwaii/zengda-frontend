@@ -49,6 +49,9 @@ onMounted(async () => {
 
 
 const onClick = (row: any, column: any, event: Event) => {
+	if ((event.target as HTMLElement).closest('button')) {
+		return
+	}
 	console.log('Clicking row:', row.id)
 	navigateTo(`/project/${row.id}`, { replace: true })
 }

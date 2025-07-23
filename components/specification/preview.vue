@@ -19,26 +19,30 @@ const specDocument = ref<Blob>()
 const docxContainer = ref<HTMLElement | null>(null)
 
 onMounted(async () => {
-  specification.value = await entityApis.specification.getAll(props.specificationId)
-  if (specification.value) {
-    let url = specification.value.url
-    if (url[0] === '/') url = url.slice(1)
-    specDocument.value = await entityApis.system.download(url)
-  }
+  console.log('onMounted')
   await onRefresh()
 })
 
 const onRefresh = async () => {
+  if (!specDocument.value) {
+    specification.value = await entityApis.specification.getAll(props.specificationId)
+    if (specification.value) {
+      let url = specification.value.url
+      if (url[0] === '/') url = url.slice(1)
+      specDocument.value = await entityApis.system.download(url)
+    }
+  }
 	console.log(specDocument.value,docxContainer.value)
   if (specDocument.value && docxContainer.value) {
     // 渲染 Word 文档
     await renderAsync(specDocument.value, docxContainer.value)
   }
 }
-watch(() =>dialogTableVisible, async () => {
-  if (dialogTableVisible.value) {
-    await onRefresh()
-  }
+watch(() => dialogTableVisible.value, async () => {
+  await onRefresh()
+})
+watch(() => docxContainer.value, async () => {
+  await onRefresh()
 })
 </script>
 <style scoped>

@@ -13,8 +13,13 @@ const props = defineProps<{
 }>()
 const entityApis = useEntityApis()
 const priceData = ref<ZdPrice>()
-watch(() => props.configId, async () => {
+const onRefresh = async () => {
 	priceData.value = await entityApis.price.get(props.configId)
+}
+watch(() => props.configId, async () => {
+	await onRefresh()
 })
-
+onMounted(async () => {
+	await onRefresh()
+})
 </script>

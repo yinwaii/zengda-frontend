@@ -7,6 +7,9 @@
 			<el-form-item label="项目描述">
 				<el-input v-model="project.description" />
 			</el-form-item>
+			<el-form-item label="模板">
+				<template-selector v-model="project.templateId" />
+			</el-form-item>
 			<el-button type="primary" @click="onSubmit">确定</el-button>
 			<el-button @click="dialogVisible = false">取消</el-button>
 		</el-form>

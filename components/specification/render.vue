@@ -1,13 +1,14 @@
 <template>
 	<div class="w-full">
 		<el-button type="primary" @click="onDownload">下载规格书</el-button>
+		<el-empty v-if="errorMsg" :description="errorMsg" />
 		<div ref="docxContainer" class="docx-scroll-container"></div>
 	</div>
 </template>
 <script setup lang="ts">
 import { renderAsync } from 'docx-preview'
 const props = defineProps<{
-	specificationId: number
+	templateId: number
 	configId: number
 }>()
 const entityApis = useEntityApis()
@@ -15,6 +16,8 @@ const specification = ref<ZdSpecification>()
 const renderUrl = ref<string>()
 const renderedFile = ref<Blob>()
 const docxContainer = ref<HTMLElement | null>(null)
+const template = ref<ZdTemplate>()
+const errorMsg = ref<string>()
 // 清理specConfig中的null值
 const cleanSpecConfig = (obj: any): any => {
 	if (obj === null || obj === undefined) {
@@ -63,16 +66,26 @@ const onDownload = () => {
 		window.URL.revokeObjectURL(url)
 	}
 }
-watch(() => props.configId, async () => {
-	specification.value = await entityApis.specification.getAll(props.specificationId)
-	renderUrl.value = await entityApis.specification.render(props.configId, specification.value)
-	if (renderUrl.value && docxContainer.value) {
-		renderedFile.value = await entityApis.system.download(renderUrl.value)
-		await renderAsync(renderedFile.value, docxContainer.value)
+const onRefresh = async () => {
+	try {
+		template.value = await entityApis.template.get(props.templateId)
+		specification.value = await entityApis.specification.getAll(template.value?.specId)
+		renderUrl.value = await entityApis.specification.render(props.configId, specification.value)
+		if (renderUrl.value && docxContainer.value) {
+			renderedFile.value = await entityApis.system.download(renderUrl.value)
+			await renderAsync(renderedFile.value, docxContainer.value)
+		}
+		errorMsg.value = undefined
 	}
+	catch (error) {
+		errorMsg.value = error as string
+	}
+}
+watch(() => props.configId, async () => {
+	await onRefresh()
 })
 onMounted(async () => {
-	specification.value = await entityApis.specification.getAll(props.specificationId)
+	await onRefresh()
 })
 </script>
 <style scoped>

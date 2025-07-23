@@ -4,6 +4,7 @@
 			<el-button type="primary" @click="handleUploadSpec">插入规格书</el-button>
 			<el-button type="primary" @click="handlePreviewSpec">预览规格书</el-button>
 		</div>
+		<el-empty v-if="!specId" description="请先上传规格书" />
 		<specification-preview v-if="specId" v-model="dialogVisible" :specification-id="specId" />
 		<specification-table v-if="specId" :specification-id="specId" />
 	</div>
