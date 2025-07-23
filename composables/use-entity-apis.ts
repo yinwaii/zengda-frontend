@@ -227,8 +227,12 @@ export const useEntityApis = (): any => {
 
     paramMapping: {
       getAll: (specId: number) => api.get<Array<ZdSpecTagMap>>(`/specification/paramMapping/${specId}`),
-      update: (specMap: ZdSpecTagMap) => api.put<ZdSpecTagMap>(`/specification/paramMapping/${specMap.specId}`, specMap),
+      update: (specId: number, specMap: ZdSpecTagMap) => api.put<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, specMap),
       delete: (specId: number, specParamName: string) => api.delete<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, specParamName)
+    },
+
+    searchParam: {
+      search: (searchStr: string) => api.get<ZdSearchParam[]>(`/parameter/search`, { searchValue: searchStr })
     },
 
     system: {
