@@ -31,6 +31,6 @@
 ### 部署环境
 - 连接服务器：ssh ubuntu@111.229.109.11
 - 在服务器上打开文件夹：cd ~/zengda-frontend/
-- 更新前端镜像最新版本：docker pull yinwai/zengda-frontend
 - 停止之前的服务：docker compose down
+- 更新前端镜像最新版本：docker compose pull
 - 启动：docker compose up -d
