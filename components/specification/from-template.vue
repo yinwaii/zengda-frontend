@@ -4,6 +4,7 @@
 			<el-button type="primary" @click="handleUploadSpec">插入规格书</el-button>
 			<el-button type="primary" @click="handlePreviewSpec">预览规格书</el-button>
 			<el-button type="primary" @click="onDownload">下载规格书</el-button>
+			<el-button type="primary" @click="onAutoMatch">自动配对参数</el-button>
 		</div>
 		<el-empty v-if="!specId" description="请先上传规格书" />
 		<specification-preview v-if="specId" v-model="dialogVisible" :specification-id="specId" />
@@ -46,6 +47,7 @@ const handleUploadSpec = async () => {
 							formData.append('file', blob, file.name)
 
 							await entityApis.specification.modify_template(props.templateId, formData)
+							await onAutoMatch()
 						}
 					} catch (error: any) {
 						ElMessage.error('上传规格书失败:' + error.message)
@@ -90,6 +92,23 @@ const onDownload = async () => {
 			window.URL.revokeObjectURL(url)
 		}
 	}
+}
+
+const onAutoMatch = async () => {
+	const template = await entityApis.template.get(props.templateId)
+	const mapping = await entityApis.paramMapping.getAll(template.specId)
+	const parameters = await entityApis.parameter.get(template.specId, 'template')
+	for (const mappingItem of mapping) {
+		const parameter = parameters.find((p: ZdParameter) => p.name === mappingItem.specParamName)
+		if (parameter) {
+			await entityApis.paramMapping.update(template.specId, {
+				specParamName: parameter.name,
+				parameterId: parameter.id,
+				specId: template.specId,
+			})
+		}
+	}
+	ElMessage.success('自动配对参数成功')
 }
 
 </script>

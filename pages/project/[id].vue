@@ -22,12 +22,12 @@
 			</el-space>
 			<configuration-dialog v-model="dialogVisible" @submit="onSubmitConfiguration" />
 		</div> -->
-		<el-tabs type="border-card">
+		<el-tabs v-model="activeTab" type="border-card">
 			<el-tab-pane label="报价填写">
 				<configuration-argument v-if="configId && zdproject?.templateId" :config-id="configId" :template-id="zdproject.templateId" />
 			</el-tab-pane>
 			<el-tab-pane label="规格书生成">
-				<specification-render v-if="configId && zdproject?.templateId" :template-id="zdproject.templateId" :config-id="configId" />
+				<specification-render v-if="configId && zdproject?.templateId" :template-id="zdproject.templateId" :config-id="configId" :active-tab="activeTab" 	/>
 			</el-tab-pane>
 			<el-tab-pane label="报价预览">
 				<configuration-price v-if="configId" :config-id="configId" />
@@ -42,6 +42,7 @@ const zdproject = ref<ZdProject>()
 const entityApis = useEntityApis()
 const configId = ref<number>()
 const dialogVisible = ref(false)
+const activeTab = ref('报价填写')
 const onRefresh = async () => {
 	zdproject.value = await entityApis.project.get(id)
 	const configs = (await entityApis.configuration.getByTemplateId(zdproject.value?.templateId, zdproject.value?.id)).list
@@ -52,7 +53,6 @@ const onRefresh = async () => {
 		const config = await entityApis.configuration.createDefault(zdproject.value?.id)
 		configId.value = config
 	}
-	console.log(configId.value, zdproject.value?.templateId)
 }
 onMounted(async () => {
 	await onRefresh()

@@ -10,6 +10,7 @@ import { renderAsync } from 'docx-preview'
 const props = defineProps<{
 	templateId: number
 	configId: number
+	activeTab: string
 }>()
 const entityApis = useEntityApis()
 const specification = ref<ZdSpecification>()
@@ -89,6 +90,9 @@ watch(() => props.configId, async () => {
 	await onRefresh()
 })
 onMounted(async () => {
+	await onRefresh()
+})
+watch(() => props.activeTab, async () => {
 	await onRefresh()
 })
 </script>

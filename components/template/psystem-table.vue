@@ -11,8 +11,9 @@
 			<el-table-column prop="description" label="模块描述" />
 			<el-table-column prop="updatedTime" label="更新时间" />
 			<el-table-column prop="updatedBy" label="更新人" />
-			<el-table-column label="操作">
+			<el-table-column label="操作" width="250">
 				<template #default="scope">
+					<el-button type="primary" @click="onPasteTag(scope.row)">tag</el-button>
 					<el-button type="primary" @click="onEditPSystem(scope.row)">编辑</el-button>
 					<el-button type="danger" @click="onDeletePSystem(scope.row)">删除</el-button>
 				</template>
@@ -89,5 +90,13 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 }
 const onAddPSystem = () => {
 	psystemDialogVisible.value = true
+}
+const onPasteTag = async (psystem: ZdPSystem) => {
+	const specification = await entityApis.specification.getAll(psystem.specId)
+	if (specification) {
+		console.log(specification.fileTag)
+		await copyToClipboard(`{{+${specification.fileTag}}}`)
+		ElMessage.success('复制成功')
+	}
 }
 </script>
