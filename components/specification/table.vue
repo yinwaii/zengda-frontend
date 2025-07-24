@@ -55,7 +55,7 @@ const onEditComponent = (row: ZdSpecTagMap) => {
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (row: ZdSpecTagMap) => {
-	await entityApis.paramMapping.delete(props.specificationId, row.specParamName)
+	await entityApis.paramMapping.delete(row.specId, row.specParamName)
 	paramMapping.value = await entityApis.paramMapping.getAll(props.specificationId)
 }
 

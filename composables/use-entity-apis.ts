@@ -218,17 +218,15 @@ export const useEntityApis = (): any => {
         query: { tag }
       }),
       modify_psystem: (psystemId: number, formData: FormData) => formApi.put<object>(`/pSystem/${psystemId}/spec`, formData),
-      modify_template: (templateId: number, file: File) => {
-        const formData = new FormData()
-        formData.append('file', file)
-        formApi.put<object>(`/template/${templateId}/spec`, formData)
-      }
+      modify_template: (templateId: number, formData: FormData) => formApi.put<object>(`/template/${templateId}/spec`, formData)
     },
 
     paramMapping: {
       getAll: (specId: number) => api.get<Array<ZdSpecTagMap>>(`/specification/paramMapping/${specId}`),
       update: (specId: number, specMap: ZdSpecTagMap) => api.put<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, specMap),
-      delete: (specId: number, specParamName: string) => api.delete<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, specParamName)
+      delete: (specId: number, specParamName: string) => api.delete<ZdSpecTagMap>(`/specification/paramMapping/${specId}`, {}, {
+        query: { specParamName }
+      })
     },
 
     searchParam: {

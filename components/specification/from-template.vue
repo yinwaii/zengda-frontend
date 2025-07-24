@@ -3,6 +3,7 @@
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="handleUploadSpec">插入规格书</el-button>
 			<el-button type="primary" @click="handlePreviewSpec">预览规格书</el-button>
+			<el-button type="primary" @click="onDownload">下载规格书</el-button>
 		</div>
 		<el-empty v-if="!specId" description="请先上传规格书" />
 		<specification-preview v-if="specId" v-model="dialogVisible" :specification-id="specId" />
@@ -69,4 +70,26 @@ const handleUploadSpec = async () => {
 const handlePreviewSpec = () => {
 	dialogVisible.value = true
 }
+
+const onDownload = async () => {
+	if (!specId.value) return
+	const specification = await entityApis.specification.getAll(specId.value)
+	if (specification) {
+		let url = specification.url
+		if (url[0] === '/') url = url.slice(1)
+		const specDocument = await entityApis.system.download(url)
+		if (specDocument) {
+			// 创建下载链接
+			const url = window.URL.createObjectURL(specDocument)
+			const link = document.createElement('a')
+			link.href = url
+			link.download = `规格书_${specification.name}.docx`
+			document.body.appendChild(link)
+			link.click()
+			document.body.removeChild(link)
+			window.URL.revokeObjectURL(url)
+		}
+	}
+}
+
 </script>

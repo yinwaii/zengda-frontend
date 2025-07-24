@@ -1,6 +1,6 @@
 <template>
 	<div class="w-full" v-loading="loading">
-		<el-button type="primary" @click="onDownload">下载规格书</el-button>
+		<el-button style="margin-bottom: 20px" type="primary" @click="onDownload">下载规格书</el-button>
 		<el-empty v-if="errorMsg" :description="errorMsg" />
 		<div ref="docxContainer" class="docx-scroll-container"></div>
 	</div>
@@ -102,6 +102,7 @@ onMounted(async () => {
 	background: #fff;
 	box-sizing: border-box;
 	padding: 16px;
+	padding-top: 0;
 	/* 防止内容横向溢出 */
 	overflow-x: hidden;
 }
