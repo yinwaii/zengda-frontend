@@ -4,9 +4,6 @@
 			<el-form-item label="参数名称">
 				<el-input v-model="parameter.name" />
 			</el-form-item>
-			<el-form-item label="参数类型">
-				<el-input v-model="parameter.dtype" />
-			</el-form-item>
 			<el-form-item label="参数值">
 				<el-input v-model="parameter.value" />
 			</el-form-item>
@@ -36,7 +33,7 @@ const emptyParameter = () => {
 		isReadonly: false,
 		objectId: 0,
 		objectType: '',
-		dtype: '',
+		dtype: 'string',
 		unit: '',
 		showType: '',
 	}
@@ -53,6 +50,12 @@ watch(props, async (newVal) => {
 	}
 })
 const onSubmit = async () => {
+	if (!isNaN(parseFloat(parameter.value.value)) && !isNaN(parameter.value.value)) {
+		parameter.value.dtype = 'number'
+	}
+	else {
+		parameter.value.dtype = 'string'
+	}
 	emit('submit', parameter.value)
 	dialogVisible.value = false
 }

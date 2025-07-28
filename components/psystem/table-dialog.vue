@@ -59,7 +59,7 @@ const onSubmit = () => {
 	emit('submit', selectedRows)
 }
 const handleRefresh = async () => {
-	psystems.value = (await entityApis.psystem.getAll()).list
+	psystems.value = (await entityApis.psystem.getAll())
 	if (search.value) {
 		psystems.value = psystems.value.filter(psystem => psystem.name.includes(search.value) || psystem.description?.includes(search.value))
 	}

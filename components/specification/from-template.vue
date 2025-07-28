@@ -8,7 +8,7 @@
 		</div>
 		<el-empty v-if="!specId" description="请先上传规格书" />
 		<specification-preview v-if="specId" v-model="dialogVisible" :specification-id="specId" />
-		<specification-table v-if="specId" :specification-id="specId" />
+		<specification-table v-if="specId" :specification-id="specId" :trigger="trigger" />
 	</div>
 </template>
 <script setup lang="ts">
@@ -18,6 +18,7 @@ const props = defineProps<{
 const dialogVisible = ref<boolean>(false)
 const specId = ref<number | null>(null)
 const entityApis = useEntityApis()
+const trigger = ref(0)
 onMounted(async () => {
 	const template = await entityApis.template.get(props.templateId)
 	specId.value = template.specId
@@ -48,6 +49,9 @@ const handleUploadSpec = async () => {
 
 							await entityApis.specification.modify_template(props.templateId, formData)
 							await onAutoMatch()
+							const template = await entityApis.template.get(props.templateId)
+							specId.value = template.specId
+							trigger.value++
 						}
 					} catch (error: any) {
 						ElMessage.error('上传规格书失败:' + error.message)
@@ -97,7 +101,7 @@ const onDownload = async () => {
 const onAutoMatch = async () => {
 	const template = await entityApis.template.get(props.templateId)
 	const mapping = await entityApis.paramMapping.getAll(template.specId)
-	const parameters = await entityApis.parameter.get(template.specId, 'template')
+	const parameters = await entityApis.parameter.get(template.id, 'template')
 	for (const mappingItem of mapping) {
 		const parameter = parameters.find((p: ZdParameter) => p.name === mappingItem.specParamName)
 		if (parameter) {
@@ -108,7 +112,15 @@ const onAutoMatch = async () => {
 			})
 		}
 	}
+	const new_parameters = parameters.map((p: ZdParameter) => {
+		if (!isNaN(parseFloat(p.value)) && !isNaN(p.value)) {
+			p.dtype = 'number'
+		}
+		return p;
+	});
+	await entityApis.parameter.updateBatch(new_parameters)
 	ElMessage.success('自动配对参数成功')
+	trigger.value++
 }
 
 </script>

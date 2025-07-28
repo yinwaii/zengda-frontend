@@ -8,7 +8,7 @@
 		</div>
 		<el-empty v-if="!specId" description="请先上传规格书" />
 		<specification-preview v-if="specId" v-model="dialogVisible" :specification-id="specId" />
-		<specification-table v-if="specId" :specification-id="specId" />
+		<specification-table v-if="specId" :specification-id="specId" :trigger="trigger" />
 	</div>
 </template>
 <script setup lang="ts">
@@ -18,6 +18,7 @@ const props = defineProps<{
 const dialogVisible = ref<boolean>(false)
 const specId = ref<number | null>(null)
 const entityApis = useEntityApis()
+const trigger = ref(0)
 onMounted(async () => {
 	const psystem = await entityApis.psystem.get(props.psystemId)
 	specId.value = psystem.specId
@@ -69,6 +70,9 @@ const handleUploadSpec = async () => {
 
 							await entityApis.specification.modify_psystem(props.psystemId, formData)
 							await onAutoMatch()
+							const psystem = await entityApis.psystem.get(props.psystemId)
+							specId.value = psystem.specId
+							trigger.value++
 						}
 					} catch (error: any) {
 						ElMessage.error('上传规格书失败:' + error.message)
@@ -97,9 +101,11 @@ const handlePreviewSpec = () => {
 const onAutoMatch = async () => {
 	const psystem = await entityApis.psystem.get(props.psystemId)
 	const mapping = await entityApis.paramMapping.getAll(psystem.specId)
-	const parameters = await entityApis.parameter.get(psystem.specId, 'psystem')
+	const parameters = await entityApis.parameter.get(psystem.id, 'psystem')
 	for (const mappingItem of mapping) {
+		console.log(mappingItem, parameters)
 		const parameter = parameters.find((p: ZdParameter) => p.name === mappingItem.specParamName)
+		console.log(parameter)
 		if (parameter) {
 			await entityApis.paramMapping.update(psystem.specId, {
 				specParamName: parameter.name,
@@ -108,6 +114,14 @@ const onAutoMatch = async () => {
 			})
 		}
 	}
+	const new_parameters = parameters.map((p: ZdParameter) => {
+		if (!isNaN(parseFloat(p.value)) && !isNaN(p.value)) {
+			p.dtype = 'number'
+		}
+		return p;
+	});
+	await entityApis.parameter.updateBatch(new_parameters)
 	ElMessage.success('自动配对参数成功')
+	trigger.value++
 }
 </script>

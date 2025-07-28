@@ -96,8 +96,22 @@ onMounted(async () => {
 	componentConfigs.value = await entityApis.component_configuration.get(props.configId)
 })
 const handleNodeClick = async (node: any) => {
-	console.log(node)
 	objectArgument.value = await entityApis.argument.get(props.configId, node.objectType, node.objectId)
+	const parameters: Array<ZdParameter> = await entityApis.parameter.get(node.objectId, node.objectType)
+	if (objectArgument.value) {
+		for (const parameter of parameters) {
+			if (!objectArgument.value.arguments.find((a: any) => a.name === parameter.name)) {
+				objectArgument.value.arguments.push({
+					id: parameter.id,
+					name: parameter.name,
+					type: parameter.dtype || 'string',
+					value: parameter.value
+				})
+			}
+		}
+	}
+	console.log(objectArgument.value)
+	await entityApis.argument.update(props.configId, objectArgument.value)
 	isComponent.value = node.objectType === 'component'
 	if (isComponent.value) {
 		const boms = await entityApis.bom.getByComponentId(node.objectId)
@@ -116,6 +130,7 @@ const handleSave = async () => {
 				}
 				return c
 			})
+			console.log(componentConfigs.value)
 			await entityApis.component_configuration.update(props.configId, componentArgument.value)
 		}
 		await entityApis.argument.update(props.configId, objectArgument.value)

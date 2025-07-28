@@ -24,6 +24,7 @@
 <script setup lang="ts">
 const props = defineProps<{
 	specificationId: number
+	trigger: number
 }>()
 const currentPage = ref<number>(1)
 const pageSize = ref<number>(10)
@@ -46,6 +47,10 @@ const onRefresh = async () => {
 	console.log(paramMapping.value)
 }
 onMounted(async () => {
+	await onRefresh()
+})
+
+watch(() => props.trigger, async () => {
 	await onRefresh()
 })
 
