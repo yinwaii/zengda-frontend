@@ -34,6 +34,7 @@ onMounted(async () => {
 })
 
 const handleRefresh = async () => {
+	console.log(props.bomId)
 	if (props.bomId)
 		bom.value = await entityApis.bom.get(props.bomId)
 }
@@ -63,15 +64,21 @@ const handleAddItem = async (item: ZdItem) => {
 }
 
 const handleDeleteItem = async (item: ZdItem) => {
-	try {
-		if (bom.value && item.itemId) {
-			bom.value.items = bom.value.items.filter(curr => curr.itemId !== item.itemId)
-			await entityApis.bom.update(bom.value)
+	ElMessageBox.confirm('确定删除该物料吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
+		try {
+			if (bom.value && item.itemId) {
+				bom.value.items = bom.value.items.filter(curr => curr.itemId !== item.itemId)
+				await entityApis.bom.update(bom.value)
+			}
+		} catch (error) {
+			ElMessage.error('操作失败')
 		}
-	} catch (error) {
-		ElMessage.error('操作失败')
-	}
-	ElMessage.success('操作成功')
+			ElMessage.success('操作成功')
+	})
 }
 const handleUpdateBom = async () => {
 	await entityApis.bom.update(bom.value)

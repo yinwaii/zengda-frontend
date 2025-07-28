@@ -8,6 +8,7 @@ export const useUserStore = defineStore('userStore', () => {
 	const previousUsername = ref('')
 	const isAuthenticated = ref(false)
 	const entityApis = useEntityApis();
+	const lastSave = ref(false)
 
 	const login = async (username: string, password: string, save: boolean = false) => {
 		try {
@@ -16,8 +17,10 @@ export const useUserStore = defineStore('userStore', () => {
 			token.value = result.token
 			expireTime.value = String(result.expireTime)
 			isAuthenticated.value = true
-			if (save)
+			if (save) {
 				previousUsername.value = username
+				lastSave.value = true
+			}
 
 			// 保存到 cookie
 			const cookie = useCookie('Admin-Token', {
@@ -59,7 +62,8 @@ export const useUserStore = defineStore('userStore', () => {
 		login,
 		logout,
 		checkAuth,
-		getPreviousUsername
+		getPreviousUsername,
+		lastSave
 	}
 }, {
 	persist: {

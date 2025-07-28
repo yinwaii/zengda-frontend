@@ -2,7 +2,6 @@
 	<div class="w-full">
 		<psystem-table-dialog v-model="psystemDialogVisible" @submit="onSelectPSystems" />
 		<div class="flex items-center gap-2">
-			<el-button type="primary" @click="onNewPSystem">新建模块</el-button>
 			<el-button type="primary" @click="onAddPSystem">添加模块</el-button>
 		</div>
 		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe @row-click="onClick">
@@ -11,9 +10,9 @@
 			<el-table-column prop="description" label="模块描述" />
 			<el-table-column prop="updatedTime" label="更新时间" />
 			<el-table-column prop="updatedBy" label="更新人" />
-			<el-table-column label="操作" width="250">
+			<el-table-column label="操作" width="300">
 				<template #default="scope">
-					<el-button type="primary" @click="onPasteTag(scope.row)">tag</el-button>
+					<el-button type="primary" @click="onPasteTag(scope.row)">复制模块ID</el-button>
 					<el-button type="primary" @click="onEditPSystem(scope.row)">编辑</el-button>
 					<el-button type="danger" @click="onDeletePSystem(scope.row)">删除</el-button>
 				</template>
@@ -80,6 +79,11 @@ const onEditPSystem = (psystem: ZdPSystem) => {
 	dialogVisible.value = true
 }
 const onDeletePSystem = async (psystem: ZdPSystem) => {
+	ElMessageBox.confirm('确定删除该模块吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.template_psystem.delete(props.templateId, psystem.id)
 		await handleRefresh()
@@ -87,6 +91,7 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 const onAddPSystem = () => {
 	psystemDialogVisible.value = true

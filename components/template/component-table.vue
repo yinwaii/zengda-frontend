@@ -2,7 +2,6 @@
 	<div class="w-full">
 		<component-table-dialog v-model="componentTableDialogVisible" @submit="onSelectComponents" />
 		<div class="flex items-center gap-2">
-			<el-button type="primary" @click="onNewComponent">新建组件</el-button>
 			<el-button type="primary" @click="onAddComponent">添加组件</el-button>
 		</div>
 		<el-table :data="components.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
@@ -85,6 +84,11 @@ const onEditComponent = (component: ZdComponent) => {
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (component: ZdComponent) => {
+	ElMessageBox.confirm('确定删除该组件吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		const tcomponent = tcomponents.value.find((item: ZdTComponent) => item.componentId === component.id)
 		if (tcomponent) {
@@ -95,6 +99,7 @@ const onDeleteComponent = async (component: ZdComponent) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 const onSelectComponents = async (components: ZdComponent[]) => {
 	componentTableDialogVisible.value = false

@@ -2,7 +2,7 @@
 	<el-dialog v-model="dialogVisible" title="选择参数" width="800" :close-on-click-modal="true">
 		<div class="w-full">
 			<div class="flex justify-center">
-				<el-input v-model="finalSearchStr" placeholder="搜索参数" />
+				<el-input v-model="finalSearchStr" @change="onSearch" placeholder="搜索参数" />
 				<el-button type="primary" @click="onSearch">搜索</el-button>
 			</div>
 			<el-table :data="searchParams.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe @row-click="onSelectParam">

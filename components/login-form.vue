@@ -59,7 +59,7 @@ interface RuleForm {
 
 const router = useRouter();
 const userStore = useUserStore();
-const remember = ref(false)
+const remember = ref(userStore.lastSave)
 const form = reactive<RuleForm>({
 	username: userStore.getPreviousUsername() || '',
 	password: '',

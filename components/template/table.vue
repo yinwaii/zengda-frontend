@@ -76,6 +76,11 @@ const onEditTemplate = (template: ZdTemplate) => {
 	templateDialogVisible.value = true
 }
 const onDeleteTemplate = async (template: ZdTemplate) => {
+	ElMessageBox.confirm('确定删除该模板吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.template.delete(template.id)
 		await handleRefresh()
@@ -83,6 +88,7 @@ const onDeleteTemplate = async (template: ZdTemplate) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 const handleRefresh = async () => {
 	templates.value = (await entityApis.template.getByPage(0, 100)).content

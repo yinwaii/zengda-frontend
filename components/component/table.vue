@@ -85,12 +85,18 @@ const onEditComponent = (component: ZdComponent) => {
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (component: ZdComponent) => {
+	ElMessageBox.confirm('确定删除该组件吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.component.delete(component.id)
 		await handleRefresh()
 	} catch (error) {
 		ElMessage.error('操作失败')
-	}
-	ElMessage.success('操作成功')
+		}
+		ElMessage.success('操作成功')
+	})
 }
 </script>

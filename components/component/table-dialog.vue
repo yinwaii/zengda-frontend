@@ -4,6 +4,14 @@
 			<div class="flex items-center gap-2">
 				<el-button type="primary" @click="onNewComponent">选择加入的组件</el-button>
 			</div>
+			<div class="flex items-center gap-2 p-2">
+				<el-text>搜索：</el-text>
+				<el-input v-model="search" placeholder="搜索" @change="handleRefresh" style="width: 200px" />
+				<el-button type="primary" @click="handleRefresh">搜索</el-button>
+				<el-text>更新人：</el-text>
+				<el-input v-model="updatedBy" placeholder="更新人" @change="handleRefresh" style="width: 200px" />
+				<el-button type="primary" @click="handleRefresh">筛选</el-button>
+			</div>
 			<el-table ref="tableRef" :data="components.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
 				@row-click="onClick">
 				<el-table-column type="selection" width="55" />
@@ -34,6 +42,8 @@ const pageSize = ref(10)
 const dialogVisible = defineModel<boolean>('dialogVisible')
 const componentId = ref<number | null>(null)
 const tableRef = useTemplateRef<TableInstance>('tableRef')
+const search = ref('')
+const updatedBy = ref('')
 const emit = defineEmits<{
 	(e: 'submit', components: ZdComponent[]): void
 }>()
@@ -42,6 +52,12 @@ onMounted(async () => {
 })
 const handleRefresh = async () => {
 	components.value = (await entityApis.component.getAll()).list
+	if (search.value) {
+		components.value = components.value.filter(component => component.name.includes(search.value) || component.description?.includes(search.value))
+	}
+	if (updatedBy.value) {
+		components.value = components.value.filter(component => component.updatedBy?.includes(updatedBy.value))
+	}
 }
 
 const onClick = (row: any, column: any, event: Event) => {

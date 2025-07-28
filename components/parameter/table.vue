@@ -49,6 +49,11 @@ const handleEdit = (row: ZdParameter) => {
 }
 
 const handleDelete = async (row: ZdParameter) => {
+	ElMessageBox.confirm('确定删除该参数吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.parameter.delete(row.id)
 		await handleRefresh()
@@ -56,6 +61,7 @@ const handleDelete = async (row: ZdParameter) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 
 const handleSubmit = async (parameter: Partial<ZdParameter>) => {

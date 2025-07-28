@@ -10,7 +10,7 @@
 			<el-table-column label="操作">
 				<template #default="scope">
 					<el-button type="primary" @click="onEditComponent(scope.row)">编辑</el-button>
-					<el-button type="danger" @click="onDeleteComponent(scope.row)">删除</el-button>
+					<el-button type="danger" @click="onDeleteComponent(scope.row)">解绑</el-button>
 				</template>
 			</el-table-column>
 		</el-table>
@@ -55,8 +55,14 @@ const onEditComponent = (row: ZdSpecTagMap) => {
 	dialogVisible.value = true
 }
 const onDeleteComponent = async (row: ZdSpecTagMap) => {
-	await entityApis.paramMapping.delete(row.specId, row.specParamName)
-	paramMapping.value = await entityApis.paramMapping.getAll(props.specificationId)
+	ElMessageBox.confirm('确定解除该参数与模板的绑定吗？', '提示', {	
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
+		await entityApis.paramMapping.delete(row.specId, row.specParamName)
+		paramMapping.value = await entityApis.paramMapping.getAll(props.specificationId)
+	})
 }
 
 </script>

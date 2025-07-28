@@ -76,6 +76,11 @@ const onEditPSystem = (psystem: ZdPSystem) => {
 	psystemDialogVisible.value = true
 }
 const onDeletePSystem = async (psystem: ZdPSystem) => {
+	ElMessageBox.confirm('确定删除该功能吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.psystem.delete(psystem.id)
 		await handleRefresh()
@@ -83,6 +88,7 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 const handleRefresh = async () => {
 	psystems.value = (await entityApis.psystem.getAll())

@@ -1,7 +1,7 @@
 <template>
 	<div class="w-full">
 		<div class="flex items-center gap-2">
-			<el-button type="primary" @click="handleUploadSpec">插入规格书</el-button>
+			<el-button type="primary" @click="handleUploadSpec">上传规格书</el-button>
 			<el-button type="primary" @click="handlePreviewSpec">预览规格书</el-button>
 			<el-button type="primary" @click="onDownload">下载规格书</el-button>
 			<el-button type="primary" @click="onAutoMatch">自动配对参数</el-button>

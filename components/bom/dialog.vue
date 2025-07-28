@@ -34,12 +34,13 @@ const searchItems = ref<ZdItem[]>([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 
+onMounted(async () => {
+	await handleSearchItem()
+})
+
 const handleSearchItem = async () => {
-	if (!searchItemStr.value) {
-		return
-	}
-	console.log(currentPage.value, pageSize.value)
-	searchItems.value = await entityApis.item.search(searchItemStr.value, {
+	const searchStr = searchItemStr.value ? searchItemStr.value : '*'
+	searchItems.value = await entityApis.item.search(searchStr, {
 		"page": {
 			"current": currentPage.value,
 			"size": pageSize.value

@@ -15,11 +15,11 @@
     </div>
 
     <el-tabs type="border-card">
-      <el-tab-pane label="参数配置">
+      <!-- <el-tab-pane label="参数配置">
         <parameter-table v-if="zdcomponent?.id" :obj-type="'component'" :obj-id="zdcomponent.id" />
-      </el-tab-pane>
+      </el-tab-pane> -->
       <el-tab-pane label="BOM表配置">
-        <bom-table v-if="zdcomponent?.bomId" :bom-id="zdcomponent.bomId" />
+        <bom-table v-if="bomId" :bom-id="bomId" />
       </el-tab-pane>
       <!-- <el-tab-pane label="报价预览">
 
@@ -33,8 +33,27 @@
 const { id } = useRoute().params
 const zdcomponent = ref<ZdComponent>()
 const entityApis = useEntityApis()
-onMounted(async () => {
+const onRefresh = async () => {
   zdcomponent.value = await entityApis.component.get(id)
+}
+const bomId = ref<number>()
+const onUpdateBom = async () => {
+  if (!zdcomponent.value?.id) { 
+    return
+  }
+  const boms = await entityApis.bom.getByComponentId(zdcomponent.value.id)
+  console.log(boms)
+  if (boms.length === 0) {
+    const bom = await entityApis.bom.create({ componentId: zdcomponent.value.id })
+    bomId.value = bom.id
+  }
+  else {
+    bomId.value = boms[0]
+  }
+}
+onMounted(async () => {
+  await onRefresh()
+  await onUpdateBom()
 })
 
 </script>

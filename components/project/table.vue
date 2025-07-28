@@ -77,6 +77,11 @@ const onEditProject = (project: ZdProject) => {
 	projectDialogVisible.value = true
 }
 const onDeleteProject = async (project: ZdProject) => {
+	ElMessageBox.confirm('确定删除该项目吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
 	try {
 		await entityApis.project.delete(project.id)
 		await handleRefresh()
@@ -84,6 +89,7 @@ const onDeleteProject = async (project: ZdProject) => {
 		ElMessage.error('操作失败')
 	}
 	ElMessage.success('操作成功')
+	})
 }
 const handleRefresh = async () => {
 	projects.value = (await entityApis.project.getByPage(0, 100)).content
