@@ -53,10 +53,16 @@ async function fetchWithRawData<T>(url: string, options: any = {}): Promise<T> {
 		
 		// 区分超时错误和其他错误
 		if (error.name === 'AbortError') {
+			ElMessage.error('请求超时:' + url)
 			console.error('请求超时:', url)
 			throw new Error(`请求超时: ${url}`)
 		}
 		
+		const userStore = useUserStore()
+		if (!userStore.checkAuth()) {
+			navigateTo('/login')
+		}
+		ElMessage.error('请求失败:' + error.message)
 		console.error('请求失败:', error)
 		throw error
 	}
@@ -111,6 +117,11 @@ async function fetchWithResponse<T>(url: string, options: any = {}, baseUrl?: st
 		}
 		
 		console.error('请求失败:', error, '请求URL:', url)
+		const userStore = useUserStore()
+		if (!userStore.checkAuth()) {
+			navigateTo('/login')
+		}
+		ElMessage.error('请求失败:' + error.message)
 		throw error;
 	}
 }
