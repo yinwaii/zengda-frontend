@@ -1,6 +1,7 @@
 <template>
 	<div class="w-full" v-loading="loading">
 		<el-button style="margin-bottom: 20px" type="primary" @click="onDownload">下载规格书</el-button>
+		<el-text>渲染状态：{{ renderStatus }}</el-text>
 		<el-empty v-if="errorMsg" :description="errorMsg" />
 		<div ref="docxContainer" class="docx-scroll-container"></div>
 	</div>
@@ -20,6 +21,7 @@ const docxContainer = ref<HTMLElement | null>(null)
 const template = ref<ZdTemplate>()
 const errorMsg = ref<string>()
 const loading = ref<boolean>(false)
+const renderStatus = ref<string>('')
 // 清理specConfig中的null值
 const cleanSpecConfig = (obj: any): any => {
 	if (obj === null || obj === undefined) {
@@ -70,21 +72,45 @@ const onDownload = () => {
 }
 const onRefresh = async () => {
 	loading.value = true
+	template.value = await entityApis.template.get(props.templateId)
+	specification.value = await entityApis.specification.getAll(template.value?.specId)
+	renderStatus.value = '渲染中'
+	console.log(specification.value)
 	try {
-		template.value = await entityApis.template.get(props.templateId)
-		specification.value = await entityApis.specification.getAll(template.value?.specId)
+		ElMessage.success('开始渲染规格书')
 		renderUrl.value = await entityApis.specification.render(props.configId, specification.value)
-		if (renderUrl.value && docxContainer.value) {
-			renderedFile.value = await entityApis.system.download(renderUrl.value)
-			await renderAsync(renderedFile.value, docxContainer.value)
-		}
-		errorMsg.value = undefined
+		renderStatus.value = '渲染成功'
+		ElMessage.success('渲染规格书成功')
 	}
 	catch (error) {
-		errorMsg.value = error as string
+		ElMessage.error('渲染规格书失败')
+		renderStatus.value = '渲染失败'
+		if (specification.value?.renderHistory) {
+			const renderHistory = JSON.parse(specification.value.renderHistory)
+			console.log(renderHistory)
+			const renderHistoryItem = renderHistory.find((item: ZdSpecificationRenderHistory) => item.configId === props.configId)
+			console.log(renderHistoryItem)
+			if (renderHistoryItem) {
+				renderUrl.value = renderHistoryItem.record
+				renderStatus.value = '渲染成功(使用同一配置的历史渲染)'
+				ElMessage.success('使用历史渲染规格书成功')
+			}
+			else if (renderHistory.length > 0) {
+				console.log(renderHistory[renderHistory.length - 1])
+				renderUrl.value = renderHistory[renderHistory.length - 1].record
+				renderStatus.value = '渲染成功(使用最后一次成功的配置渲染)'
+				ElMessage.success('使用最新渲染规格书成功')
+			}
+		}
 	} finally {
 		loading.value = false
 	}
+	console.log(renderUrl.value, docxContainer.value)
+	if (renderUrl.value && docxContainer.value) {
+		renderedFile.value = await entityApis.system.download(renderUrl.value)
+		await renderAsync(renderedFile.value, docxContainer.value)
+	}
+	errorMsg.value = undefined
 }
 watch(() => props.configId, async () => {
 	await onRefresh()

@@ -6,7 +6,7 @@
 		<el-table v-if="parameter" stripe :data="parameter">
 			<el-table-column prop="id" label="ID" width="50" />
 			<el-table-column prop="name" label="参数名称" />
-			<el-table-column prop="dtype" label="参数类型" />
+			<!-- <el-table-column prop="dtype" label="参数类型" /> -->
 			<el-table-column prop="value" label="参数值" />
 			<el-table-column prop="description" label="参数描述" />
 			<el-table-column label="操作">

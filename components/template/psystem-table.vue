@@ -4,20 +4,23 @@
 		<div class="flex items-center gap-2">
 			<el-button type="primary" @click="onAddPSystem">添加模块</el-button>
 		</div>
-		<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe @row-click="onClick">
-			<el-table-column prop="id" label="ID" width="60" />
-			<el-table-column prop="name" label="模块名称" />
-			<el-table-column prop="description" label="模块描述" />
-			<el-table-column prop="updatedTime" label="更新时间" />
-			<el-table-column prop="updatedBy" label="更新人" />
-			<el-table-column label="操作" width="300">
-				<template #default="scope">
-					<el-button type="primary" @click="onPasteTag(scope.row)">复制模块ID</el-button>
-					<el-button type="primary" @click="onEditPSystem(scope.row)">编辑</el-button>
-					<el-button type="danger" @click="onDeletePSystem(scope.row)">删除</el-button>
-				</template>
-			</el-table-column>
-		</el-table>
+		<VueDraggable target="tbody" v-model="psystems" :animation="150" @end="onChange">
+			<el-table :data="psystems.slice((currentPage - 1) * pageSize, currentPage * pageSize)" stripe
+				@row-click="onClick">
+				<el-table-column prop="id" label="ID" width="60" />
+				<el-table-column prop="name" label="模块名称" />
+				<el-table-column prop="description" label="模块描述" />
+				<el-table-column prop="updatedTime" label="更新时间" />
+				<el-table-column prop="updatedBy" label="更新人" />
+				<el-table-column label="操作" width="300">
+					<template #default="scope">
+						<el-button type="primary" @click="onPasteTag(scope.row)">复制模块ID</el-button>
+						<el-button type="primary" @click="onEditPSystem(scope.row)">编辑</el-button>
+						<el-button type="danger" @click="onDeletePSystem(scope.row)">删除</el-button>
+					</template>
+				</el-table-column>
+			</el-table>
+		</VueDraggable>
 		<div class="flex justify-center mt-4">
 			<el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
 				layout="total, sizes, prev, pager, next, jumper" :total="psystems.length" />
@@ -27,6 +30,7 @@
 </template>
 
 <script setup lang="tsx">
+import { VueDraggable } from 'vue-draggable-plus'
 const props = defineProps<{
 	templateId: number
 }>()
@@ -51,7 +55,7 @@ const onClick = (row: any, column: any, event: Event) => {
 	}
 	navigateTo(`/psystem/${row.id}`, { replace: true })
 }
-const onSelectPSystems = async(psystems: ZdPSystem[]) => {
+const onSelectPSystems = async (psystems: ZdPSystem[]) => {
 	psystemDialogVisible.value = false
 	await Promise.all(psystems.map(async (psystem: ZdPSystem) => (await entityApis.template_psystem.create(props.templateId, psystem.id))))
 	await handleRefresh()
@@ -65,7 +69,7 @@ const onSubmit = async (psystem: Partial<ZdPSystem>) => {
 		if (psystemId.value === null) {
 			const res = await entityApis.psystem.create(psystem)
 			await entityApis.template_psystem.create(props.templateId, res.id)
-	} else {
+		} else {
 			await entityApis.psystem.update(psystem)
 		}
 		await handleRefresh()
@@ -84,13 +88,13 @@ const onDeletePSystem = async (psystem: ZdPSystem) => {
 		cancelButtonText: '取消',
 		type: 'warning',
 	}).then(async () => {
-	try {
-		await entityApis.template_psystem.delete(props.templateId, psystem.id)
-		await handleRefresh()
-	} catch (error) {
-		ElMessage.error('操作失败')
-	}
-	ElMessage.success('操作成功')
+		try {
+			await entityApis.template_psystem.delete(props.templateId, psystem.id)
+			await handleRefresh()
+		} catch (error) {
+			ElMessage.error('操作失败')
+		}
+		ElMessage.success('操作成功')
 	})
 }
 const onAddPSystem = () => {
@@ -103,5 +107,16 @@ const onPasteTag = async (psystem: ZdPSystem) => {
 		await copyToClipboard(`{{+${specification.fileTag}}}`)
 		ElMessage.success('复制成功')
 	}
+}
+const onChange = (evt: any) => {
+	ElMessageBox.confirm('确定重新排序吗？', '提示', {
+		confirmButtonText: '确定',
+		cancelButtonText: '取消',
+		type: 'warning',
+	}).then(async () => {
+		const templateIds = psystems.value.map((psystem: ZdPSystem) => psystem.id)
+		await entityApis.template_psystem.updateBatch(props.templateId, templateIds)
+		await handleRefresh()
+	})
 }
 </script>

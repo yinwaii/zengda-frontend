@@ -1,3 +1,9 @@
+export interface ZdSpecificationRenderHistory {
+	time: number
+	record: string
+	configId: number
+}
+
 export interface ZdSpecification extends BasicProperty, TimeStamp {
 	params: object
 	searchValue: string
@@ -10,6 +16,7 @@ export interface ZdSpecification extends BasicProperty, TimeStamp {
 	texts: object
 	bools: object
 	imgs: object
+	renderHistory: string
 	versionLink: Array<ZdVersionNode>
 	content?: string
 }

@@ -24,6 +24,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vee-validate": "^4.15.0",
     "vue": "latest",
+    "vue-draggable-plus": "^0.6.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
